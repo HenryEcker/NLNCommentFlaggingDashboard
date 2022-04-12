@@ -22,6 +22,14 @@ export function capitalise(str: string): string {
 }
 
 /**
+ * Adds an htmlDecode function to all Strings. This makes it easy to decode the response from the SE API
+ * @returns {string}
+ */
+export function htmlDecode(str: string): string | null {
+    return new DOMParser().parseFromString(str, "text/html").documentElement.textContent;
+}
+
+/**
  * Formats a number to two decimal places with a percent sign
  *
  * @param {number} percent The value to format
