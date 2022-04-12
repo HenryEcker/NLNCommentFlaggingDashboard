@@ -1,0 +1,14 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "isolatedModules": true,
+    "strict": true,
+    "strictBindCallApply": false,
+    "removeComments": true,
+    "module": "ES6",
+    "target": "ES2021"
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
