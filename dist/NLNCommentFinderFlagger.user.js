@@ -1,9 +1,11 @@
 // ==UserScript==
-// @name         NLN Comment Finder/Flagger
+// @name         NLN Comment Finder/Flagger TS
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/NLNCommentFinderFlagger
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      1.0.0
+// @downloadURL  https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
+// @updateURL    https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
 //
 // @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
 //
