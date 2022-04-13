@@ -32,7 +32,7 @@ module.exports = {
 // @run-at       document-end
 //
 // ==/UserScript==
-/* globals $, StackExchange, GM_config, jQuery */\n`.replace(/^\s+/mg, '')
+/* globals $, StackExchange, jQuery */\n`.replace(/^\s+/mg, '')
         })
     ],
     module: {

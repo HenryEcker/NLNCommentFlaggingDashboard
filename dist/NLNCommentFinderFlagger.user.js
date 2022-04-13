@@ -14,7 +14,7 @@
 // @run-at       document-end
 //
 // ==/UserScript==
-/* globals $, StackExchange, GM_config, jQuery */
+/* globals $, StackExchange, jQuery */
 
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ([
