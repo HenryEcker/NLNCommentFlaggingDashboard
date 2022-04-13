@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/NLNCommentFinderFlagger
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      2.0.1
+// @version      2.0.2
 // @downloadURL  https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
 //
@@ -27,7 +27,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "calcNoiseRatio": () => (/* binding */ calcNoiseRatio),
 /* harmony export */   "capitalise": () => (/* binding */ capitalise),
-/* harmony export */   "displayErr": () => (/* binding */ displayErr),
 /* harmony export */   "formatComment": () => (/* binding */ formatComment),
 /* harmony export */   "formatPercentage": () => (/* binding */ formatPercentage),
 /* harmony export */   "getFormDataFromObject": () => (/* binding */ getFormDataFromObject),
@@ -60,10 +59,6 @@ function getOffset(hours) {
 function formatComment(comment) {
     return `${formatPercentage(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
-function displayErr(err, comment) {
-    console.error(err);
-    console.error("Would've autoflagged", formatComment(comment));
-}
 function reduceObjectToSettableType(obj, initialAcc) {
     return Object.entries(obj).reduce((acc, [key, value]) => {
         acc.set(key, value);
@@ -82,44 +77,26 @@ function getURLSearchParamsFromObject(o) {
 /* 2 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "FlagAttemptFailed": () => (/* binding */ FlagAttemptFailed),
-/* harmony export */   "RatedLimitedError": () => (/* binding */ RatedLimitedError)
-/* harmony export */ });
-class SelfNamedError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = this.constructor.name;
-    }
-}
-class FlagAttemptFailed extends SelfNamedError {
-}
-class RatedLimitedError extends SelfNamedError {
-}
+            "use strict";
+            __webpack_require__.r(__webpack_exports__);
+            /* harmony export */
+            __webpack_require__.d(__webpack_exports__, {
+                /* harmony export */   "FlaggingDashboard": () => (/* binding */ FlaggingDashboard)
+                /* harmony export */
+            });
+            /* harmony import */
+            var _types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+            /* harmony import */
+            var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
+            /* harmony import */
+            var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 
 
-/***/ }),
-/* 3 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "FlaggingDashboard": () => (/* binding */ FlaggingDashboard)
-/* harmony export */ });
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
-
-
-
-class FlaggingDashboard {
-    constructor(mountPoint, fkey, uiConfig) {
-        this.htmlIds = {
-            containerDivId: "NLN_Comment_Wrapper",
-            tableId: "NLN_Comment_Reports_Table",
+            class FlaggingDashboard {
+                constructor(mountPoint, fkey, uiConfig) {
+                    this.htmlIds = {
+                        containerDivId: "NLN_Comment_Wrapper",
+                        tableId: "NLN_Comment_Reports_Table",
             tableBodyId: "NLN_Comment_Reports_Table_Body",
             styleId: "nln-comment-userscript-styles"
         };
@@ -306,32 +283,65 @@ class FlaggingDashboard {
             document.title = title;
         }
     }
-}
+            }
 
 
-/***/ }),
-/* 4 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+            /***/
+        }),
+        /* 3 */
+        /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "flagComment": () => (/* binding */ flagComment),
-/* harmony export */   "getComments": () => (/* binding */ getComments),
-/* harmony export */   "getFlagQuota": () => (/* binding */ getFlagQuota)
-/* harmony export */ });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+            "use strict";
+            __webpack_require__.r(__webpack_exports__);
+            /* harmony export */
+            __webpack_require__.d(__webpack_exports__, {
+                /* harmony export */   "FlagAttemptFailed": () => (/* binding */ FlagAttemptFailed),
+                /* harmony export */   "RatedLimitedError": () => (/* binding */ RatedLimitedError)
+                /* harmony export */
+            });
+
+            class SelfNamedError extends Error {
+                constructor(message) {
+                    super(message);
+                    this.name = this.constructor.name;
+                }
+            }
+
+            class FlagAttemptFailed extends SelfNamedError {
+            }
+
+            class RatedLimitedError extends SelfNamedError {
+            }
 
 
-function getComments(AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) {
-    const usp = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getURLSearchParamsFromObject)({
-        'pagesize': 100,
-        'order': 'desc',
-        'sort': 'creation',
-        'filter': COMMENT_FILTER,
-        'fromdate': FROM_DATE,
-        ...(TO_DATE && { 'todate': TO_DATE })
+            /***/
+        }),
+        /* 4 */
+        /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+            "use strict";
+            __webpack_require__.r(__webpack_exports__);
+            /* harmony export */
+            __webpack_require__.d(__webpack_exports__, {
+                /* harmony export */   "flagComment": () => (/* binding */ flagComment),
+                /* harmony export */   "getComments": () => (/* binding */ getComments),
+                /* harmony export */   "getFlagQuota": () => (/* binding */ getFlagQuota)
+                /* harmony export */
+            });
+            /* harmony import */
+            var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+            /* harmony import */
+            var _types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+
+
+            function getComments(AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) {
+                const usp = (0, _utils__WEBPACK_IMPORTED_MODULE_0__.getURLSearchParamsFromObject)({
+                    'pagesize': 100,
+                    'order': 'desc',
+                    'sort': 'creation',
+                    'filter': COMMENT_FILTER,
+                    'fromdate': FROM_DATE,
+                    ...(TO_DATE && {'todate': TO_DATE})
     });
     return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`)
         .then(res => res.json())
@@ -1374,32 +1384,33 @@ module.exports = GM_config;
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var _FlaggingDashboard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
-/* harmony import */ var _globalvars__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
-/* harmony import */ var _GM_config_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
-/* harmony import */ var _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_GM_config_index__WEBPACK_IMPORTED_MODULE_5__);
+    "use strict";
+    __webpack_require__.r(__webpack_exports__);
+    /* harmony import */
+    var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+    /* harmony import */
+    var _FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+    /* harmony import */
+    var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+    /* harmony import */
+    var _globalvars__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+    /* harmony import */
+    var _GM_config_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
+    /* harmony import */
+    var _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_GM_config_index__WEBPACK_IMPORTED_MODULE_4__);
 
 
-
-
-
-
-_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().init({
-    'id': 'NLN_Comment_Config',
-    'title': 'NLN Comment Finder/Flagger Settings',
-    'fields': {
-        'SITE_NAME': {
-            'label': 'Site Name',
-            'section': ['API Information (Changes will take affect on page refresh)'],
-            'type': 'text',
-            'default': 'stackoverflow'
-        },
-        'ACCESS_TOKEN': {
+    _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().init({
+        'id': 'NLN_Comment_Config',
+        'title': 'NLN Comment Finder/Flagger Settings',
+        'fields': {
+            'SITE_NAME': {
+                'label': 'Site Name',
+                'section': ['API Information (Changes will take affect on page refresh)'],
+                'type': 'text',
+                'default': 'stackoverflow'
+            },
+            'ACCESS_TOKEN': {
             'label': 'Access Token',
             'type': 'text'
         },
@@ -1429,11 +1440,6 @@ _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().init({
             'type': 'checkbox',
             'default': false
         },
-        'AUTO_FLAG': {
-            'label': 'Should Autoflag',
-            'type': 'checkbox',
-            'default': false
-        },
         'POST_TYPE': {
             'label': 'Types of post to consider',
             'type': 'select',
@@ -1459,13 +1465,6 @@ _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().init({
             'min': 0,
             'max': 100,
             'default': 25
-        },
-        'AUTOFLAG_CERTAINTY': {
-            'label': 'How certain should the script be to autoflag if checked (out of 100)',
-            'type': 'unsigned float',
-            'min': 25,
-            'max': 100,
-            'default': 75
         },
         'FLAG_QUOTA_LIMIT': {
             'label': 'Stop flagging with how many remaining comment flags',
@@ -1513,7 +1512,7 @@ _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().init({
     }
 });
 function postTypeFilter(actualPT) {
-    const configPT = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('POST_TYPE');
+    const configPT = _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('POST_TYPE');
     if (configPT === 'all') {
         return true;
     }
@@ -1522,109 +1521,69 @@ function postTypeFilter(actualPT) {
     }
 }
 function UserScript() {
-    const SITE_NAME = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('SITE_NAME');
-    const ACCESS_TOKEN = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('ACCESS_TOKEN');
-    const KEY = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('KEY');
+    const SITE_NAME = _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('SITE_NAME');
+    const ACCESS_TOKEN = _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('ACCESS_TOKEN');
+    const KEY = _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('KEY');
     if (!SITE_NAME || !ACCESS_TOKEN || !KEY) {
-        _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().open();
+        _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().open();
     }
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
-    const FLAG_RATE = 7 * 1000;
-    const API_REQUEST_RATE = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('DELAY_BETWEEN_API_CALLS') * 1000;
+    const API_REQUEST_RATE = _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('DELAY_BETWEEN_API_CALLS') * 1000;
     const settingsButton = jQuery('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
-    settingsButton.on('click', () => _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().open());
+    settingsButton.on('click', () => _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().open());
     const li = jQuery('<li></li>');
     li.append(settingsButton);
     jQuery('header ol.s-topbar--content > li:nth-child(2)').after(li);
     const fkey = StackExchange.options.user.fkey;
-    let lastSuccessfulRead = Math.floor(((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
-    const UI = new _FlaggingDashboard__WEBPACK_IMPORTED_MODULE_2__.FlaggingDashboard(jQuery('#mainbar'), fkey, {
-        displayLink: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('UI_DISPLAY_LINK_TO_COMMENT'),
-        displayPostType: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('UI_DISPLAY_POST_TYPE'),
-        displayNoiseRatio: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('UI_DISPLAY_NOISE_RATIO'),
-        displayFlagUI: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('UI_DISPLAY_FLAG_BUTTON'),
-        displayBlacklistMatches: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('UI_DISPLAY_BLACKLIST_MATCHES'),
-        displayCommentDeleteState: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('UI_DISPLAY_COMMENT_DELETE_STATE'),
-        shouldUpdateTitle: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('DOCUMENT_TITLE_SHOULD_UPDATE')
+    let lastSuccessfulRead = Math.floor(((0, _utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
+    const UI = new _FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__.FlaggingDashboard(jQuery('#mainbar'), fkey, {
+        displayLink: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_LINK_TO_COMMENT'),
+        displayPostType: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_POST_TYPE'),
+        displayNoiseRatio: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_NOISE_RATIO'),
+        displayFlagUI: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_FLAG_BUTTON'),
+        displayBlacklistMatches: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_BLACKLIST_MATCHES'),
+        displayCommentDeleteState: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_COMMENT_DELETE_STATE'),
+        shouldUpdateTitle: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('DOCUMENT_TITLE_SHOULD_UPDATE')
     });
     UI.init();
-    if (_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('ACTIVE')) {
+    if (_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('ACTIVE')) {
         UI.render();
     }
-    const disableAutoFlagging = () => {
-        console.log("No more flags available for autoflagging. Disabling...");
-        _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().set('AUTO_FLAG', false);
-    };
     const main = async (mainInterval) => {
-        const toDate = Math.floor((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('HOUR_OFFSET')) / 1000);
-        const response = await (0,_api__WEBPACK_IMPORTED_MODULE_3__.getComments)(AUTH_STR, COMMENT_FILTER, lastSuccessfulRead, toDate);
-        if (response.quota_remaining <= _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('API_QUOTA_LIMIT')) {
+        const toDate = Math.floor((0, _utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) / 1000);
+        const response = await (0, _api__WEBPACK_IMPORTED_MODULE_2__.getComments)(AUTH_STR, COMMENT_FILTER, lastSuccessfulRead, toDate);
+        if (response.quota_remaining <= _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('API_QUOTA_LIMIT')) {
             window.clearInterval(mainInterval);
             return;
         }
         if (response.items.length > 0) {
             lastSuccessfulRead = toDate + 1;
-            response.items
-                .reduce((acc, comment) => {
-                if (postTypeFilter(comment.post_type) && comment.body_markdown.length <= _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('MAXIMUM_LENGTH_COMMENT')) {
-                    const decodedMarkdown = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.htmlDecode)(comment.body_markdown) || '';
-                    const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(_globalvars__WEBPACK_IMPORTED_MODULE_4__.blacklist);
-                    if (blacklistMatches && !decodedMarkdown.match(_globalvars__WEBPACK_IMPORTED_MODULE_4__.whitelist)) {
-                        const noiseRatio = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.calcNoiseRatio)(blacklistMatches, decodedMarkdown.replace(/\B@\w+/g, '').length);
-                        const newComment = {
-                            can_flag: comment.can_flag,
-                            body: decodedMarkdown,
-                            link: comment.link,
-                            _id: comment.comment_id,
-                            post_id: comment.post_id,
-                            post_type: comment.post_type,
-                            blacklist_matches: blacklistMatches,
-                            noise_ratio: noiseRatio
-                        };
-                        if (noiseRatio >= _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('AUTOFLAG_CERTAINTY')) {
-                            acc.push(newComment);
-                        }
-                        else if (noiseRatio >= _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('DISPLAY_CERTAINTY')) {
-                            UI.addComment(newComment);
+            response.items.forEach((comment) => {
+                if (postTypeFilter(comment.post_type) && comment.body_markdown.length <= _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('MAXIMUM_LENGTH_COMMENT')) {
+                    const decodedMarkdown = (0, _utils__WEBPACK_IMPORTED_MODULE_0__.htmlDecode)(comment.body_markdown) || '';
+                    const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(_globalvars__WEBPACK_IMPORTED_MODULE_3__.blacklist);
+                    if (blacklistMatches && !decodedMarkdown.match(_globalvars__WEBPACK_IMPORTED_MODULE_3__.whitelist)) {
+                        const noiseRatio = (0, _utils__WEBPACK_IMPORTED_MODULE_0__.calcNoiseRatio)(blacklistMatches, decodedMarkdown.replace(/\B@\w+/g, '').length);
+                        if (noiseRatio >= _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('DISPLAY_CERTAINTY')) {
+                            UI.addComment({
+                                can_flag: comment.can_flag,
+                                body: decodedMarkdown,
+                                link: comment.link,
+                                _id: comment.comment_id,
+                                post_id: comment.post_id,
+                                post_type: comment.post_type,
+                                blacklist_matches: blacklistMatches,
+                                noise_ratio: noiseRatio
+                            });
                         }
                     }
-                }
-                return acc;
-            }, [])
-                .forEach((comment, idx) => {
-                if (_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('AUTO_FLAG')) {
-                    setTimeout(() => {
-                        (0,_api__WEBPACK_IMPORTED_MODULE_3__.getFlagQuota)(comment._id).then(remainingFlags => {
-                            if (remainingFlags <= _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('FLAG_QUOTA_LIMIT')) {
-                                disableAutoFlagging();
-                                return;
-                            }
-                            (0,_api__WEBPACK_IMPORTED_MODULE_3__.flagComment)(fkey, comment)
-                                .then((newComment) => {
-                                UI.addComment(newComment);
-                            })
-                                .catch(err => {
-                                if (err instanceof _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError) {
-                                    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.displayErr)(err, comment);
-                                    UI.addComment({ ...comment, was_flagged: false });
-                                }
-                                else if (err instanceof _types__WEBPACK_IMPORTED_MODULE_1__.FlagAttemptFailed) {
-                                    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.displayErr)(err, comment);
-                                    UI.addComment({ ...comment, can_flag: false });
-                                }
-                            });
-                        }).catch(err => (0,_utils__WEBPACK_IMPORTED_MODULE_0__.displayErr)(err, comment));
-                    }, idx * FLAG_RATE);
-                }
-                else {
-                    UI.addComment(comment);
                 }
             });
         }
     };
-    if (_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('ACTIVE')) {
-        if (_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('RUN_IMMEDIATELY')) {
+    if (_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('ACTIVE')) {
+        if (_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('RUN_IMMEDIATELY')) {
             main();
         }
         const mainInterval = window.setInterval(() => main(mainInterval), API_REQUEST_RATE);
