@@ -1,16 +1,7 @@
-import {calcNoiseRatio, displayErr, getOffset, htmlDecode} from "./utils";
-import {
-    APIComment,
-    Comment,
-    FlagAttemptFailed,
-    FlaggingDashboardConfig,
-    PostType,
-    RatedLimitedError,
-    SECommentAPIResponse,
-    StackExchange
-} from "./types";
+import {calcNoiseRatio, getOffset, htmlDecode} from "./utils";
+import {APIComment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from "./types";
 import {FlaggingDashboard} from "./FlaggingDashboard";
-import {flagComment, getComments, getFlagQuota} from "./api";
+import {getComments} from "./api";
 import {blacklist, whitelist} from "./globalvars";
 import GM_config from '../GM_config/index';
 
@@ -58,11 +49,6 @@ GM_config.init({
             'type': 'checkbox',
             'default': false
         },
-        'AUTO_FLAG': {
-            'label': 'Should Autoflag',
-            'type': 'checkbox',
-            'default': false
-        },
         'POST_TYPE': {
             'label': 'Types of post to consider',
             'type': 'select',
@@ -88,13 +74,6 @@ GM_config.init({
             'min': 0,
             'max': 100,
             'default': 25
-        },
-        'AUTOFLAG_CERTAINTY': {
-            'label': 'How certain should the script be to autoflag if checked (out of 100)',
-            'type': 'unsigned float',
-            'min': 25,
-            'max': 100,
-            'default': 75
         },
         'FLAG_QUOTA_LIMIT': {
             'label': 'Stop flagging with how many remaining comment flags',
@@ -162,8 +141,7 @@ function UserScript(): void {
     }
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
-    const FLAG_RATE = 7 * 1000;
-    const API_REQUEST_RATE: number = (GM_config.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
+    const API_REQUEST_RATE = (GM_config.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
 
     // Add Config Button
     const settingsButton: JQuery = jQuery('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
@@ -199,11 +177,6 @@ function UserScript(): void {
         UI.render();
     }
 
-    const disableAutoFlagging = () => {
-        console.log("No more flags available for autoflagging. Disabling...");
-        GM_config.set('AUTO_FLAG', false);
-    }
-
     const main = async (mainInterval?: number) => {
         const toDate = Math.floor(getOffset(GM_config.get('HOUR_OFFSET') as number) / 1000);
         const response: SECommentAPIResponse = await getComments(
@@ -214,24 +187,24 @@ function UserScript(): void {
         );
         if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
             window.clearInterval(mainInterval);
-            return; // Exit script because checkFlagOptions could potentially make more API Calls
+            return; // Exit script
         }
         if (response.items.length > 0) {
 
             // Update last successful read time
             lastSuccessfulRead = toDate + 1;
 
-            response.items
-                .reduce((acc: Array<Comment>, comment: APIComment) => {
-                    if (postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) {
-                        const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
-                        const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
-                        if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
-                            const noiseRatio = calcNoiseRatio(
-                                blacklistMatches,
-                                decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
-                            );
-                            const newComment: Comment = {
+            response.items.forEach((comment: APIComment) => {
+                if (postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) {
+                    const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
+                    const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
+                    if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
+                        const noiseRatio = calcNoiseRatio(
+                            blacklistMatches,
+                            decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
+                        );
+                        if (noiseRatio >= (GM_config.get('DISPLAY_CERTAINTY') as number)) {
+                            UI.addComment({
                                 can_flag: comment.can_flag,
                                 body: decodedMarkdown,
                                 link: comment.link,
@@ -240,47 +213,11 @@ function UserScript(): void {
                                 post_type: comment.post_type,
                                 blacklist_matches: blacklistMatches,
                                 noise_ratio: noiseRatio
-                            };
-                            if (noiseRatio >= (GM_config.get('AUTOFLAG_CERTAINTY') as number)) {
-                                acc.push(newComment);
-                            } else if (noiseRatio >= (GM_config.get('DISPLAY_CERTAINTY') as number)) {
-                                // Isn't an autoflag_candidate
-                                UI.addComment(newComment);
-                            }
+                            });
                         }
                     }
-                    return acc;
-                }, [])
-                .forEach((comment: Comment, idx: number) => {
-                    if (GM_config.get('AUTO_FLAG')) {
-                        setTimeout(() => {
-                            // "Open" comment flagging dialog to get remaining Flag Count
-                            getFlagQuota(comment._id).then(remainingFlags => {
-                                if (remainingFlags <= (GM_config.get('FLAG_QUOTA_LIMIT') as number)) {
-                                    disableAutoFlagging();
-                                    return; // Exit so nothing tries to be flagged
-                                }
-                                // Autoflagging
-                                flagComment(fkey, comment)
-                                    .then((newComment: Comment) => {
-                                        UI.addComment(newComment);
-                                    })
-                                    .catch(err => {
-                                        if (err instanceof RatedLimitedError) {
-                                            displayErr(err, comment);
-                                            UI.addComment({...comment, was_flagged: false});
-                                        } else if (err instanceof FlagAttemptFailed) {
-                                            displayErr(err, comment);
-                                            // Add to UI with can_flag false to render the 🚫
-                                            UI.addComment({...comment, can_flag: false});
-                                        }
-                                    });
-                            }).catch(err => displayErr(err, comment));
-                        }, idx * FLAG_RATE);
-                    } else {
-                        UI.addComment(comment);
-                    }
-                });
+                }
+            });
         }
     };
     if ((GM_config.get('ACTIVE') as boolean)) {

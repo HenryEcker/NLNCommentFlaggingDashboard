@@ -76,16 +76,6 @@ export function formatComment(comment: Comment): string {
     return `${formatPercentage(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
 
-/**
- * Easily output error messages and the comment they occurred on.
- * @param {Error} err
- * @param {Comment} comment
- */
-export function displayErr(err: Error, comment: Comment): void {
-    console.error(err);
-    console.error("Would've autoflagged", formatComment(comment));
-}
-
 
 function reduceObjectToSettableType<Type extends {
     set: (key: string, value: string) => void
