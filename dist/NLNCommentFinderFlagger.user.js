@@ -97,16 +97,16 @@ function getURLSearchParamsFromObject(o) {
                     this.htmlIds = {
                         containerDivId: "NLN_Comment_Wrapper",
                         tableId: "NLN_Comment_Reports_Table",
-            tableBodyId: "NLN_Comment_Reports_Table_Body",
-            styleId: "nln-comment-userscript-styles"
-        };
-        this.SO = {
-            'CSS': {
-                tableContainerDiv: 's-table-container',
-                table: 's-table',
-                buttonPrimary: 's-btn s-btn__primary',
-                buttonGeneral: 's-btn',
-            },
+                        tableBodyId: "NLN_Comment_Reports_Table_Body",
+                        styleId: "nln-comment-userscript-styles"
+                    };
+                    this.SO = {
+                        'CSS': {
+                            tableContainerDiv: 's-table-container',
+                            table: 's-table',
+                            buttonPrimary: 's-btn s-btn__primary',
+                            buttonGeneral: 's-btn',
+                        },
             'HTML': {
                 pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
             }
@@ -137,7 +137,7 @@ function getURLSearchParamsFromObject(o) {
         const container = jQuery(`<div id="${this.htmlIds.containerDivId}""></div>`);
         {
             const header = jQuery('<nln-header></nln-header>');
-            header.append(jQuery(`<h2>NLN Comments</h2>`));
+            header.append(jQuery(`<h2>NLN Comment Flagging Dashboard</h2>`));
             container.append(header);
         }
         {
@@ -342,16 +342,17 @@ function getURLSearchParamsFromObject(o) {
                     'filter': COMMENT_FILTER,
                     'fromdate': FROM_DATE,
                     ...(TO_DATE && {'todate': TO_DATE})
-    });
-    return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`)
-        .then(res => res.json())
-        .then(resData => resData);
-}
-function getFlagQuota(commentID) {
-    return new Promise((resolve, reject) => {
-        $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
-            .done((data) => {
-            const pattern = /you have (\d+) flags left today/i;
+                });
+                return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`)
+                    .then(res => res.json())
+                    .then(resData => resData);
+            }
+
+            function getFlagQuota(commentID) {
+                return new Promise((resolve, reject) => {
+                    $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
+                        .done((data) => {
+                            const pattern = /you have (\d+) flags left today/i;
             const match = $('div:contains("flags left today")', data).filter((idx, n) => (n.childElementCount === 0) && Boolean(n.innerText.match(pattern))).last().text().match(pattern);
             if (match !== null) {
                 return resolve(Number(match[1]));
@@ -1411,16 +1412,16 @@ var __webpack_exports__ = {};
                 'default': 'stackoverflow'
             },
             'ACCESS_TOKEN': {
-            'label': 'Access Token',
-            'type': 'text'
-        },
-        'KEY': {
-            'label': 'Key',
-            'type': 'text'
-        },
-        'API_QUOTA_LIMIT': {
-            'label': 'At what API quota should this script stop making new requests',
-            'type': 'int',
+                'label': 'Access Token',
+                'type': 'text'
+            },
+            'KEY': {
+                'label': 'Key',
+                'type': 'text'
+            },
+            'API_QUOTA_LIMIT': {
+                'label': 'At what API quota should this script stop making new requests',
+                'type': 'int',
             'default': 500
         },
         'DELAY_BETWEEN_API_CALLS': {

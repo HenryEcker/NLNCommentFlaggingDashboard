@@ -73,7 +73,7 @@ export class FlaggingDashboard {
         // Header Elements
         {
             const header = jQuery('<nln-header></nln-header>');
-            header.append(jQuery(`<h2>NLN Comments</h2>`));
+            header.append(jQuery(`<h2>NLN Comment Flagging Dashboard</h2>`));
             container.append(header);
         }
         // Build Table
