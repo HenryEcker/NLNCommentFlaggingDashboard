@@ -22,6 +22,8 @@ module.exports = {
 // @homepage     https://github.com/HenryEcker/NLNCommentFinderFlagger
 // @author       ${userscriptInfo.author}
 // @version      ${userscriptInfo.version}
+// @downloadURL  https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
+// @updateURL    https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
 //
 // @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
 //
