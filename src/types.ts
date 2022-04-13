@@ -1,7 +1,9 @@
+export type PostType = 'question' | 'answer' | 'all';
+
 export interface Comment {
     _id: number,
     post_id: number,
-    post_type: string,
+    post_type: PostType,
     body: string,
     link: string,
     blacklist_matches: RegExpMatchArray,
@@ -16,6 +18,41 @@ export interface SEFlagResponse {
     Outcome: number,
     ResultChangedState: boolean,
     Message: string
+}
+
+export interface APIComment {
+    can_flag: boolean,
+    post_type: PostType,
+    post_id: number,
+    comment_id: number,
+    body_markdown: string,
+    link: string,
+    body: string
+}
+
+export interface SECommentAPIResponse {
+    items: Array<APIComment>,
+    has_more: boolean,
+    quota_max: boolean,
+    quota_remaining: boolean
+}
+
+export interface FlaggingDashboardConfig {
+    displayLink: boolean,
+    displayPostType: boolean,
+    displayNoiseRatio: boolean,
+    displayFlagUI: boolean,
+    displayBlacklistMatches: boolean,
+    displayCommentDeleteState: boolean,
+    shouldUpdateTitle: boolean
+}
+
+export interface StackExchange {
+    options: {
+        user: {
+            fkey: string
+        }
+    }
 }
 
 /**

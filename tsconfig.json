@@ -7,8 +7,5 @@
     "removeComments": true,
     "module": "ES6",
     "target": "ES2021"
-  },
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }

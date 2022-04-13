@@ -1,7 +1,6 @@
 import {getFormDataFromObject, getURLSearchParamsFromObject} from "./utils";
-import {Comment, FlagAttemptFailed, RatedLimitedError, SEFlagResponse} from "./types";
+import {Comment, FlagAttemptFailed, RatedLimitedError, SECommentAPIResponse, SEFlagResponse} from "./types";
 
-import "jquery";
 
 /**
  * Get comments to analyse.
@@ -17,7 +16,7 @@ export function getComments(
     COMMENT_FILTER: string,
     FROM_DATE: number,
     TO_DATE: number | undefined = undefined
-): Promise<JSON> {
+): Promise<SECommentAPIResponse> {
     const usp = getURLSearchParamsFromObject({
         'pagesize': 100,
         'order': 'desc',
@@ -26,7 +25,9 @@ export function getComments(
         'fromdate': FROM_DATE,
         ...(TO_DATE && {'todate': TO_DATE})
     });
-    return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`).then(res => res.json());
+    return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`)
+        .then(res => res.json())
+        .then(resData => resData as SECommentAPIResponse);
 }
 
 /**
@@ -41,7 +42,7 @@ export function getFlagQuota(commentID: number): Promise<number> {
     return new Promise((resolve, reject) => {
         $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
             .done((data: string) => {
-                const pattern: RegExp = /you have (\d+) flags left today/i;
+                const pattern = /you have (\d+) flags left today/i;
                 const match: RegExpMatchArray | null = $('div:contains("flags left today")', data).filter((idx: number, n: HTMLElement): boolean => (n.childElementCount === 0) && Boolean(n.innerText.match(pattern))).last().text().match(pattern);
                 if (match !== null) {
                     return resolve(Number(match[1]));

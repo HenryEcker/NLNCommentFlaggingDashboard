@@ -1,8 +1,28 @@
 {
-  "devDependencies": {
-    "@types/jquery": "^3.5.14"
+  "name": "nln-comment-finder-flagger",
+  "version": "1.0.0",
+  "author": "Henry Ecker (https://github.com/HenryEcker)",
+  "description": "Find comments which may potentially be no longer needed and flag them for removal",
+  "scripts": {
+    "lint": "eslint src",
+    "build": "npm run lint && webpack"
   },
-  "dependencies": {
-    "@types/tampermonkey": "^4.0.5"
+  "devDependencies": {
+    "@types/jquery": "^3.5.14",
+    "@types/tampermonkey": "^4.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "ts-loader": "^9.2.8",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HenryEcker/NLNCommentFinderFlagger.git"
   }
 }
