@@ -17,7 +17,7 @@ module.exports = {
             raw: true,
             banner: `
 // ==UserScript==
-// @name         NLN Comment Finder/Flagger TS
+// @name         NLN Comment Finder/Flagger
 // @description  ${userscriptInfo.description}
 // @homepage     https://github.com/HenryEcker/NLNCommentFinderFlagger
 // @author       ${userscriptInfo.author}

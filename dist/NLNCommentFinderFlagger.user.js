@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         NLN Comment Finder/Flagger TS
+// @name         NLN Comment Finder/Flagger
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/NLNCommentFinderFlagger
 // @author       Henry Ecker (https://github.com/HenryEcker)
