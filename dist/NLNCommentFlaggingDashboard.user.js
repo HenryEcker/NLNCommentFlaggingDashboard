@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/NLNCommentFlaggingDashboard
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      2.0.2
+// @version      2.0.3
 // @downloadURL  https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 // @updateURL    https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 //
@@ -118,13 +118,14 @@ function getURLSearchParamsFromObject(o) {
                 }
 
                 init() {
-        this.buildBaseStyles();
-        this.buildBaseUI();
-    }
-    buildBaseStyles() {
-        const styles = document.createElement('style');
-        styles.setAttribute('id', this.htmlIds.styleId);
-        styles.innerHTML = `
+                    this.buildBaseStyles();
+                    this.buildBaseUI();
+                }
+
+                buildBaseStyles() {
+                    const styles = document.createElement('style');
+                    styles.setAttribute('id', this.htmlIds.styleId);
+                    styles.innerHTML = `
 #${this.htmlIds.containerDivId} {
     padding: 25px 0;
     display: grid;
@@ -363,16 +364,16 @@ function getURLSearchParamsFromObject(o) {
                         })
                         .fail((err) => {
                             if (err.status === 409) {
-                throw new _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You may only load the comment flag dialog every 3 seconds");
+                                throw new _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You may only load the comment flag dialog every 3 seconds");
+                            } else {
+                                return reject();
+                            }
+                        });
+                });
             }
-            else {
-                return reject();
-            }
-        });
-    });
-}
-function flagComment(fkey, comment) {
-    return new Promise((resolve) => {
+
+            function flagComment(fkey, comment) {
+                return new Promise((resolve) => {
         fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
             method: "POST",
             body: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getFormDataFromObject)({
@@ -1432,16 +1433,16 @@ var __webpack_exports__ = {};
             },
             'ACTIVE': {
                 'label': 'Running',
-            'section': ['Run Information'],
-            'type': 'checkbox',
-            'default': false
-        },
-        'RUN_IMMEDIATELY': {
-            'label': 'Should run immediately on entering matched pages',
-            'type': 'checkbox',
-            'default': false
-        },
-        'POST_TYPE': {
+                'section': ['Run Information'],
+                'type': 'checkbox',
+                'default': false
+            },
+            'RUN_IMMEDIATELY': {
+                'label': 'Should run immediately on entering matched pages',
+                'type': 'checkbox',
+                'default': false
+            },
+            'POST_TYPE': {
             'label': 'Types of post to consider',
             'type': 'select',
             'options': ['all', 'question', 'answer'],
