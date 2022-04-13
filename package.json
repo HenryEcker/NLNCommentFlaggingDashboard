@@ -1,6 +1,6 @@
 {
   "name": "nln-comment-finder-flagger",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Henry Ecker (https://github.com/HenryEcker)",
   "description": "Find comments which may potentially be no longer needed and flag them for removal",
   "scripts": {
