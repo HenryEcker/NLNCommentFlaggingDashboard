@@ -152,7 +152,7 @@ function postTypeFilter(actualPT: PostType): boolean {
 }
 
 
-function main() {
+function UserScript(): void {
     const SITE_NAME: string = GM_config.get('SITE_NAME') as string;
     const ACCESS_TOKEN: string = GM_config.get('ACCESS_TOKEN') as string;
     const KEY: string = GM_config.get('KEY') as string;
@@ -291,4 +291,4 @@ function main() {
     }
 }
 
-main();
+UserScript();

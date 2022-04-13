@@ -1611,7 +1611,7 @@
             }
         }
 
-        function main() {
+        function UserScript() {
             const SITE_NAME = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('SITE_NAME');
             const ACCESS_TOKEN = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('ACCESS_TOKEN');
             const KEY = _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('KEY');
@@ -1718,7 +1718,7 @@
             }
         }
 
-        main();
+        UserScript();
 
     })();
 
