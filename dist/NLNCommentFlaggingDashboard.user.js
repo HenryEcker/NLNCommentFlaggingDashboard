@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         NLN Comment Finder/Flagger
+// @name         NLN Comment Flagging Dashboard
 // @description  Find comments which may potentially be no longer needed and flag them for removal
-// @homepage     https://github.com/HenryEcker/NLNCommentFinderFlagger
+// @homepage     https://github.com/HenryEcker/NLNCommentFlaggingDashboard
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      2.0.2
-// @downloadURL  https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
-// @updateURL    https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
+// @downloadURL  https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
+// @updateURL    https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 //
 // @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
 //
@@ -107,16 +107,17 @@ function getURLSearchParamsFromObject(o) {
                             buttonPrimary: 's-btn s-btn__primary',
                             buttonGeneral: 's-btn',
                         },
-            'HTML': {
-                pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
-            }
-        };
-        this.mountPoint = mountPoint;
-        this.fkey = fkey;
-        this.uiConfig = uiConfig;
-        this.tableData = {};
-    }
-    init() {
+                        'HTML': {
+                            pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
+                        }
+                    };
+                    this.mountPoint = mountPoint;
+                    this.fkey = fkey;
+                    this.uiConfig = uiConfig;
+                    this.tableData = {};
+                }
+
+                init() {
         this.buildBaseStyles();
         this.buildBaseUI();
     }
@@ -353,16 +354,15 @@ function getURLSearchParamsFromObject(o) {
                     $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
                         .done((data) => {
                             const pattern = /you have (\d+) flags left today/i;
-            const match = $('div:contains("flags left today")', data).filter((idx, n) => (n.childElementCount === 0) && Boolean(n.innerText.match(pattern))).last().text().match(pattern);
-            if (match !== null) {
-                return resolve(Number(match[1]));
-            }
-            else {
-                return resolve(0);
-            }
-        })
-            .fail((err) => {
-            if (err.status === 409) {
+                            const match = $('div:contains("flags left today")', data).filter((idx, n) => (n.childElementCount === 0) && Boolean(n.innerText.match(pattern))).last().text().match(pattern);
+                            if (match !== null) {
+                                return resolve(Number(match[1]));
+                            } else {
+                                return resolve(0);
+                            }
+                        })
+                        .fail((err) => {
+                            if (err.status === 409) {
                 throw new _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You may only load the comment flag dialog every 3 seconds");
             }
             else {
@@ -1403,7 +1403,7 @@ var __webpack_exports__ = {};
 
     _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().init({
         'id': 'NLN_Comment_Config',
-        'title': 'NLN Comment Finder/Flagger Settings',
+        'title': 'NLN Comment Flagging Dashboard Settings',
         'fields': {
             'SITE_NAME': {
                 'label': 'Site Name',
@@ -1422,16 +1422,16 @@ var __webpack_exports__ = {};
             'API_QUOTA_LIMIT': {
                 'label': 'At what API quota should this script stop making new requests',
                 'type': 'int',
-            'default': 500
-        },
-        'DELAY_BETWEEN_API_CALLS': {
-            'label': 'How frequently (in seconds) should comments be fetched',
-            'type': 'unsigned float',
-            'min': 60,
-            'default': 180
-        },
-        'ACTIVE': {
-            'label': 'Running',
+                'default': 500
+            },
+            'DELAY_BETWEEN_API_CALLS': {
+                'label': 'How frequently (in seconds) should comments be fetched',
+                'type': 'unsigned float',
+                'min': 60,
+                'default': 180
+            },
+            'ACTIVE': {
+                'label': 'Running',
             'section': ['Run Information'],
             'type': 'checkbox',
             'default': false
@@ -1531,7 +1531,7 @@ function UserScript() {
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
     const API_REQUEST_RATE = _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('DELAY_BETWEEN_API_CALLS') * 1000;
-    const settingsButton = jQuery('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
+    const settingsButton = jQuery('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
     settingsButton.on('click', () => _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().open());
     const li = jQuery('<li></li>');
     li.append(settingsButton);

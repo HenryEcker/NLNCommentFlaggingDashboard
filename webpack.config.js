@@ -7,7 +7,7 @@ module.exports = {
     mode: 'none',
     target: 'node',
     output: {
-        filename: './NLNCommentFinderFlagger.user.js'
+        filename: './NLNCommentFlaggingDashboard.user.js'
     },
     resolve: {
         extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
@@ -17,13 +17,13 @@ module.exports = {
             raw: true,
             banner: `
 // ==UserScript==
-// @name         NLN Comment Finder/Flagger
+// @name         NLN Comment Flagging Dashboard
 // @description  ${userscriptInfo.description}
-// @homepage     https://github.com/HenryEcker/NLNCommentFinderFlagger
+// @homepage     https://github.com/HenryEcker/NLNCommentFlaggingDashboard
 // @author       ${userscriptInfo.author}
 // @version      ${userscriptInfo.version}
-// @downloadURL  https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
-// @updateURL    https://github.com/HenryEcker/NLNCommentFinderFlagger/raw/master/dist/NLNCommentFinderFlagger.user.js
+// @downloadURL  https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
+// @updateURL    https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 //
 // @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
 //

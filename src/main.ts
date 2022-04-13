@@ -11,7 +11,7 @@ declare const StackExchange: StackExchange;
 /* Configurable Options */
 GM_config.init({
     'id': 'NLN_Comment_Config',
-    'title': 'NLN Comment Finder/Flagger Settings',
+    'title': 'NLN Comment Flagging Dashboard Settings',
     'fields': {
         'SITE_NAME': {
             'label': 'Site Name',
@@ -144,7 +144,7 @@ function UserScript(): void {
     const API_REQUEST_RATE = (GM_config.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
 
     // Add Config Button
-    const settingsButton: JQuery = jQuery('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
+    const settingsButton: JQuery = jQuery('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
     settingsButton.on('click', () => GM_config.open());
     const li: JQuery = jQuery('<li></li>')
     li.append(settingsButton);
