@@ -19,11 +19,11 @@ module.exports = {
 // ==UserScript==
 // @name         NLN Comment Flagging Dashboard
 // @description  ${userscriptInfo.description}
-// @homepage     https://github.com/HenryEcker/NLNCommentFlaggingDashboard
+// @homepage     ${userscriptInfo.repository.homepage}
 // @author       ${userscriptInfo.author}
 // @version      ${userscriptInfo.version}
-// @downloadURL  https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
-// @updateURL    https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
+// @downloadURL  ${userscriptInfo.repository.dist_url}
+// @updateURL    ${userscriptInfo.repository.dist_url}
 //
 // @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
 //

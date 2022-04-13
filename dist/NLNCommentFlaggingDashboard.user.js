@@ -133,9 +133,10 @@ function getURLSearchParamsFromObject(o) {
     grid-gap: 10px;
 }
 `;
-        document.head.appendChild(styles);
-    }
-    buildBaseUI() {
+                    document.head.appendChild(styles);
+                }
+
+                buildBaseUI() {
         const container = jQuery(`<div id="${this.htmlIds.containerDivId}""></div>`);
         {
             const header = jQuery('<nln-header></nln-header>');
@@ -374,16 +375,16 @@ function getURLSearchParamsFromObject(o) {
 
             function flagComment(fkey, comment) {
                 return new Promise((resolve) => {
-        fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
-            method: "POST",
-            body: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getFormDataFromObject)({
-                'fkey': fkey,
-                'otherText': "",
-                'overrideWarning': true
-            })
-        }).then((res) => {
-            if (res.status === 409) {
-                throw new _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You can only flag once every 5 seconds");
+                    fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
+                        method: "POST",
+                        body: (0, _utils__WEBPACK_IMPORTED_MODULE_0__.getFormDataFromObject)({
+                            'fkey': fkey,
+                            'otherText': "",
+                            'overrideWarning': true
+                        })
+                    }).then((res) => {
+                        if (res.status === 409) {
+                            throw new _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You can only flag once every 5 seconds");
             }
             else if (res.status === 200) {
                 return res.json();
@@ -1443,16 +1444,16 @@ var __webpack_exports__ = {};
                 'default': false
             },
             'POST_TYPE': {
-            'label': 'Types of post to consider',
-            'type': 'select',
-            'options': ['all', 'question', 'answer'],
-            'default': 'all'
-        },
-        'MAXIMUM_LENGTH_COMMENT': {
-            'label': 'Maximum length comments to consider',
-            'type': 'int',
-            'min': 15,
-            'max': 600,
+                'label': 'Types of post to consider',
+                'type': 'select',
+                'options': ['all', 'question', 'answer'],
+                'default': 'all'
+            },
+            'MAXIMUM_LENGTH_COMMENT': {
+                'label': 'Maximum length comments to consider',
+                'type': 'int',
+                'min': 15,
+                'max': 600,
             'default': 600
         },
         'HOUR_OFFSET': {
