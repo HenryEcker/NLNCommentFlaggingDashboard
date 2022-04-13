@@ -192,6 +192,8 @@ function main() {
             shouldUpdateTitle: GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean
         } as FlaggingDashboardConfig
     );
+
+    UI.init();
     // Only Render if Active
     if (GM_config.get('ACTIVE')) {
         UI.render();

@@ -156,7 +156,8 @@
                     this.htmlIds = {
                         containerDivId: "NLN_Comment_Wrapper",
                         tableId: "NLN_Comment_Reports_Table",
-                        tableBodyId: "NLN_Comment_Reports_Table_Body"
+                        tableBodyId: "NLN_Comment_Reports_Table_Body",
+                        styleId: "nln-comment-userscript-styles"
                     };
                     this.SO = {
                         'CSS': {
@@ -173,13 +174,16 @@
                     this.fkey = fkey;
                     this.uiConfig = uiConfig;
                     this.tableData = {};
+                }
+
+                init() {
                     this.buildBaseStyles();
                     this.buildBaseUI();
                 }
 
                 buildBaseStyles() {
                     const styles = document.createElement('style');
-                    styles.setAttribute('id', 'nln-comment-userscript-styles');
+                    styles.setAttribute('id', this.htmlIds.styleId);
                     styles.innerHTML = `
 #${this.htmlIds.containerDivId} {
     padding: 25px 0;
@@ -192,46 +196,46 @@
                 }
 
                 buildBaseUI() {
-                    const container = $(`<div id="${this.htmlIds.containerDivId}""></div>`);
+                    const container = jQuery(`<div id="${this.htmlIds.containerDivId}""></div>`);
                     {
-                        const header = $('<nln-header></nln-header>');
-                        header.append($(`<h2>NLN Comments</h2>`));
+                        const header = jQuery('<nln-header></nln-header>');
+                        header.append(jQuery(`<h2>NLN Comments</h2>`));
                         container.append(header);
                     }
                     {
-                        const tableContainer = $(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
-                        const table = $(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
-                        const thead = $('<thead></thead>');
-                        const tr = $('<tr></tr>');
-                        tr.append($('<th>Comment Text</th>'));
+                        const tableContainer = jQuery(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
+                        const table = jQuery(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
+                        const thead = jQuery('<thead></thead>');
+                        const tr = jQuery('<tr></tr>');
+                        tr.append(jQuery('<th>Comment Text</th>'));
                         if (this.uiConfig.displayPostType) {
-                            tr.append($('<th>Post Type</th>'));
+                            tr.append(jQuery('<th>Post Type</th>'));
                         }
                         if (this.uiConfig.displayLink) {
-                            tr.append($('<th>Link</th>'));
+                            tr.append(jQuery('<th>Link</th>'));
                         }
                         if (this.uiConfig.displayBlacklistMatches) {
-                            tr.append($('<th>Blacklist Matches</th>'));
+                            tr.append(jQuery('<th>Blacklist Matches</th>'));
                         }
                         if (this.uiConfig.displayNoiseRatio) {
-                            tr.append($('<th>Noise Ratio</th>'));
+                            tr.append(jQuery('<th>Noise Ratio</th>'));
                         }
                         if (this.uiConfig.displayFlagUI) {
-                            tr.append($('<th>Flag</th>'));
+                            tr.append(jQuery('<th>Flag</th>'));
                         }
                         if (this.uiConfig.displayCommentDeleteState) {
-                            tr.append($('<th>Deleted</th>'));
+                            tr.append(jQuery('<th>Deleted</th>'));
                         }
-                        tr.append($('<th>Clear</th>'));
+                        tr.append(jQuery('<th>Clear</th>'));
                         thead.append(tr);
                         table.append(thead);
-                        table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
+                        table.append(jQuery(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
                         tableContainer.append(table);
                         container.append(tableContainer);
                     }
                     {
-                        const footer = $('<nln-footer></nln-footer>');
-                        const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
+                        const footer = jQuery('<nln-footer></nln-footer>');
+                        const clearAllButton = jQuery(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
                         clearAllButton.on('click', () => {
                             this.tableData = {};
                             this.render();
@@ -243,10 +247,10 @@
                 }
 
                 render() {
-                    const tbody = $(`#${this.htmlIds.tableBodyId}`);
+                    const tbody = jQuery(`#${this.htmlIds.tableBodyId}`);
                     tbody.empty();
                     Object.values(this.tableData).forEach(comment => {
-                        const tr = $('<tr></tr>');
+                        const tr = jQuery('<tr></tr>');
                         tr.append(`<td>${comment.body}</td>`);
                         if (this.uiConfig.displayPostType) {
                             tr.append(`<td>${(0, _utils__WEBPACK_IMPORTED_MODULE_1__.capitalise)(comment.post_type)}</td>`);
@@ -266,12 +270,12 @@
                             } else if (comment.was_flagged) {
                                 tr.append(`<td>✓</td>`);
                             } else {
-                                const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
+                                const flagButton = jQuery(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                                 flagButton.on('click', () => {
                                     flagButton.text('Flagging...');
-                                    this.handleFlagComment(this.fkey, comment);
+                                    this.handleFlagComment(comment);
                                 });
-                                const td = $('<td></td>');
+                                const td = jQuery('<td></td>');
                                 td.append(flagButton);
                                 tr.append(td);
                             }
@@ -288,9 +292,9 @@
                             }
                         }
                         {
-                            const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
+                            const clearButton = jQuery(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
                             clearButton.on('click', () => this.removeComment(comment._id));
-                            const clearButtonTD = $('<td></td>');
+                            const clearButtonTD = jQuery('<td></td>');
                             clearButtonTD.append(clearButton);
                             tr.append(clearButtonTD);
                         }
@@ -299,7 +303,7 @@
                     this.updatePageTitle();
                 }
 
-                handleFlagComment(fkey, comment) {
+                handleFlagComment(comment) {
                     (0, _api__WEBPACK_IMPORTED_MODULE_2__.flagComment)(this.fkey, comment).then((newComment) => {
                         this.tableData[newComment._id] = newComment;
                     }).catch((err) => {
@@ -1634,6 +1638,7 @@
                 displayCommentDeleteState: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('UI_DISPLAY_COMMENT_DELETE_STATE'),
                 shouldUpdateTitle: _GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('DOCUMENT_TITLE_SHOULD_UPDATE')
             });
+            UI.init();
             if (_GM_config_index__WEBPACK_IMPORTED_MODULE_5___default().get('ACTIVE')) {
                 UI.render();
             }

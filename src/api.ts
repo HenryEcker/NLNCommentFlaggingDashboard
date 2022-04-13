@@ -65,7 +65,7 @@ export function getFlagQuota(commentID: number): Promise<number> {
  *
  * @param {string} fkey Needed to identify the user
  * @param {Comment} comment the complete comment object
- * @returns {Promise<Comment>} Resolves with a new comment object with appropriate fields set to render in the table
+ * @returns {Promise<Comment>} Resolves with a new comment object with appropriate fields set to indicate if the flag was successful and how the comment responded to the flag
  *
  * @throws {RatedLimitedError} Throws a RateLimitedError when attempting to flag too quickly. The flags can only be added every 5 seconds (globally)
  * @throws {FlagAttemptFailed} Throws a FlagAttemptFailed if the flag attempt failed for some other reason than RateLimit, AlreadyFlagged, or Already Deleted.
