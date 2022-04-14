@@ -1,4 +1,4 @@
-import {Comment} from "./types";
+import {Comment} from "./Types";
 
 /**
  * Converts an array of distinct RegExp and joins them together using OR (|)

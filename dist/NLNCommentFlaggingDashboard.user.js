@@ -85,11 +85,11 @@ function getURLSearchParamsFromObject(o) {
                 /* harmony export */
             });
             /* harmony import */
-            var _types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+            var _Types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
             /* harmony import */
-            var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
+            var _Utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
             /* harmony import */
-            var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+            var _SE_API__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 
 
             class FlaggingDashboard {
@@ -137,16 +137,16 @@ function getURLSearchParamsFromObject(o) {
                 }
 
                 buildBaseUI() {
-        const container = jQuery(`<div id="${this.htmlIds.containerDivId}""></div>`);
-        {
-            const header = jQuery('<nln-header></nln-header>');
-            header.append(jQuery(`<h2>NLN Comment Flagging Dashboard</h2>`));
-            container.append(header);
-        }
-        {
-            const tableContainer = jQuery(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
-            const table = jQuery(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
-            const thead = jQuery('<thead></thead>');
+                    const container = jQuery(`<div id="${this.htmlIds.containerDivId}""></div>`);
+                    {
+                        const header = jQuery('<nln-header></nln-header>');
+                        header.append(jQuery(`<h2>NLN Comment Flagging Dashboard</h2>`));
+                        container.append(header);
+                    }
+                    {
+                        const tableContainer = jQuery(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
+                        const table = jQuery(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
+                        const thead = jQuery('<thead></thead>');
             const tr = jQuery('<tr></tr>');
             tr.append(jQuery('<th>Comment Text</th>'));
             if (this.uiConfig.displayPostType) {
@@ -193,7 +193,7 @@ function getURLSearchParamsFromObject(o) {
             const tr = jQuery('<tr></tr>');
             tr.append(`<td>${comment.body}</td>`);
             if (this.uiConfig.displayPostType) {
-                tr.append(`<td>${(0,_utils__WEBPACK_IMPORTED_MODULE_1__.capitalise)(comment.post_type)}</td>`);
+                tr.append(`<td>${(0, _Utils__WEBPACK_IMPORTED_MODULE_1__.capitalise)(comment.post_type)}</td>`);
             }
             if (this.uiConfig.displayLink) {
                 tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
@@ -202,7 +202,7 @@ function getURLSearchParamsFromObject(o) {
                 tr.append(`<td>${comment.blacklist_matches.map(e => `"${e}"`).join(', ')}</td>`);
             }
             if (this.uiConfig.displayNoiseRatio) {
-                tr.append(`<td>${(0,_utils__WEBPACK_IMPORTED_MODULE_1__.formatPercentage)(comment.noise_ratio)}</td>`);
+                tr.append(`<td>${(0, _Utils__WEBPACK_IMPORTED_MODULE_1__.formatPercentage)(comment.noise_ratio)}</td>`);
             }
             if (this.uiConfig.displayFlagUI) {
                 if (!comment.can_flag) {
@@ -247,13 +247,12 @@ function getURLSearchParamsFromObject(o) {
         this.updatePageTitle();
     }
     handleFlagComment(comment) {
-        (0,_api__WEBPACK_IMPORTED_MODULE_2__.flagComment)(this.fkey, comment).then((newComment) => {
+        (0, _SE_API__WEBPACK_IMPORTED_MODULE_2__.flagComment)(this.fkey, comment).then((newComment) => {
             this.tableData[newComment._id] = newComment;
         }).catch((err) => {
-            if (err instanceof _types__WEBPACK_IMPORTED_MODULE_0__.RatedLimitedError) {
+            if (err instanceof _Types__WEBPACK_IMPORTED_MODULE_0__.RatedLimitedError) {
                 alert('Flagging too fast!');
-            }
-            else if (err instanceof _types__WEBPACK_IMPORTED_MODULE_0__.FlagAttemptFailed) {
+            } else if (err instanceof _Types__WEBPACK_IMPORTED_MODULE_0__.FlagAttemptFailed) {
                 alert(err.message);
                 this.tableData[comment._id].can_flag = false;
             }
@@ -332,13 +331,13 @@ function getURLSearchParamsFromObject(o) {
                 /* harmony export */
             });
             /* harmony import */
-            var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+            var _Utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
             /* harmony import */
-            var _types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+            var _Types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 
 
             function getComments(AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) {
-                const usp = (0, _utils__WEBPACK_IMPORTED_MODULE_0__.getURLSearchParamsFromObject)({
+                const usp = (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.getURLSearchParamsFromObject)({
                     'pagesize': 100,
                     'order': 'desc',
                     'sort': 'creation',
@@ -365,7 +364,7 @@ function getURLSearchParamsFromObject(o) {
                         })
                         .fail((err) => {
                             if (err.status === 409) {
-                                throw new _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You may only load the comment flag dialog every 3 seconds");
+                                throw new _Types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You may only load the comment flag dialog every 3 seconds");
                             } else {
                                 return reject();
                             }
@@ -377,24 +376,22 @@ function getURLSearchParamsFromObject(o) {
                 return new Promise((resolve) => {
                     fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
                         method: "POST",
-                        body: (0, _utils__WEBPACK_IMPORTED_MODULE_0__.getFormDataFromObject)({
+                        body: (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.getFormDataFromObject)({
                             'fkey': fkey,
                             'otherText': "",
                             'overrideWarning': true
                         })
                     }).then((res) => {
                         if (res.status === 409) {
-                            throw new _types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You can only flag once every 5 seconds");
-            }
-            else if (res.status === 200) {
-                return res.json();
-            }
-        }).then((resData) => {
-            if (resData.Success && resData.Outcome === 0) {
-                comment.was_flagged = true;
-                comment.was_deleted = resData.ResultChangedState;
-            }
-            else if (!resData.Success && resData.Outcome === 2) {
+                            throw new _Types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You can only flag once every 5 seconds");
+                        } else if (res.status === 200) {
+                            return res.json();
+                        }
+                    }).then((resData) => {
+                        if (resData.Success && resData.Outcome === 0) {
+                            comment.was_flagged = true;
+                            comment.was_deleted = resData.ResultChangedState;
+                        } else if (!resData.Success && resData.Outcome === 2) {
                 if (resData.Message === "You have already flagged this comment") {
                     comment.was_flagged = true;
                     comment.was_deleted = false;
@@ -409,7 +406,7 @@ function getURLSearchParamsFromObject(o) {
                     comment.was_flagged = false;
                 }
                 else {
-                    throw new _types__WEBPACK_IMPORTED_MODULE_1__.FlagAttemptFailed(resData.Message);
+                    throw new _Types__WEBPACK_IMPORTED_MODULE_1__.FlagAttemptFailed(resData.Message);
                 }
             }
             return resolve(comment);
@@ -422,42 +419,45 @@ function getURLSearchParamsFromObject(o) {
 /* 5 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "FlagAttemptFailed": () => (/* binding */ FlagAttemptFailed),
-/* harmony export */   "RatedLimitedError": () => (/* binding */ RatedLimitedError),
-/* harmony export */   "blacklist": () => (/* binding */ blacklist),
-/* harmony export */   "whitelist": () => (/* binding */ whitelist)
-/* harmony export */ });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+            "use strict";
+            __webpack_require__.r(__webpack_exports__);
+            /* harmony export */
+            __webpack_require__.d(__webpack_exports__, {
+                /* harmony export */   "FlagAttemptFailed": () => (/* binding */ FlagAttemptFailed),
+                /* harmony export */   "RatedLimitedError": () => (/* binding */ RatedLimitedError),
+                /* harmony export */   "blacklist": () => (/* binding */ blacklist),
+                /* harmony export */   "whitelist": () => (/* binding */ whitelist)
+                /* harmony export */
+            });
+            /* harmony import */
+            var _Utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
-const blacklist = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.mergeRegexes)([
-    /(?:[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/,
-    /\s+((?=[!-~])[\W_]){2,}\s*/,
-    /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
-    /(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))/,
-    /(?:you(r|['’]?re|\s+are)?|that['’]?s?)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
-    /(?:Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
-    /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s?\s*it)[.!]?/,
-    /(?:happy\s+coding)/,
-    /(it('?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
-    /\b(?:f(?:riend(?:io|o)?|am)|b(?:ud(?:dy)?|ro)|ma(?:te|n)|amigo|homie|dude|pal|sir)\b/,
-    /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)/,
-    /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?/,
-    /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+/,
-    /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
-    /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You\s+)?saved\s+m[ey])/,
-    /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver/,
-    /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
-    /(?:please(?:\s+\w+)\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?/,
-], 'gi');
-const whitelist = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.mergeRegexes)([
-    /\b(?:n(?:eed|ot)|unfortunate(ly)?|persists?|require|but|unaccept(ed)?)\b/,
-    /(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|wouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))/,
-    /\b(will|I'?ll)\s*try\b/,
-    /[?]/
-], 'gi');
+            const blacklist = (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.mergeRegexes)([
+                /(?:[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/,
+                /\s+((?=[!-~])[\W_]){2,}\s*/,
+                /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
+                /(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))/,
+                /(?:you(r|['’]?re|\s+are)?|that['’]?s?)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
+                /(?:Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
+                /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s?\s*it)[.!]?/,
+                /(?:happy\s+coding)/,
+                /(it('?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
+                /\b(?:f(?:riend(?:io|o)?|am)|b(?:ud(?:dy)?|ro)|ma(?:te|n)|amigo|homie|dude|pal|sir)\b/,
+                /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)/,
+                /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?/,
+                /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+/,
+                /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
+                /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You\s+)?saved\s+m[ey])/,
+                /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver/,
+                /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
+                /(?:please(?:\s+\w+)\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?/,
+            ], 'gi');
+            const whitelist = (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.mergeRegexes)([
+                /\b(?:n(?:eed|ot)|unfortunate(ly)?|persists?|require|but|unaccept(ed)?)\b/,
+                /(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|wouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))/,
+                /\b(will|I'?ll)\s*try\b/,
+                /[?]/
+            ], 'gi');
 class SelfNamedError extends Error {
     constructor(message) {
         super(message);
@@ -1390,13 +1390,13 @@ var __webpack_exports__ = {};
     "use strict";
     __webpack_require__.r(__webpack_exports__);
     /* harmony import */
-    var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+    var _Utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
     /* harmony import */
-    var _FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+    var _UI_Dashboard_FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
     /* harmony import */
-    var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+    var _SE_API__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
     /* harmony import */
-    var _globalvars__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+    var _GlobalVars__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
     /* harmony import */
     var _GM_config_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
     /* harmony import */
@@ -1454,16 +1454,16 @@ var __webpack_exports__ = {};
                 'type': 'int',
                 'min': 15,
                 'max': 600,
-            'default': 600
-        },
-        'HOUR_OFFSET': {
-            'label': 'How long ago (in hours) should the calls be offset',
-            'type': 'unsigned float',
-            'min': 0,
-            'default': 0
-        },
-        'DISPLAY_CERTAINTY': {
-            'label': 'How certain should the script be to display in UI (out of 100)',
+                'default': 600
+            },
+            'HOUR_OFFSET': {
+                'label': 'How long ago (in hours) should the calls be offset',
+                'type': 'unsigned float',
+                'min': 0,
+                'default': 0
+            },
+            'DISPLAY_CERTAINTY': {
+                'label': 'How certain should the script be to display in UI (out of 100)',
             'type': 'unsigned float',
             'min': 0,
             'max': 100,
@@ -1478,7 +1478,7 @@ var __webpack_exports__ = {};
         },
         'DOCUMENT_TITLE_SHOULD_UPDATE': {
             'label': 'Update Title with number of pending comments for review: ',
-            'section': ['UI Config (Changes will take affect on page refresh)'],
+            'section': ['UI Settings (Changes will take affect on page refresh)'],
             'type': 'checkbox',
             'default': true
         },
@@ -1539,8 +1539,8 @@ function UserScript() {
     li.append(settingsButton);
     jQuery('header ol.s-topbar--content > li:nth-child(2)').after(li);
     const fkey = StackExchange.options.user.fkey;
-    let lastSuccessfulRead = Math.floor(((0, _utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
-    const UI = new _FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__.FlaggingDashboard(jQuery('#mainbar'), fkey, {
+    let lastSuccessfulRead = Math.floor(((0, _Utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
+    const UI = new _UI_Dashboard_FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__.FlaggingDashboard(jQuery('#mainbar'), fkey, {
         displayLink: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_LINK_TO_COMMENT'),
         displayPostType: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_POST_TYPE'),
         displayNoiseRatio: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_NOISE_RATIO'),
@@ -1554,8 +1554,8 @@ function UserScript() {
         UI.render();
     }
     const main = async (mainInterval) => {
-        const toDate = Math.floor((0, _utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) / 1000);
-        const response = await (0, _api__WEBPACK_IMPORTED_MODULE_2__.getComments)(AUTH_STR, COMMENT_FILTER, lastSuccessfulRead, toDate);
+        const toDate = Math.floor((0, _Utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) / 1000);
+        const response = await (0, _SE_API__WEBPACK_IMPORTED_MODULE_2__.getComments)(AUTH_STR, COMMENT_FILTER, lastSuccessfulRead, toDate);
         if (response.quota_remaining <= _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('API_QUOTA_LIMIT')) {
             window.clearInterval(mainInterval);
             return;
@@ -1564,10 +1564,10 @@ function UserScript() {
             lastSuccessfulRead = toDate + 1;
             response.items.forEach((comment) => {
                 if (postTypeFilter(comment.post_type) && comment.body_markdown.length <= _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('MAXIMUM_LENGTH_COMMENT')) {
-                    const decodedMarkdown = (0, _utils__WEBPACK_IMPORTED_MODULE_0__.htmlDecode)(comment.body_markdown) || '';
-                    const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(_globalvars__WEBPACK_IMPORTED_MODULE_3__.blacklist);
-                    if (blacklistMatches && !decodedMarkdown.match(_globalvars__WEBPACK_IMPORTED_MODULE_3__.whitelist)) {
-                        const noiseRatio = (0, _utils__WEBPACK_IMPORTED_MODULE_0__.calcNoiseRatio)(blacklistMatches, decodedMarkdown.replace(/\B@\w+/g, '').length);
+                    const decodedMarkdown = (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.htmlDecode)(comment.body_markdown) || '';
+                    const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(_GlobalVars__WEBPACK_IMPORTED_MODULE_3__.blacklist);
+                    if (blacklistMatches && !decodedMarkdown.match(_GlobalVars__WEBPACK_IMPORTED_MODULE_3__.whitelist)) {
+                        const noiseRatio = (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.calcNoiseRatio)(blacklistMatches, decodedMarkdown.replace(/\B@\w+/g, '').length);
                         if (noiseRatio >= _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('DISPLAY_CERTAINTY')) {
                             UI.addComment({
                                 can_flag: comment.can_flag,

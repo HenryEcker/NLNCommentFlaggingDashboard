@@ -1,5 +1,5 @@
-import {getFormDataFromObject, getURLSearchParamsFromObject} from "./utils";
-import {Comment, FlagAttemptFailed, RatedLimitedError, SECommentAPIResponse, SEFlagResponse} from "./types";
+import {getFormDataFromObject, getURLSearchParamsFromObject} from "./Utils";
+import {Comment, FlagAttemptFailed, RatedLimitedError, SECommentAPIResponse, SEFlagResponse} from "./Types";
 
 
 /**

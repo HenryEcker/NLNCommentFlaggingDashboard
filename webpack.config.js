@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const userscriptInfo = require('./package.json');
 
 module.exports = {
-    entry: './src/main.ts',
+    entry: './src/Main.ts',
     mode: 'none',
     target: 'node',
     output: {

@@ -1,6 +1,6 @@
-import {Comment, FlagAttemptFailed, FlaggingDashboardConfig, RatedLimitedError} from "./types";
-import {capitalise, formatPercentage} from "./utils";
-import {flagComment} from "./api";
+import {Comment, FlagAttemptFailed, FlaggingDashboardConfig, RatedLimitedError} from "../../Types";
+import {capitalise, formatPercentage} from "../../Utils";
+import {flagComment} from "../../SE_API";
 
 export class FlaggingDashboard {
     private readonly mountPoint: JQuery<HTMLElement>;

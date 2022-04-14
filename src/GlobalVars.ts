@@ -1,4 +1,4 @@
-import {mergeRegexes} from "./utils";
+import {mergeRegexes} from "./Utils";
 
 
 export const blacklist = mergeRegexes([

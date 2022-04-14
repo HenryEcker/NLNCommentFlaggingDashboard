@@ -1,8 +1,8 @@
-import {calcNoiseRatio, getOffset, htmlDecode} from "./utils";
-import {APIComment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from "./types";
-import {FlaggingDashboard} from "./FlaggingDashboard";
-import {getComments} from "./api";
-import {blacklist, whitelist} from "./globalvars";
+import {calcNoiseRatio, getOffset, htmlDecode} from "./Utils";
+import {APIComment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from "./Types";
+import {FlaggingDashboard} from "./UI/Dashboard/FlaggingDashboard";
+import {getComments} from "./SE_API";
+import {blacklist, whitelist} from "./GlobalVars";
 import GM_config from '../GM_config/index';
 
 
@@ -84,7 +84,7 @@ GM_config.init({
         },
         'DOCUMENT_TITLE_SHOULD_UPDATE': {
             'label': 'Update Title with number of pending comments for review: ',
-            'section': ['UI Config (Changes will take affect on page refresh)'],
+            'section': ['UI Settings (Changes will take affect on page refresh)'],
             'type': 'checkbox',
             'default': true
         },
@@ -143,7 +143,7 @@ function UserScript(): void {
     const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
     const API_REQUEST_RATE = (GM_config.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
 
-    // Add Config Button
+    // Add Settings Button
     const settingsButton: JQuery = jQuery('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
     settingsButton.on('click', () => GM_config.open());
     const li: JQuery = jQuery('<li></li>')
