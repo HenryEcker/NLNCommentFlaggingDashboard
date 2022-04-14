@@ -2066,7 +2066,6 @@ function UserScript() {
     const fkey = StackExchange.options.user.fkey;
     let lastSuccessfulRead = Math.floor(((0,_Utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
     const toaster = new _UI_Toast_Toast__WEBPACK_IMPORTED_MODULE_5__.Toast("NLN-Toast-Container");
-    toaster.open('Flagging too fast!', 'error', 10000);
     const UI = new _UI_Dashboard_FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__.FlaggingDashboard($('#mainbar'), fkey, {
         displayLink: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_LINK_TO_COMMENT'),
         displayPostType: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_POST_TYPE'),
