@@ -1,7 +1,7 @@
 const path = require('path');
-const webpack = require('webpack');
 const userscriptInfo = require('./package.json');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
     entry: './src/Main.ts',
@@ -15,11 +15,30 @@ module.exports = {
         extensions: ['.webpack.js', '.ts', '.tsx', '.js']
     },
     plugins: [
-        new CleanWebpackPlugin(),
-        new webpack.BannerPlugin({
-            raw: true,
-            include: /.user.js/, // only add banner to user.js files
-            banner: `
+        new CleanWebpackPlugin()
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                include: path.resolve(__dirname, 'src'),
+                loader: 'ts-loader'
+            },
+            {
+                test: /\.s[ac]ss$/i,
+                include: path.resolve(__dirname, 'src'),
+                use: ['style-loader', 'css-loader', 'sass-loader']
+            }
+        ]
+    },
+    optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin({
+            terserOptions: {
+                ecma: 2021,
+                keep_classnames: true,
+                format: {
+                    preamble: `
 // ==UserScript==
 // @name         NLN Comment Flagging Dashboard
 // @description  ${userscriptInfo.description}
@@ -37,20 +56,8 @@ module.exports = {
 //
 // ==/UserScript==
 /* globals $, StackExchange, $ */\n`.replace(/^\s+/mg, '')
-        }),
-    ],
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                include: path.resolve(__dirname, 'src'),
-                loader: 'ts-loader'
-            },
-            {
-                test: /\.s[ac]ss$/i,
-                include: path.resolve(__dirname, 'src'),
-                use: ['style-loader', 'css-loader', 'sass-loader']
+                }
             }
-        ]
+        })]
     }
 }
