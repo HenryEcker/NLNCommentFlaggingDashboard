@@ -1,20 +1,28 @@
 const path = require('path');
 const webpack = require('webpack');
 const userscriptInfo = require('./package.json');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
     entry: './src/Main.ts',
     mode: 'none',
     target: 'node',
     output: {
+        path: path.resolve(__dirname, 'dist'),
         filename: './NLNCommentFlaggingDashboard.user.js'
     },
     resolve: {
-        extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
+        extensions: ['.webpack.js', '.ts', '.tsx', '.js']
     },
     plugins: [
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin({
+            filename: "./NLNCommentFlaggingDashboard.css",
+        }),
         new webpack.BannerPlugin({
             raw: true,
+            include: /.user.js/,
             banner: `
 // ==UserScript==
 // @name         NLN Comment Flagging Dashboard
@@ -32,8 +40,8 @@ module.exports = {
 // @run-at       document-end
 //
 // ==/UserScript==
-/* globals $, StackExchange, jQuery */\n`.replace(/^\s+/mg, '')
-        })
+/* globals $, StackExchange, $ */\n`.replace(/^\s+/mg, '')
+        }),
     ],
     module: {
         rules: [
@@ -41,6 +49,11 @@ module.exports = {
                 test: /\.tsx?$/,
                 include: path.resolve(__dirname, 'src'),
                 loader: 'ts-loader'
+            },
+            {
+                test: /\.s[ac]ss$/i,
+                include: path.resolve(__dirname, 'src'),
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
             }
         ]
     }

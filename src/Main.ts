@@ -144,11 +144,11 @@ function UserScript(): void {
     const API_REQUEST_RATE = (GM_config.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
 
     // Add Settings Button
-    const settingsButton: JQuery = jQuery('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
+    const settingsButton: JQuery = $('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
     settingsButton.on('click', () => GM_config.open());
-    const li: JQuery = jQuery('<li></li>')
+    const li: JQuery = $('<li></li>')
     li.append(settingsButton);
-    jQuery('header ol.s-topbar--content > li:nth-child(2)').after(li);
+    $('header ol.s-topbar--content > li:nth-child(2)').after(li);
 
 
     const fkey = StackExchange.options.user.fkey;
@@ -158,7 +158,7 @@ function UserScript(): void {
 
     // Build UI
     const UI: FlaggingDashboard = new FlaggingDashboard(
-        jQuery('#mainbar'),
+        $('#mainbar'),
         fkey,
         {
             displayLink: GM_config.get('UI_DISPLAY_LINK_TO_COMMENT') as boolean,

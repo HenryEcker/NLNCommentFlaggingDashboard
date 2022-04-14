@@ -14,7 +14,7 @@
 // @run-at       document-end
 //
 // ==/UserScript==
-/* globals $, StackExchange, jQuery */
+/* globals $, StackExchange, $ */
 
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ([
@@ -137,60 +137,60 @@ function getURLSearchParamsFromObject(o) {
                 }
 
                 buildBaseUI() {
-                    const container = jQuery(`<div id="${this.htmlIds.containerDivId}""></div>`);
+                    const container = $(`<div id="${this.htmlIds.containerDivId}""></div>`);
                     {
-                        const header = jQuery('<nln-header></nln-header>');
-                        header.append(jQuery(`<h2>NLN Comment Flagging Dashboard</h2>`));
+                        const header = $('<nln-header></nln-header>');
+                        header.append($(`<h2>NLN Comment Flagging Dashboard</h2>`));
                         container.append(header);
                     }
                     {
-                        const tableContainer = jQuery(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
-                        const table = jQuery(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
-                        const thead = jQuery('<thead></thead>');
-                        const tr = jQuery('<tr></tr>');
-                        tr.append(jQuery('<th>Comment Text</th>'));
+                        const tableContainer = $(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
+                        const table = $(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
+                        const thead = $('<thead></thead>');
+                        const tr = $('<tr></tr>');
+                        tr.append($('<th>Comment Text</th>'));
                         if (this.uiConfig.displayPostType) {
-                            tr.append(jQuery('<th>Post Type</th>'));
+                            tr.append($('<th>Post Type</th>'));
                         }
                         if (this.uiConfig.displayLink) {
-                            tr.append(jQuery('<th>Link</th>'));
+                            tr.append($('<th>Link</th>'));
                         }
                         if (this.uiConfig.displayBlacklistMatches) {
-                            tr.append(jQuery('<th>Blacklist Matches</th>'));
-            }
-            if (this.uiConfig.displayNoiseRatio) {
-                tr.append(jQuery('<th>Noise Ratio</th>'));
-            }
-            if (this.uiConfig.displayFlagUI) {
-                tr.append(jQuery('<th>Flag</th>'));
-            }
-            if (this.uiConfig.displayCommentDeleteState) {
-                tr.append(jQuery('<th>Deleted</th>'));
-            }
-            tr.append(jQuery('<th>Clear</th>'));
-            thead.append(tr);
-            table.append(thead);
-            table.append(jQuery(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
-            tableContainer.append(table);
-            container.append(tableContainer);
-        }
-        {
-            const footer = jQuery('<nln-footer></nln-footer>');
-            const clearAllButton = jQuery(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
-            clearAllButton.on('click', () => {
-                this.tableData = {};
-                this.render();
-            });
-            footer.append(clearAllButton);
-            container.append(footer);
-        }
+                            tr.append($('<th>Blacklist Matches</th>'));
+                        }
+                        if (this.uiConfig.displayNoiseRatio) {
+                            tr.append($('<th>Noise Ratio</th>'));
+                        }
+                        if (this.uiConfig.displayFlagUI) {
+                            tr.append($('<th>Flag</th>'));
+                        }
+                        if (this.uiConfig.displayCommentDeleteState) {
+                            tr.append($('<th>Deleted</th>'));
+                        }
+                        tr.append($('<th>Clear</th>'));
+                        thead.append(tr);
+                        table.append(thead);
+                        table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
+                        tableContainer.append(table);
+                        container.append(tableContainer);
+                    }
+                    {
+                        const footer = $('<nln-footer></nln-footer>');
+                        const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
+                        clearAllButton.on('click', () => {
+                            this.tableData = {};
+                            this.render();
+                        });
+                        footer.append(clearAllButton);
+                        container.append(footer);
+                    }
         this.mountPoint.before(container);
     }
     render() {
-        const tbody = jQuery(`#${this.htmlIds.tableBodyId}`);
+        const tbody = $(`#${this.htmlIds.tableBodyId}`);
         tbody.empty();
         Object.values(this.tableData).forEach(comment => {
-            const tr = jQuery('<tr></tr>');
+            const tr = $('<tr></tr>');
             tr.append(`<td>${comment.body}</td>`);
             if (this.uiConfig.displayPostType) {
                 tr.append(`<td>${(0, _Utils__WEBPACK_IMPORTED_MODULE_1__.capitalise)(comment.post_type)}</td>`);
@@ -212,12 +212,12 @@ function getURLSearchParamsFromObject(o) {
                     tr.append(`<td>✓</td>`);
                 }
                 else {
-                    const flagButton = jQuery(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
+                    const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
                         flagButton.text('Flagging...');
                         this.handleFlagComment(comment);
                     });
-                    const td = jQuery('<td></td>');
+                    const td = $('<td></td>');
                     td.append(flagButton);
                     tr.append(td);
                 }
@@ -236,9 +236,9 @@ function getURLSearchParamsFromObject(o) {
                 }
             }
             {
-                const clearButton = jQuery(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
+                const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
                 clearButton.on('click', () => this.removeComment(comment._id));
-                const clearButtonTD = jQuery('<td></td>');
+                const clearButtonTD = $('<td></td>');
                 clearButtonTD.append(clearButton);
                 tr.append(clearButtonTD);
             }
@@ -412,8 +412,8 @@ function getURLSearchParamsFromObject(o) {
 
             /***/
         }),
-/* 5 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+        /* 5 */
+        /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
             "use strict";
             __webpack_require__.r(__webpack_exports__);
@@ -469,7 +469,8 @@ function getURLSearchParamsFromObject(o) {
             }
 
 
-/***/ }),
+            /***/
+        }),
 /* 6 */
 /***/ ((module) => {
 
@@ -1473,16 +1474,16 @@ var __webpack_exports__ = {};
                 'type': 'int',
                 'min': 0,
                 'max': 100,
-            'default': 0
-        },
-        'DOCUMENT_TITLE_SHOULD_UPDATE': {
-            'label': 'Update Title with number of pending comments for review: ',
-            'section': ['UI Settings (Changes will take affect on page refresh)'],
-            'type': 'checkbox',
-            'default': true
-        },
-        'UI_DISPLAY_POST_TYPE': {
-            'label': 'Display Type of Post the comment is under: ',
+                'default': 0
+            },
+            'DOCUMENT_TITLE_SHOULD_UPDATE': {
+                'label': 'Update Title with number of pending comments for review: ',
+                'section': ['UI Settings (Changes will take affect on page refresh)'],
+                'type': 'checkbox',
+                'default': true
+            },
+            'UI_DISPLAY_POST_TYPE': {
+                'label': 'Display Type of Post the comment is under: ',
             'type': 'checkbox',
             'default': true
         },
@@ -1532,14 +1533,14 @@ function UserScript() {
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
     const API_REQUEST_RATE = _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('DELAY_BETWEEN_API_CALLS') * 1000;
-    const settingsButton = jQuery('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
+    const settingsButton = $('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
     settingsButton.on('click', () => _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().open());
-    const li = jQuery('<li></li>');
+    const li = $('<li></li>');
     li.append(settingsButton);
-    jQuery('header ol.s-topbar--content > li:nth-child(2)').after(li);
+    $('header ol.s-topbar--content > li:nth-child(2)').after(li);
     const fkey = StackExchange.options.user.fkey;
     let lastSuccessfulRead = Math.floor(((0, _Utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
-    const UI = new _UI_Dashboard_FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__.FlaggingDashboard(jQuery('#mainbar'), fkey, {
+    const UI = new _UI_Dashboard_FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__.FlaggingDashboard($('#mainbar'), fkey, {
         displayLink: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_LINK_TO_COMMENT'),
         displayPostType: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_POST_TYPE'),
         displayNoiseRatio: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_NOISE_RATIO'),
