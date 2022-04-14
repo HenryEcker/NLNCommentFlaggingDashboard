@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/NLNCommentFlaggingDashboard
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      2.0.3
+// @version      2.0.4
 // @downloadURL  https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 // @updateURL    https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 //
@@ -147,16 +147,16 @@ function getURLSearchParamsFromObject(o) {
                         const tableContainer = jQuery(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
                         const table = jQuery(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
                         const thead = jQuery('<thead></thead>');
-            const tr = jQuery('<tr></tr>');
-            tr.append(jQuery('<th>Comment Text</th>'));
-            if (this.uiConfig.displayPostType) {
-                tr.append(jQuery('<th>Post Type</th>'));
-            }
-            if (this.uiConfig.displayLink) {
-                tr.append(jQuery('<th>Link</th>'));
-            }
-            if (this.uiConfig.displayBlacklistMatches) {
-                tr.append(jQuery('<th>Blacklist Matches</th>'));
+                        const tr = jQuery('<tr></tr>');
+                        tr.append(jQuery('<th>Comment Text</th>'));
+                        if (this.uiConfig.displayPostType) {
+                            tr.append(jQuery('<th>Post Type</th>'));
+                        }
+                        if (this.uiConfig.displayLink) {
+                            tr.append(jQuery('<th>Link</th>'));
+                        }
+                        if (this.uiConfig.displayBlacklistMatches) {
+                            tr.append(jQuery('<th>Blacklist Matches</th>'));
             }
             if (this.uiConfig.displayNoiseRatio) {
                 tr.append(jQuery('<th>Noise Ratio</th>'));
@@ -373,49 +373,45 @@ function getURLSearchParamsFromObject(o) {
             }
 
             function flagComment(fkey, comment) {
-                return new Promise((resolve) => {
-                    fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
-                        method: "POST",
-                        body: (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.getFormDataFromObject)({
-                            'fkey': fkey,
-                            'otherText': "",
-                            'overrideWarning': true
-                        })
-                    }).then((res) => {
-                        if (res.status === 409) {
-                            throw new _Types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You can only flag once every 5 seconds");
-                        } else if (res.status === 200) {
-                            return res.json();
-                        }
-                    }).then((resData) => {
-                        if (resData.Success && resData.Outcome === 0) {
+                return fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
+                    method: "POST",
+                    body: (0, _Utils__WEBPACK_IMPORTED_MODULE_0__.getFormDataFromObject)({
+                        'fkey': fkey,
+                        'otherText': "",
+                        'overrideWarning': true
+                    })
+                }).then((res) => {
+                    if (res.status === 409) {
+                        throw new _Types__WEBPACK_IMPORTED_MODULE_1__.RatedLimitedError("You can only flag once every 5 seconds");
+                    } else if (res.status === 200) {
+                        return res.json();
+                    }
+                }).then((resData) => {
+                    if (resData.Success && resData.Outcome === 0) {
+                        comment.was_flagged = true;
+                        comment.was_deleted = resData.ResultChangedState;
+                    } else if (!resData.Success && resData.Outcome === 2) {
+                        if (resData.Message === "You have already flagged this comment") {
                             comment.was_flagged = true;
-                            comment.was_deleted = resData.ResultChangedState;
-                        } else if (!resData.Success && resData.Outcome === 2) {
-                if (resData.Message === "You have already flagged this comment") {
-                    comment.was_flagged = true;
-                    comment.was_deleted = false;
-                }
-                else if (resData.Message === "This comment is deleted and cannot be flagged") {
-                    comment.can_flag = false;
-                    comment.was_flagged = false;
-                    comment.was_deleted = true;
-                }
-                else if (resData.Message.toLowerCase().includes('out of flag')) {
-                    comment.can_flag = false;
-                    comment.was_flagged = false;
-                }
-                else {
-                    throw new _Types__WEBPACK_IMPORTED_MODULE_1__.FlagAttemptFailed(resData.Message);
-                }
+                            comment.was_deleted = false;
+                        } else if (resData.Message === "This comment is deleted and cannot be flagged") {
+                            comment.can_flag = false;
+                            comment.was_flagged = false;
+                            comment.was_deleted = true;
+                        } else if (resData.Message.toLowerCase().includes('out of flag')) {
+                            comment.can_flag = false;
+                            comment.was_flagged = false;
+                        } else {
+                            throw new _Types__WEBPACK_IMPORTED_MODULE_1__.FlagAttemptFailed(resData.Message);
+                        }
+                    }
+                    return comment;
+                });
             }
-            return resolve(comment);
-        });
-    });
-}
 
 
-/***/ }),
+            /***/
+        }),
 /* 5 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -458,16 +454,19 @@ function getURLSearchParamsFromObject(o) {
                 /\b(will|I'?ll)\s*try\b/,
                 /[?]/
             ], 'gi');
-class SelfNamedError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = this.constructor.name;
-    }
-}
-class FlagAttemptFailed extends SelfNamedError {
-}
-class RatedLimitedError extends SelfNamedError {
-}
+
+            class SelfNamedError extends Error {
+                constructor(message) {
+                    super(message);
+                    this.name = this.constructor.name;
+                }
+            }
+
+            class FlagAttemptFailed extends SelfNamedError {
+            }
+
+            class RatedLimitedError extends SelfNamedError {
+            }
 
 
 /***/ }),
@@ -1464,16 +1463,16 @@ var __webpack_exports__ = {};
             },
             'DISPLAY_CERTAINTY': {
                 'label': 'How certain should the script be to display in UI (out of 100)',
-            'type': 'unsigned float',
-            'min': 0,
-            'max': 100,
-            'default': 25
-        },
-        'FLAG_QUOTA_LIMIT': {
-            'label': 'Stop flagging with how many remaining comment flags',
-            'type': 'int',
-            'min': 0,
-            'max': 100,
+                'type': 'unsigned float',
+                'min': 0,
+                'max': 100,
+                'default': 25
+            },
+            'FLAG_QUOTA_LIMIT': {
+                'label': 'Stop flagging with how many remaining comment flags',
+                'type': 'int',
+                'min': 0,
+                'max': 100,
             'default': 0
         },
         'DOCUMENT_TITLE_SHOULD_UPDATE': {

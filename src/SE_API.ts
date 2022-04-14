@@ -71,40 +71,38 @@ export function getFlagQuota(commentID: number): Promise<number> {
  * @throws {FlagAttemptFailed} Throws a FlagAttemptFailed if the flag attempt failed for some other reason than RateLimit, AlreadyFlagged, or Already Deleted.
  */
 export function flagComment(fkey: string, comment: Comment): Promise<Comment> {
-    return new Promise<Comment>((resolve) => {
-        fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
-            method: "POST",
-            body: getFormDataFromObject({
-                'fkey': fkey,
-                'otherText': "",
-                'overrideWarning': true
-            })
-        }).then((res: Response) => {
-            if (res.status === 409) {
-                throw new RatedLimitedError("You can only flag once every 5 seconds");
-            } else if (res.status === 200) {
-                return res.json();
-            }
-        }).then((resData: SEFlagResponse) => {
-            if (resData.Success && resData.Outcome === 0) {
+    return fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
+        method: "POST",
+        body: getFormDataFromObject({
+            'fkey': fkey,
+            'otherText': "",
+            'overrideWarning': true
+        })
+    }).then((res: Response) => {
+        if (res.status === 409) {
+            throw new RatedLimitedError("You can only flag once every 5 seconds");
+        } else if (res.status === 200) {
+            return res.json();
+        }
+    }).then((resData: SEFlagResponse) => {
+        if (resData.Success && resData.Outcome === 0) {
+            comment.was_flagged = true;
+            comment.was_deleted = resData.ResultChangedState
+        } else if (!resData.Success && resData.Outcome === 2) {
+            if (resData.Message === "You have already flagged this comment") {
                 comment.was_flagged = true;
-                comment.was_deleted = resData.ResultChangedState
-            } else if (!resData.Success && resData.Outcome === 2) {
-                if (resData.Message === "You have already flagged this comment") {
-                    comment.was_flagged = true;
-                    comment.was_deleted = false;
-                } else if (resData.Message === "This comment is deleted and cannot be flagged") {
-                    comment.can_flag = false;
-                    comment.was_flagged = false; // This might have been previously flagged by you, but this flag attempt did not result in a flag
-                    comment.was_deleted = true;
-                } else if (resData.Message.toLowerCase().includes('out of flag')) {
-                    comment.can_flag = false;
-                    comment.was_flagged = false;
-                } else {
-                    throw new FlagAttemptFailed(resData.Message);
-                }
+                comment.was_deleted = false;
+            } else if (resData.Message === "This comment is deleted and cannot be flagged") {
+                comment.can_flag = false;
+                comment.was_flagged = false; // This might have been previously flagged by you, but this flag attempt did not result in a flag
+                comment.was_deleted = true;
+            } else if (resData.Message.toLowerCase().includes('out of flag')) {
+                comment.can_flag = false;
+                comment.was_flagged = false;
+            } else {
+                throw new FlagAttemptFailed(resData.Message);
             }
-            return resolve(comment);
-        });
-    })
+        }
+        return comment;
+    });
 }
