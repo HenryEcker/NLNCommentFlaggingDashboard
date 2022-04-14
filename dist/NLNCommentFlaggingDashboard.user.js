@@ -1320,7 +1320,7 @@ class Toast {
         this.openCloseDuration = openCloseDuration;
     }
     open(message, toastType, toastDuration = 5000) {
-        const toastDiv = $(`<div class="nln-toast open"></div>`);
+        const toastDiv = $(`<div class="nln-toast open ${toastType}"></div>`);
         toastDiv.css('animation-duration', (0,_Utils__WEBPACK_IMPORTED_MODULE_1__.formatCSSDuration)(this.openCloseDuration));
         {
             const toastContent = $(` <div class="toast-content"></div></div>`);
@@ -1339,7 +1339,7 @@ class Toast {
         }
         if (toastDuration !== undefined) {
             const toastProgressWrapper = $(`<div class="toast-progress-wrapper"></div>`);
-            const toastProgress = $(`<div class="toast-progress ${toastType}"></div>`);
+            const toastProgress = $(`<div class="toast-progress"></div>`);
             toastProgress.css('animation-delay', (0,_Utils__WEBPACK_IMPORTED_MODULE_1__.formatCSSDuration)(this.openCloseDuration));
             toastProgress.css('animation-duration', (0,_Utils__WEBPACK_IMPORTED_MODULE_1__.formatCSSDuration)(toastDuration));
             toastProgressWrapper.append(toastProgress);
@@ -1717,7 +1717,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".nln-toast {\n  box-sizing: content-box;\n  background-color: var(--theme-background-color);\n  position: absolute;\n  top: 10%;\n  left: 50%;\n  border: 1px solid black;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.nln-toast.open {\n  animation-name: fadeInDown;\n  animation-fill-mode: forwards;\n  animation-timing-function: ease-in-out;\n}\n.nln-toast.close {\n  animation-name: fadeUpOut;\n  animation-fill-mode: forwards;\n  animation-timing-function: ease-in-out;\n}\n.nln-toast .toast-text {\n  padding: 1em;\n}\n.nln-toast .toast-content {\n  display: grid;\n  grid-template-columns: 1fr 0.25fr;\n}\n.nln-toast .toast-close-wrapper {\n  display: flex;\n  align-content: center;\n  justify-content: center;\n}\n.nln-toast .toast-close-button {\n  background: none;\n  border: none;\n}\n.nln-toast .toast-progress-wrapper {\n  width: 100%;\n  height: 10px;\n  border-top: 1px solid black;\n}\n.nln-toast .toast-progress {\n  width: 100%;\n  height: 100%;\n  animation-name: progressAnimate;\n  animation-direction: normal;\n  animation-fill-mode: forwards;\n  animation-timing-function: linear;\n}\n.nln-toast .toast-progress.error {\n  background-color: red;\n}\n@keyframes fadeInDown {\n  0% {\n    opacity: 0;\n    transform: translateY(-100px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n@keyframes fadeUpOut {\n  0% {\n    opacity: 1;\n    transform: translateY(0);\n  }\n  100% {\n    opacity: 0;\n    transform: translateY(-100px);\n  }\n}\n@keyframes progressAnimate {\n  0% {\n    width: 100%;\n  }\n  100% {\n    width: 0;\n  }\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".nln-toast {\n  box-sizing: content-box;\n  position: absolute;\n  top: calc(var(--theme-topbar-height) + 10px);\n  left: 50%;\n  border: 1px solid var(--theme-content-border-color);\n  border-radius: 6px;\n  overflow: hidden;\n  color: var(--theme-body-font-color);\n}\n.nln-toast.error {\n  background-color: rgba(255, 0, 0, 0.6);\n}\n.nln-toast.error .toast-progress {\n  background-color: #F00;\n}\n.nln-toast .toast-text {\n  padding: 1em;\n}\n.nln-toast .toast-content {\n  display: grid;\n  grid-template-columns: 1fr 0.25fr;\n}\n.nln-toast .toast-close-wrapper {\n  display: flex;\n  align-content: center;\n  justify-content: center;\n}\n.nln-toast .toast-close-button {\n  background: none;\n  border: none;\n  cursor: pointer;\n  color: var(--theme-body-font-color);\n}\n.nln-toast .toast-progress-wrapper {\n  width: 100%;\n  height: 10px;\n  border-top: 1px solid var(--theme-content-border-color);\n  background-color: var(--theme-background-color);\n}\n.nln-toast .toast-progress {\n  width: 100%;\n  height: 100%;\n  animation-name: progressAnimate;\n  animation-direction: normal;\n  animation-fill-mode: forwards;\n  animation-timing-function: linear;\n}\n@keyframes progressAnimate {\n  0% {\n    width: 100%;\n  }\n  100% {\n    width: 0;\n  }\n}\n.nln-toast.open {\n  animation-name: fadeInDown;\n  animation-fill-mode: forwards;\n  animation-timing-function: ease-in-out;\n}\n@keyframes fadeUpOut {\n  0% {\n    opacity: 1;\n    transform: translateY(0);\n  }\n  100% {\n    opacity: 0;\n    transform: translateY(-100px);\n  }\n}\n.nln-toast.close {\n  animation-name: fadeUpOut;\n  animation-fill-mode: forwards;\n  animation-timing-function: ease-in-out;\n}\n@keyframes fadeInDown {\n  0% {\n    opacity: 0;\n    transform: translateY(-100px);\n  }\n  100% {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -2066,6 +2066,7 @@ function UserScript() {
     const fkey = StackExchange.options.user.fkey;
     let lastSuccessfulRead = Math.floor(((0,_Utils__WEBPACK_IMPORTED_MODULE_0__.getOffset)(_GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
     const toaster = new _UI_Toast_Toast__WEBPACK_IMPORTED_MODULE_5__.Toast("NLN-Toast-Container");
+    toaster.open('Flagging too fast!', 'error', 10000);
     const UI = new _UI_Dashboard_FlaggingDashboard__WEBPACK_IMPORTED_MODULE_1__.FlaggingDashboard($('#mainbar'), fkey, {
         displayLink: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_LINK_TO_COMMENT'),
         displayPostType: _GM_config_index__WEBPACK_IMPORTED_MODULE_4___default().get('UI_DISPLAY_POST_TYPE'),

@@ -13,7 +13,7 @@ export class Toast {
     }
 
     open(message: string, toastType: ToastType, toastDuration: number | undefined = 5000): void {
-        const toastDiv = $(`<div class="nln-toast open"></div>`);
+        const toastDiv = $(`<div class="nln-toast open ${toastType}"></div>`);
         toastDiv.css('animation-duration', formatCSSDuration(this.openCloseDuration));
         {
             const toastContent = $(` <div class="toast-content"></div></div>`);
@@ -33,7 +33,7 @@ export class Toast {
         // Only add progress bar and autoclose if toast has duration
         if (toastDuration !== undefined) {
             const toastProgressWrapper = $(`<div class="toast-progress-wrapper"></div>`);
-            const toastProgress = $(`<div class="toast-progress ${toastType}"></div>`);
+            const toastProgress = $(`<div class="toast-progress"></div>`);
             toastProgress.css('animation-delay', formatCSSDuration(this.openCloseDuration));
             toastProgress.css('animation-duration', formatCSSDuration(toastDuration));
             toastProgressWrapper.append(toastProgress);
