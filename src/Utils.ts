@@ -86,7 +86,11 @@ export function formatCSSDuration(ms: number) {
     return `${ms / 1000}s`;
 }
 
-
+/**
+ * Take an object and convert it to a settable type (FormData, URLSearchParams, etc.)
+ * @param {object} obj Object to convert
+ * @param initialAcc Empty return type object (new FormData(), new URLSearchParams(), etc.)
+ */
 function reduceObjectToSettableType<Type extends {
     set: (key: string, value: string) => void
 }>(obj: object, initialAcc: Type): Type {
