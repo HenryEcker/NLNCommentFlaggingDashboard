@@ -137,7 +137,7 @@ class FlaggingDashboard {
     buildBaseUI() {
         const container = $(`<div id="${this.htmlIds.containerDivId}""></div>`);
         {
-            const header = $('<nln-header></nln-header>');
+            const header = $('<div class=nln-header"></div>');
             header.append($(`<h2>NLN Comment Flagging Dashboard</h2>`));
             container.append(header);
         }
@@ -173,7 +173,7 @@ class FlaggingDashboard {
             container.append(tableContainer);
         }
         {
-            const footer = $('<nln-footer></nln-footer>');
+            const footer = $('<div class="nln-footer"></div>');
             const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
             clearAllButton.on('click', () => {
                 this.tableData = {};
