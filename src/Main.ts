@@ -4,6 +4,7 @@ import {FlaggingDashboard} from "./UI/Dashboard/FlaggingDashboard";
 import {getComments} from "./SE_API";
 import {blacklist, whitelist} from "./GlobalVars";
 import GM_config from '../GM_config/index';
+import {Toast} from "./UI/Toast/Toast";
 
 
 declare const StackExchange: StackExchange;
@@ -132,6 +133,7 @@ function postTypeFilter(actualPT: PostType): boolean {
 
 
 function UserScript(): void {
+
     const SITE_NAME: string = GM_config.get('SITE_NAME') as string;
     const ACCESS_TOKEN: string = GM_config.get('ACCESS_TOKEN') as string;
     const KEY: string = GM_config.get('KEY') as string;
@@ -144,7 +146,7 @@ function UserScript(): void {
     const API_REQUEST_RATE = (GM_config.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
 
     // Add Settings Button
-    const settingsButton: JQuery = $('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
+    const settingsButton: JQuery<HTMLElement> = $('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
     settingsButton.on('click', () => GM_config.open());
     const li: JQuery = $('<li></li>')
     li.append(settingsButton);
@@ -156,6 +158,9 @@ function UserScript(): void {
     // Prime last successful read
     let lastSuccessfulRead: number = Math.floor((getOffset(GM_config.get('HOUR_OFFSET') as number) - API_REQUEST_RATE) / 1000);
 
+
+    // Create Toaster for custom Toast Messages
+    const toaster = new Toast("NLN-Toast-Container");
     // Build UI
     const UI: FlaggingDashboard = new FlaggingDashboard(
         $('#mainbar'),
@@ -168,7 +173,8 @@ function UserScript(): void {
             displayBlacklistMatches: GM_config.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
             displayCommentDeleteState: GM_config.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean,
             shouldUpdateTitle: GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean
-        } as FlaggingDashboardConfig
+        } as FlaggingDashboardConfig,
+        toaster
     );
 
     UI.init();

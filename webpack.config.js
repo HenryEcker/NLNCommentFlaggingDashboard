@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const userscriptInfo = require('./package.json');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
@@ -17,12 +16,9 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new MiniCssExtractPlugin({
-            filename: "./NLNCommentFlaggingDashboard.css",
-        }),
         new webpack.BannerPlugin({
             raw: true,
-            include: /.user.js/,
+            include: /.user.js/, // only add banner to user.js files
             banner: `
 // ==UserScript==
 // @name         NLN Comment Flagging Dashboard
@@ -53,7 +49,7 @@ module.exports = {
             {
                 test: /\.s[ac]ss$/i,
                 include: path.resolve(__dirname, 'src'),
-                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
+                use: ['style-loader', 'css-loader', 'sass-loader']
             }
         ]
     }

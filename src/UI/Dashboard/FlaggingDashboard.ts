@@ -1,11 +1,13 @@
 import {Comment, FlagAttemptFailed, FlaggingDashboardConfig, RatedLimitedError} from "../../Types";
 import {capitalise, formatPercentage} from "../../Utils";
 import {flagComment} from "../../SE_API";
+import {Toast} from "../Toast/Toast";
 
 export class FlaggingDashboard {
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly fkey: string;
     private readonly uiConfig: FlaggingDashboardConfig;
+    private readonly toaster: Toast;
     private tableData: { [key: number]: Comment };
     private readonly htmlIds = {
         containerDivId: "NLN_Comment_Wrapper",
@@ -31,11 +33,13 @@ export class FlaggingDashboard {
      * @param {JQuery<HTMLElement>} mountPoint The HTMLElement in which this dashboard will be built
      * @param {string} fkey The user fkey (needed to handle flagging)
      * @param {FlaggingDashboardConfig} uiConfig Configuration to determine which UI elements to render
+     * @param {Toast} toaster A toaster to display custom toast messages.
      */
-    constructor(mountPoint: JQuery<HTMLElement>, fkey: string, uiConfig: FlaggingDashboardConfig) {
+    constructor(mountPoint: JQuery<HTMLElement>, fkey: string, uiConfig: FlaggingDashboardConfig, toaster: Toast) {
         this.mountPoint = mountPoint;
         this.fkey = fkey;
         this.uiConfig = uiConfig;
+        this.toaster = toaster;
         this.tableData = {};
     }
 
@@ -197,9 +201,9 @@ export class FlaggingDashboard {
             this.tableData[newComment._id] = newComment;
         }).catch((err) => {
             if (err instanceof RatedLimitedError) {
-                alert('Flagging too fast!');
+                this.toaster.open('Flagging too fast!', 'error');
             } else if (err instanceof FlagAttemptFailed) {
-                alert(err.message);
+                this.toaster.open(err.message, 'error', 8000);
                 this.tableData[comment._id].can_flag = false;
             }
         }).finally(() => {

@@ -76,6 +76,16 @@ export function formatComment(comment: Comment): string {
     return `${formatPercentage(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
 
+/**
+ * Converts a number in MS to a string formatted in seconds with an 's' for CSS
+ *
+ * @param ms duration in milliseconds
+ * @returns {string} formatted string
+ */
+export function formatCSSDuration(ms: number) {
+    return `${ms / 1000}s`;
+}
+
 
 function reduceObjectToSettableType<Type extends {
     set: (key: string, value: string) => void

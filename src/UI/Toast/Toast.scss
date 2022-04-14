@@ -1,5 +1,95 @@
 .nln-toast {
-  .header {
-    background: rebeccapurple;
+  $toast-border: 1px solid black;
+
+  box-sizing: content-box;
+  background-color: var(--theme-background-color); // Comes from SO styles
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  border: $toast-border;
+  border-radius: 6px;
+  overflow: hidden;
+
+  &.open {
+    animation-name: fadeInDown;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-in-out;
+  }
+
+  &.close {
+    animation-name: fadeUpOut;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-in-out;
+  }
+
+  .toast-text {
+    padding: 1em;
+  }
+
+  .toast-content {
+    display: grid;
+    grid-template-columns: 1fr 0.25fr;
+  }
+
+  .toast-close-wrapper {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+  }
+
+  .toast-close-button {
+    background: none;
+    border: none;
+  }
+
+  .toast-progress-wrapper {
+    width: 100%;
+    height: 10px;
+    border-top: $toast-border;
+  }
+
+  .toast-progress {
+    width: 100%;
+    height: 100%;
+    animation-name: progressAnimate;
+    animation-direction: normal;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+
+    &.error {
+      background-color: red;
+    }
+  }
+
+
+  @keyframes fadeInDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-100px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeUpOut {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-100px);
+    }
+  }
+
+  @keyframes progressAnimate {
+    0% {
+      width: 100%;
+    }
+    100% {
+      width: 0;
+    }
   }
 }
