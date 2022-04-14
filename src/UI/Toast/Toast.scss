@@ -1,6 +1,7 @@
 .nln-toast {
   $toast-border: 1px solid var(--theme-content-border-color);
   $toast-text-color: var(--theme-body-font-color);
+  $toast-error-color: #F00;
 
   box-sizing: content-box;
   position: absolute;
@@ -12,10 +13,10 @@
   color: $toast-text-color;
 
   &.error {
-    background-color: #F009;
+    background-color: rgba($toast-error-color, 65%);
 
     .toast-progress {
-      background-color: #F00;
+      background-color: $toast-error-color;
     }
   }
 
