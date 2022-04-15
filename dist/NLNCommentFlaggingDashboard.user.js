@@ -9,7 +9,6 @@
 // @match       *://stackoverflow.com/users/flag-summary/15497888?group=4*
 // @grant       GM_getValue
 // @grant       GM_setValue
-// @run-at      document-end
 // ==/UserScript==
 /* globals $, StackExchange */
 

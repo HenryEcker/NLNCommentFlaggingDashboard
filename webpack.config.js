@@ -13,8 +13,7 @@ const UserScriptConfig = {
     'downloadURL': userscriptInfo.repository.dist_url,
     'updateURL': userscriptInfo.repository.dist_url,
     'match': '*://stackoverflow.com/users/flag-summary/15497888?group=4*',
-    'grant': ['GM_getValue', 'GM_setValue'],
-    'run-at': 'document-end'
+    'grant': ['GM_getValue', 'GM_setValue']
 }
 
 const globals = ['$', 'StackExchange'];
