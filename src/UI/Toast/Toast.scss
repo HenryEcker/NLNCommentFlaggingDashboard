@@ -4,7 +4,7 @@
   $toast-error-color: #F00;
 
   box-sizing: content-box;
-  position: absolute;
+  position: fixed;
   top: calc(var(--theme-topbar-height) + 10px);
   left: 50%;
   border: $toast-border;
