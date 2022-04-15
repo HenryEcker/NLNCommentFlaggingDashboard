@@ -2,6 +2,23 @@ const path = require('path');
 const userscriptInfo = require('./package.json');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
+const {buildTamperMonkeyPreamble} = require("./webpack.util");
+
+const UserScriptConfig = {
+    'name': 'NLN Comment Flagging Dashboard',
+    'description': userscriptInfo.description,
+    'homepage': userscriptInfo.repository.homepage,
+    'author': userscriptInfo.author,
+    'version': userscriptInfo.version,
+    'downloadURL': userscriptInfo.repository.dist_url,
+    'updateURL': userscriptInfo.repository.dist_url,
+    'include': '*://stackoverflow.com/users/flag-summary/15497888?group=4*',
+    'grant': ['GM_getValue', 'GM_setValue'],
+    'run-at': 'document-end'
+}
+
+const globals = ['$', 'StackExchange'];
+
 
 module.exports = {
     entry: './src/Main.ts',
@@ -38,24 +55,7 @@ module.exports = {
                 ecma: 2021,
                 keep_classnames: true,
                 format: {
-                    preamble: `
-// ==UserScript==
-// @name         NLN Comment Flagging Dashboard
-// @description  ${userscriptInfo.description}
-// @homepage     ${userscriptInfo.repository.homepage}
-// @author       ${userscriptInfo.author}
-// @version      ${userscriptInfo.version}
-// @downloadURL  ${userscriptInfo.repository.dist_url}
-// @updateURL    ${userscriptInfo.repository.dist_url}
-//
-// @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
-//
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @run-at       document-end
-//
-// ==/UserScript==
-/* globals $, StackExchange, $ */\n`.replace(/^\s+/mg, '')
+                    preamble: buildTamperMonkeyPreamble(UserScriptConfig, globals).replace(/^\s+/mg, '')
                 }
             }
         })]
