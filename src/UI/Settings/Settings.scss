@@ -1,0 +1,54 @@
+#nln-flagging-dashboard-settings-modal {
+  $border: 1px solid black;
+  $primary: white;
+  $secondary: black;
+  $header-padding: 0.25em;
+  $row-padding: 5px;
+
+  position: fixed;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .nln-config-wrapper {
+    max-width: 60vw;
+    background-color: $primary;
+    color: $secondary;
+    border: $border;
+    overflow-y: scroll;
+    max-height: 90vh;
+
+    .nln-config-header {
+      border-bottom: $border;
+      padding-top: 0.5em;
+      padding-left: $header-padding;
+
+      span {
+        font-size: 2em;
+      }
+    }
+
+    form {
+      height: 100%;
+
+      fieldset {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+
+        legend {
+          font-size: 1.5em;
+          background-color: $secondary;
+          color: $primary;
+          width: 100%;
+          padding-left: $header-padding;
+        }
+
+        .nln-field-row {
+          padding: $row-padding;
+        }
+      }
+    }
+  }
+}
