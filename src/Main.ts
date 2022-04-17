@@ -193,6 +193,7 @@ function UserScript(): void {
 
     // Create Toaster for custom Toast Messages
     const toaster = new Toast("NLN-Toast-Container");
+
     // Build UI
     const UI: FlaggingDashboard = new FlaggingDashboard(
         $('#mainbar'),
@@ -223,7 +224,7 @@ function UserScript(): void {
             lastSuccessfulRead,
             toDate
         );
-        if (response.quota_remaining <= settings.get('API_QUOTA_LIMIT')) {
+        if (response.quota_remaining <= (settings.get('API_QUOTA_LIMIT') as number)) {
             window.clearInterval(mainInterval);
             return; // Exit script
         }
@@ -233,7 +234,10 @@ function UserScript(): void {
             lastSuccessfulRead = toDate + 1;
 
             response.items.forEach((comment: APIComment) => {
-                if (postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) && comment.body_markdown.length <= settings.get('MAXIMUM_LENGTH_COMMENT')) {
+                if (
+                    postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
+                    comment.body_markdown.length <= (settings.get('MAXIMUM_LENGTH_COMMENT') as number)
+                ) {
                     const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
                     const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
                     if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
