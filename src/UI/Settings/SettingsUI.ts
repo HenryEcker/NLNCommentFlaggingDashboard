@@ -46,6 +46,7 @@ export class SettingsUI {
             buttonGeneral: 's-btn',
         }
     };
+    private readonly boundEscapeHandler: (ev: KeyboardEvent) => void;
 
 
     constructor(mountPoint: JQuery<HTMLElement>, config: SettingConfigType) {
@@ -60,8 +61,8 @@ export class SettingsUI {
             return acc;
         }, {} as ConfigVars);
         this.currentConfigVars = this.load();
-        // Form
-        this.formConfigVars = {...this.defaultConfigVars, ...this.currentConfigVars};
+        this.formConfigVars = {};
+        this.boundEscapeHandler = this.escapeKeyHandler.bind(this);
     }
 
     private load(): ConfigVars {
@@ -143,16 +144,17 @@ export class SettingsUI {
         return row;
     }
 
-    private buildUI(): void {
-        this.mountPoint.empty();
-        const wrapper = $(`<div class="nln-config-wrapper"></div>`);
-        // Header
-        wrapper.append(
-            $(`<div class="nln-config-header"><span>${this.config.title}</span></div>`)
-        );
+    private buildHeaderUI(): JQuery<HTMLElement> {
+        const header: JQuery<HTMLElement> = $(`<div class="nln-config-header"></div>`)
+        header.append($(`<span class="nln-header-text">${this.config.title}</span>`));
+        const closeButton = $(`<button class="nln-config-close-button" title="close this popup (or hit Esc)">×</button>`);
+        closeButton.on('click', () => this.close());
+        header.append(closeButton);
+        return header;
+    }
 
-        // Form
-        const form = $(`<form></form>`);
+    private buildFormUI(): JQuery<HTMLFormElement> {
+        const form: JQuery<HTMLFormElement> = $(`<form></form>`);
         Object.entries(this.config.fields).forEach(([fsName, fields]) => {
             const fieldset = $(`<fieldset></fieldset>`);
             const legend = $(`<legend>${fsName}</legend>`);
@@ -164,9 +166,9 @@ export class SettingsUI {
         });
         // Form Buttons
         const formButtonWrapper = $(`<div class="nln-config-buttons"></div>`);
-        const saveButton = $(`<button class="${this.SO.CSS.buttonPrimary}" type="submit">Save and Reload</button>`);
-        const revertButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="button">Revert Changes</button>`);
-        const resetButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="reset">Reset to default</button>`);
+        const saveButton = $(`<button class="${this.SO.CSS.buttonPrimary}" type="submit" title="save the current settings and reload the page">Save and Reload</button>`);
+        const revertButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="button" title="revert any changes to the last save point">Revert Changes</button>`);
+        const resetButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="reset" title="reset all values to their defaults">Reset to default</button>`);
 
         form.on('submit', (ev) => {
             ev.preventDefault();
@@ -198,11 +200,43 @@ export class SettingsUI {
         formButtonWrapper.append(revertButton);
         formButtonWrapper.append(saveButton);
         form.append(formButtonWrapper);
-        wrapper.append(form);
-        this.mountPoint.append(wrapper);
+        return form;
     }
 
+    private buildUI(): void {
+        this.mountPoint.empty();
+        const fullScreenModalContainer = $('<div id="nln-flagging-dashboard-settings-modal"></div>');
+        const modalContainer = $(`<div class="nln-config-wrapper"></div>`);
+
+        // Header
+        modalContainer.append(this.buildHeaderUI());
+        // Form
+        modalContainer.append(this.buildFormUI());
+
+        fullScreenModalContainer.append(modalContainer);
+        this.mountPoint.append(fullScreenModalContainer);
+    }
+
+    private escapeKeyHandler(event: KeyboardEvent): void {
+        if (event.defaultPrevented) {
+            return; // Should do nothing if the default action has been cancelled
+        }
+        if (event.key === 'Escape') {
+            this.close();
+        }
+    }
+
+
     open(): void {
+        // Form
+        this.formConfigVars = {...this.defaultConfigVars, ...this.currentConfigVars};
         this.buildUI();
+        window.addEventListener("keydown", this.boundEscapeHandler);
+    }
+
+    close(): void {
+        this.formConfigVars = {}; // empty formConfig when UI is destroyed
+        this.mountPoint.empty();
+        window.removeEventListener("keydown", this.boundEscapeHandler);
     }
 }

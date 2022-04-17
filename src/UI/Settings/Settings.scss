@@ -3,8 +3,8 @@
   $secondary: black;
   $border: 1px solid $secondary;
   $wrapper-top-bottom-padding: 0.5em;
-  $header-padding: 0.25em;
-  $row-padding: $header-padding 10px;
+  $base-padding: 0.25em;
+  $row-padding: $base-padding 10px;
 
   // Fixed Full Window Size
   position: fixed;
@@ -37,10 +37,21 @@
 
     .nln-config-header {
       border-bottom: $border;
-      padding-left: $header-padding;
+      padding: $base-padding;
+      display: flex;
+      align-content: center;
 
-      span {
+
+      .nln-header-text {
         font-size: 2em;
+        padding-right: $base-padding;
+      }
+
+      .nln-config-close-button {
+        background: none;
+        border: none;
+        font-size: 24pt;
+        cursor: pointer;
       }
     }
 
@@ -55,7 +66,7 @@
           background-color: $secondary;
           color: $primary;
           width: 100%;
-          padding-left: $header-padding;
+          padding-left: $base-padding;
         }
 
         .nln-field-row {
@@ -80,7 +91,7 @@
 
       .nln-config-buttons {
         border-top: $border;
-        padding: $header-padding;
+        padding: $base-padding;
         display: flex;
         justify-content: right;
       }
