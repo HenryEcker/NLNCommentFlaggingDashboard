@@ -1,6 +1,7 @@
 import './Toast.scss';
-import {ToastTheme} from "../../Types";
 import {formatCSSDuration} from "../../Utils";
+
+export type ToastTheme = 'error' | 'warning';
 
 export class Toast {
     private readonly toastMountPoint: JQuery<HTMLElement>;

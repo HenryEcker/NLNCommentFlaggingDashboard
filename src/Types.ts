@@ -1,5 +1,4 @@
 export type PostType = 'question' | 'answer' | 'all';
-export type ToastTheme = 'error' | 'warning';
 
 export interface Comment {
     _id: number,
