@@ -31,7 +31,8 @@ function UserScript(): void {
                 'API Information': {
                     'SITE_NAME': {
                         'label': 'Site Name',
-                        'type': 'text',
+                        'type': 'select',
+                        'options': ['stackoverflow'],
                         'default': 'stackoverflow'
                     },
                     'ACCESS_TOKEN': {
