@@ -26,7 +26,8 @@
   font-size: var(--fs-body2);
 
   .nln-config-wrapper {
-    max-width: 60vw;
+    overflow-y: auto;
+    max-height: 100%;
     background-color: $primary;
     color: $secondary;
     border: $border;
