@@ -1,5 +1,5 @@
 import './Toast.scss';
-import {ToastType} from "../../Types";
+import {ToastTheme} from "../../Types";
 import {formatCSSDuration} from "../../Utils";
 
 export class Toast {
@@ -12,8 +12,8 @@ export class Toast {
         this.openCloseDuration = openCloseDuration;
     }
 
-    open(message: string, toastType: ToastType, toastDuration: number | undefined = 5000): void {
-        const toastDiv = $(`<div class="nln-toast open ${toastType}"></div>`);
+    open(message: string, toastTheme: ToastTheme, toastDuration: number | undefined = 5000): void {
+        const toastDiv = $(`<div class="nln-toast open ${toastTheme}"></div>`);
         toastDiv.css('animation-duration', formatCSSDuration(this.openCloseDuration));
         {
             const toastContent = $(` <div class="toast-content"></div></div>`);

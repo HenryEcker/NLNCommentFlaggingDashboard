@@ -33,6 +33,7 @@
   overflow: hidden;
 
   @include themed-toast('error', var(--theme-body-font-color), rgba(255, 0, 0, 65%), rgb(255, 0, 0));
+  @include themed-toast('warning', var(--theme-body-font-color), rgba(hsl(27, 90%, 55%), 65%), hsl(27, 90%, 55%));
 
   .toast-text {
     padding: 1em;

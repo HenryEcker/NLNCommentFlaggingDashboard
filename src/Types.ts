@@ -1,5 +1,5 @@
 export type PostType = 'question' | 'answer' | 'all';
-export type ToastType = 'error';
+export type ToastTheme = 'error' | 'warning';
 
 export interface Comment {
     _id: number,
@@ -84,4 +84,7 @@ export class OutOfFlagsError extends FlagAttemptFailed {
 }
 
 export class AlreadyDeletedError extends FlagAttemptFailed {
+}
+
+export class AlreadyFlaggedError extends FlagAttemptFailed {
 }
