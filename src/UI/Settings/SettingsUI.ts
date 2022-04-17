@@ -1,35 +1,22 @@
 import './Settings.scss';
 
-interface Field {
+type ValueType = string | number | boolean;
+
+interface FieldConfig {
     label: string
+    default?: ValueType
 }
 
-interface NumberField extends Field {
-    type: 'number',
-    default?: number,
-    min?: number,
-    max?: number,
-    step?: number,
+interface InputFieldConfig extends FieldConfig {
+    type: 'number' | 'text' | 'checkbox'
+    attributes?: {
+        [key: string]: ValueType
+    }
 }
 
-interface TextInputField extends Field {
-    type: 'text',
-    default?: string,
-    minlength?: number,
-    maxlength?: number,
-    size?: number,
-    required?: boolean,
-    placeholder?: boolean
-}
-
-interface CheckboxField extends Field {
-    type: 'checkbox',
-    default?: boolean
-}
-
-interface SelectField extends Field {
-    type: 'select',
-    options: Array<string>,
+interface SelectFieldConfig extends FieldConfig {
+    type: 'select'
+    options: Array<string>
     default: string
 }
 
@@ -38,21 +25,21 @@ interface SettingConfigType {
     title: string,
     fields: {
         [fieldset: string]: {
-            [key: string]: NumberField | TextInputField | CheckboxField | SelectField
+            [key: string]: InputFieldConfig | SelectFieldConfig
         }
     }
 }
 
 interface ConfigVars {
-    [key: string]: string | number | boolean
+    [key: string]: ValueType
 }
 
 export class SettingsUI {
     private readonly config: SettingConfigType;
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly defaultConfigVars: ConfigVars;
-    private readonly currentConfigVars: ConfigVars;
-    private readonly updatedConfigVars: ConfigVars;
+    private currentConfigVars: ConfigVars;
+    private formConfigVars: ConfigVars;
     private readonly SO = {
         'CSS': {
             buttonPrimary: 's-btn s-btn__primary',
@@ -73,7 +60,8 @@ export class SettingsUI {
             return acc;
         }, {} as ConfigVars);
         this.currentConfigVars = this.load();
-        this.updatedConfigVars = {};
+        // Form
+        this.formConfigVars = {...this.defaultConfigVars, ...this.currentConfigVars};
     }
 
     private load(): ConfigVars {
@@ -89,61 +77,64 @@ export class SettingsUI {
         GM_setValue(this.config.id, JSON.stringify(this.currentConfigVars));
     }
 
-    get(key: string): string | number | boolean {
+    get(key: string): ValueType {
         return this.currentConfigVars[key] || this.defaultConfigVars[key];
     }
 
-    set(key: string, value: string | number | boolean): void {
+    set(key: string, value: ValueType): void {
         this.currentConfigVars[key] = value;
     }
 
-    private buildSelect(fieldId: string, fieldName: string, fieldOptions: SelectField, val: string): JQuery<HTMLSelectElement> {
+    private buildSelect(fieldId: string, fieldName: string, fieldOptions: SelectFieldConfig, val: ValueType): JQuery<HTMLSelectElement> {
         const select: JQuery<HTMLSelectElement> = $(`<select></select>`);
         select.attr('id', fieldId);
         fieldOptions.options.forEach((op) => {
             select.append($(`<option value="${op}">${op}</option>`))
         });
-        select.attr('value', val);
+        if (val !== undefined) {
+            select.attr('value', val.toString());
+        }
         select.on('change', (ev) => {
-            this.updatedConfigVars[fieldName] = (ev.target as HTMLSelectElement).value;
+            this.formConfigVars[fieldName] = (ev.target as HTMLSelectElement).value;
         });
         return select;
     }
 
-    private buildInput(fieldId: string, fieldName: string, fieldOptions: NumberField | TextInputField | CheckboxField, val: string): JQuery<HTMLInputElement> {
+    private buildInput(fieldId: string, fieldName: string, fieldOptions: InputFieldConfig, val: ValueType): JQuery<HTMLInputElement> {
         const input: JQuery<HTMLInputElement> = $(`<input>`);
         input.attr('id', fieldId);
-        Object.entries(fieldOptions).forEach(([attributeName, value]) => {
-            if (!['label', 'default'].includes(attributeName)) {
-                input.attr(attributeName, value);
+        input.attr('type', fieldOptions.type);
+        if (fieldOptions.attributes !== undefined) {
+            Object.entries(fieldOptions.attributes).forEach(([attributeName, value]) => {
+                input.attr(attributeName, value.toString());
+            });
+        }
+        if (val !== undefined) {
+            if (fieldOptions.type === 'checkbox' && val === true) {
+                input.prop('checked', val);
+            } else {
+                input.attr('value', val as number | string);
             }
-        });
-        if (fieldOptions.type === 'checkbox') {
-            if (val === 'true') {
-                input.attr('checked', val);
-            }
-        } else {
-            input.attr('value', val);
         }
 
         input.on('change', (ev) => {
             const target = ev.target;
             if (target.type === 'checkbox') {
-                this.updatedConfigVars[fieldName] = target.checked;
+                this.formConfigVars[fieldName] = target.checked;
             } else {
-                this.updatedConfigVars[fieldName] = target.value;
+                this.formConfigVars[fieldName] = (target.type === 'number') ? Number(target.value) : target.value;
             }
         });
         return input;
     }
 
-    private buildFieldRow(fieldName: string, fieldOptions: NumberField | TextInputField | CheckboxField | SelectField): JQuery<HTMLElement> {
+    private buildFieldRow(fieldName: string, fieldOptions: InputFieldConfig | SelectFieldConfig): JQuery<HTMLElement> {
         const row = $(`<div class="nln-field-row"></div>`)
         const fieldId = `${this.config.id}_${fieldName}`;
         const label = $(`<label id="${fieldId}_label" for="${fieldId}">${fieldOptions.label}</label>`);
         row.append(label);
 
-        const val = this.get(fieldName).toString();
+        const val = this.formConfigVars[fieldName];
         if (fieldOptions.type === 'select') {
             row.append(this.buildSelect(fieldId, fieldName, fieldOptions, val));
         } else {
@@ -153,7 +144,8 @@ export class SettingsUI {
     }
 
     private buildUI(): void {
-        const wrapper = $(`<div class="nln-config-wrapper"></div>`)
+        this.mountPoint.empty();
+        const wrapper = $(`<div class="nln-config-wrapper"></div>`);
         // Header
         wrapper.append(
             $(`<div class="nln-config-header"><span>${this.config.title}</span></div>`)
@@ -176,22 +168,26 @@ export class SettingsUI {
         const resetButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="reset">Reset to default</button>`);
 
         form.on('submit', (ev) => {
-            console.log('SUBMIT');
             ev.preventDefault();
-            console.log({...this.currentConfigVars, ...this.updatedConfigVars});
-            // Do Something to handle save and reload
+            // Set current config equal to the form config
+            this.currentConfigVars = {...this.formConfigVars};
+            // Save currentConfig
+            this.save();
+            // Reload window so changes take effect
+            window.location.reload();
         });
         form.on('reset', (ev) => {
-            console.log('RESET');
             ev.preventDefault();
-            // DO something to handle resetting to default
+            // set form config just to default (no current)
+            this.formConfigVars = {...this.defaultConfigVars};
+            // Rebuild the UI to display the changes
+            this.buildUI();
         });
 
         formButtonWrapper.append(saveButton);
         formButtonWrapper.append(resetButton);
         form.append(formButtonWrapper);
         wrapper.append(form);
-
         this.mountPoint.append(wrapper);
     }
 

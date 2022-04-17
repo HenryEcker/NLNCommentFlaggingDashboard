@@ -17,26 +17,34 @@ const settings = new SettingsUI(
                 'ACCESS_TOKEN': {
                     'label': 'Access Token',
                     'type': 'text',
-                    'size': 25
+                    'attributes': {
+                        'size': 25
+                    }
                 },
                 'KEY': {
                     'label': 'Key',
                     'type': 'text',
-                    'size': 25
+                    'attributes': {
+                        'size': 25
+                    }
                 },
                 'API_QUOTA_LIMIT': {
                     'label': 'At what API quota should this script stop making new requests',
                     'type': 'number',
-                    'step': 1,
-                    'min': 0,
-                    'default': 500
+                    'default': 500,
+                    'attributes': {
+                        'step': 1,
+                        'min': 0,
+                    }
                 },
                 'DELAY_BETWEEN_API_CALLS': {
                     'label': 'How frequently (in seconds) should comments be fetched',
                     'type': 'number',
-                    'step': 1,
-                    'min': 60, // Calls shouldn't be made more than once a minute
-                    'default': 180
+                    'default': 180,
+                    'attributes': {
+                        'step': 1,
+                        'min': 60, // Calls shouldn't be made more than once a minute
+                    }
                 },
             },
             'Run Information': {
@@ -59,31 +67,39 @@ const settings = new SettingsUI(
                 'MAXIMUM_LENGTH_COMMENT': {
                     'label': 'Maximum length comments to consider',
                     'type': 'number',
-                    'step': 1,
-                    'min': 15, // Minimum comment length
-                    'max': 600, // Maximum length limit
-                    'default': 600 // Default to max
+                    'default': 600,
+                    'attributes': {
+                        'step': 1,
+                        'min': 15, // Minimum comment length
+                        'max': 600, // Maximum length limit
+                    }
                 },
                 'HOUR_OFFSET': {
                     'label': 'How long ago (in hours) should the calls be offset',
                     'type': 'number',
-                    'min': 0,
-                    'default': 0
+                    'default': 0,
+                    'attributes': {
+                        'min': 0,
+                    }
                 },
                 'DISPLAY_CERTAINTY': {
                     'label': 'How certain should the script be to display in UI (out of 100)',
                     'type': 'number',
-                    'min': 0,
-                    'max': 100,
-                    'default': 25
+                    'default': 25,
+                    'attributes': {
+                        'min': 0,
+                        'max': 100,
+                    }
                 },
                 'FLAG_QUOTA_LIMIT': {
                     'label': 'Stop flagging with how many remaining comment flags',
                     'type': 'number',
-                    'step': 1,
-                    'min': 0,
-                    'max': 100,
-                    'default': 0
+                    'default': 0,
+                    'attributes': {
+                        'step': 1,
+                        'min': 0,
+                        'max': 100,
+                    }
                 },
             },
             'UI Settings': {
