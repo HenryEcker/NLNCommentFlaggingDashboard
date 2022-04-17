@@ -169,9 +169,10 @@ function UserScript(): void {
     const SITE_NAME: string = settings.get('SITE_NAME') as string;
     const ACCESS_TOKEN: string = settings.get('ACCESS_TOKEN') as string;
     const KEY: string = settings.get('KEY') as string;
-    if (!SITE_NAME || !ACCESS_TOKEN || !KEY) {
+    if (!ACCESS_TOKEN || !KEY) {
         // Will not run without a valid API auth string
         settings.open();
+        return;
     }
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
