@@ -2,26 +2,32 @@
   $border: 1px solid black;
   $primary: white;
   $secondary: black;
+  $wrapper-top-bottom-padding: 0.5em;
   $header-padding: 0.25em;
-  $row-padding: 5px;
+  $row-padding: $header-padding 10px;
 
   position: fixed;
   margin: 0;
   width: 100%;
   display: flex;
   justify-content: center;
+  font-family: var(--theme-body-font-family);
+  font-size: var(--fs-body2);
+  max-height: 100%;
+  overflow-y: auto;
 
   .nln-config-wrapper {
+    height: 100%;
     max-width: 60vw;
     background-color: $primary;
     color: $secondary;
     border: $border;
-    overflow-y: scroll;
-    max-height: 90vh;
+    border-radius: 10px;
+    padding-top: $wrapper-top-bottom-padding;
+    padding-bottom: $wrapper-top-bottom-padding;
 
     .nln-config-header {
       border-bottom: $border;
-      padding-top: 0.5em;
       padding-left: $header-padding;
 
       span {
@@ -47,7 +53,27 @@
 
         .nln-field-row {
           padding: $row-padding;
+          display: flex;
+          flex-wrap: nowrap;
+          flex-direction: row;
+          align-items: center;
+
+          label {
+            padding-right: 10px;
+          }
+
+          input {
+            padding: unset;
+            box-shadow: unset;
+            border-color: $secondary;
+            color: $secondary;
+          }
         }
+      }
+
+      .nln-config-buttons {
+        display: flex;
+        justify-content: right;
       }
     }
   }

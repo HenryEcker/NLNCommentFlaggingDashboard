@@ -52,6 +52,13 @@ export class SettingsUI {
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly defaultConfigVars: ConfigVars;
     private readonly currentConfigVars: ConfigVars;
+    private readonly SO = {
+        'CSS': {
+            buttonPrimary: 's-btn s-btn__primary',
+            buttonGeneral: 's-btn',
+        }
+    };
+
 
     constructor(mountPoint: JQuery<HTMLElement>, config: SettingConfigType) {
         this.mountPoint = mountPoint;
@@ -137,7 +144,27 @@ export class SettingsUI {
             });
             form.append(fieldset);
         });
+        // Form Buttons
+        const formButtonWrapper = $(`<div class="nln-config-buttons"></div>`);
+        const saveButton = $(`<button class="${this.SO.CSS.buttonPrimary}" type="submit">Save and Reload</button>`);
+        const resetButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="reset">Reset to default</button>`);
+
+        form.on('submit', (ev) => {
+            console.log('SUBMIT');
+            ev.preventDefault();
+            // Do Something to handle save and reload
+        });
+        form.on('reset', (ev) => {
+            console.log('RESET');
+            ev.preventDefault();
+            // DO something to handle resetting to default
+        });
+
+        formButtonWrapper.append(saveButton);
+        formButtonWrapper.append(resetButton);
+        form.append(formButtonWrapper);
         wrapper.append(form);
+
         this.mountPoint.append(wrapper);
     }
 
