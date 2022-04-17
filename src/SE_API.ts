@@ -1,5 +1,13 @@
 import {getFormDataFromObject, getURLSearchParamsFromObject} from "./Utils";
-import {Comment, FlagAttemptFailed, RatedLimitedError, SECommentAPIResponse, SEFlagResponse} from "./Types";
+import {
+    AlreadyDeletedError,
+    CommentFlagResult,
+    FlagAttemptFailed,
+    OutOfFlagsError,
+    RatedLimitedError,
+    SECommentAPIResponse,
+    SEFlagResponse
+} from "./Types";
 
 
 /**
@@ -64,14 +72,16 @@ export function getFlagQuota(commentID: number): Promise<number> {
  * Flag the comment using an HTML POST to the route. The NLN flag type is hard coded (39).
  *
  * @param {string} fkey Needed to identify the user
- * @param {Comment} comment the complete comment object
- * @returns {Promise<Comment>} Resolves with a new comment object with appropriate fields set to indicate if the flag was successful and how the comment responded to the flag
+ * @param {number} comment_id the complete comment object
+ * @returns {Promise<CommentFlagResult>} Resolves a CommentFlagResult with information about what happened to the comment
  *
  * @throws {RatedLimitedError} Throws a RateLimitedError when attempting to flag too quickly. The flags can only be added every 5 seconds (globally)
+ * @throws {OutOfFlagsError} Throws an OutOfFlagsError when attempting to flag a post without any remaining daily flags.
+ * @throws {AlreadyDeletedError} Throws an AlreadyDeletedError when attempting to flag a comment that has already been deleted
  * @throws {FlagAttemptFailed} Throws a FlagAttemptFailed if the flag attempt failed for some other reason than RateLimit, AlreadyFlagged, or Already Deleted.
  */
-export function flagComment(fkey: string, comment: Comment): Promise<Comment> {
-    return fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
+export function flagComment(fkey: string, comment_id: number): Promise<CommentFlagResult> {
+    return fetch(`https://${location.hostname}/flags/comments/${comment_id}/add/39`, {
         method: "POST",
         body: getFormDataFromObject({
             'fkey': fkey,
@@ -86,23 +96,23 @@ export function flagComment(fkey: string, comment: Comment): Promise<Comment> {
         }
     }).then((resData: SEFlagResponse) => {
         if (resData.Success && resData.Outcome === 0) {
-            comment.was_flagged = true;
-            comment.was_deleted = resData.ResultChangedState
+            return {
+                was_deleted: resData.ResultChangedState,
+                was_flagged: true
+            };
         } else if (!resData.Success && resData.Outcome === 2) {
             if (resData.Message === "You have already flagged this comment") {
-                comment.was_flagged = true;
-                comment.was_deleted = false;
+                return {
+                    was_deleted: false,
+                    was_flagged: true
+                };
             } else if (resData.Message === "This comment is deleted and cannot be flagged") {
-                comment.can_flag = false;
-                comment.was_flagged = false; // This might have been previously flagged by you, but this flag attempt did not result in a flag
-                comment.was_deleted = true;
+                throw new AlreadyDeletedError(resData.Message);
             } else if (resData.Message.toLowerCase().includes('out of flag')) {
-                comment.can_flag = false;
-                comment.was_flagged = false;
-            } else {
-                throw new FlagAttemptFailed(resData.Message);
+                throw new OutOfFlagsError(resData.Message);
             }
         }
-        return comment;
+        // General Something else went wrong
+        throw new FlagAttemptFailed(resData.Message);
     });
 }

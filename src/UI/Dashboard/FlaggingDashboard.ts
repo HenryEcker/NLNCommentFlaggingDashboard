@@ -1,4 +1,12 @@
-import {Comment, FlagAttemptFailed, FlaggingDashboardConfig, RatedLimitedError} from "../../Types";
+import {
+    AlreadyDeletedError,
+    Comment,
+    CommentFlagResult,
+    FlagAttemptFailed,
+    FlaggingDashboardConfig,
+    OutOfFlagsError,
+    RatedLimitedError
+} from "../../Types";
 import {capitalise, formatPercentage} from "../../Utils";
 import {flagComment} from "../../SE_API";
 import {Toast} from "../Toast/Toast";
@@ -197,12 +205,16 @@ export class FlaggingDashboard {
      * @param comment the comment to flag
      */
     handleFlagComment(comment: Comment) {
-        flagComment(this.fkey, comment).then((newComment: Comment) => {
-            this.tableData[newComment._id] = newComment;
+        flagComment(this.fkey, comment._id).then((result: CommentFlagResult) => {
+            this.tableData[comment._id].was_flagged = result.was_flagged;
+            this.tableData[comment._id].was_deleted = result.was_deleted;
         }).catch((err) => {
             if (err instanceof RatedLimitedError) {
                 this.toaster.open('Flagging too fast!', 'error');
-            } else if (err instanceof FlagAttemptFailed) {
+            } else if (err instanceof AlreadyDeletedError) {
+                this.tableData[comment._id].can_flag = false;
+                this.tableData[comment._id].was_deleted = true;
+            } else if (err instanceof OutOfFlagsError || err instanceof FlagAttemptFailed) {
                 this.toaster.open(err.message, 'error', 8000);
                 this.tableData[comment._id].can_flag = false;
             }

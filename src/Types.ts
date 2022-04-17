@@ -14,6 +14,11 @@ export interface Comment {
     was_deleted?: boolean
 }
 
+export interface CommentFlagResult {
+    was_deleted: boolean,
+    was_flagged: boolean
+}
+
 export interface SEFlagResponse {
     Success: boolean,
     Outcome: number,
@@ -72,5 +77,11 @@ class SelfNamedError extends Error {
 export class FlagAttemptFailed extends SelfNamedError {
 }
 
-export class RatedLimitedError extends SelfNamedError {
+export class RatedLimitedError extends FlagAttemptFailed {
+}
+
+export class OutOfFlagsError extends FlagAttemptFailed {
+}
+
+export class AlreadyDeletedError extends FlagAttemptFailed {
 }
