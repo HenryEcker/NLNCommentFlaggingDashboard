@@ -38,8 +38,8 @@ export interface APIComment {
 export interface SECommentAPIResponse {
     items: Array<APIComment>,
     has_more: boolean,
-    quota_max: boolean,
-    quota_remaining: boolean
+    quota_max: number,
+    quota_remaining: number
 }
 
 export interface FlaggingDashboardConfig {
