@@ -52,6 +52,7 @@ export class SettingsUI {
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly defaultConfigVars: ConfigVars;
     private readonly currentConfigVars: ConfigVars;
+    private readonly updatedConfigVars: ConfigVars;
     private readonly SO = {
         'CSS': {
             buttonPrimary: 's-btn s-btn__primary',
@@ -72,6 +73,7 @@ export class SettingsUI {
             return acc;
         }, {} as ConfigVars);
         this.currentConfigVars = this.load();
+        this.updatedConfigVars = {};
     }
 
     private load(): ConfigVars {
@@ -95,6 +97,61 @@ export class SettingsUI {
         this.currentConfigVars[key] = value;
     }
 
+    private buildSelect(fieldId: string, fieldName: string, fieldOptions: SelectField, val: string): JQuery<HTMLSelectElement> {
+        const select: JQuery<HTMLSelectElement> = $(`<select></select>`);
+        select.attr('id', fieldId);
+        fieldOptions.options.forEach((op) => {
+            select.append($(`<option value="${op}">${op}</option>`))
+        });
+        select.attr('value', val);
+        select.on('change', (ev) => {
+            this.updatedConfigVars[fieldName] = (ev.target as HTMLSelectElement).value;
+        });
+        return select;
+    }
+
+    private buildInput(fieldId: string, fieldName: string, fieldOptions: NumberField | TextInputField | CheckboxField, val: string): JQuery<HTMLInputElement> {
+        const input: JQuery<HTMLInputElement> = $(`<input>`);
+        input.attr('id', fieldId);
+        Object.entries(fieldOptions).forEach(([attributeName, value]) => {
+            if (!['label', 'default'].includes(attributeName)) {
+                input.attr(attributeName, value);
+            }
+        });
+        if (fieldOptions.type === 'checkbox') {
+            if (val === 'true') {
+                input.attr('checked', val);
+            }
+        } else {
+            input.attr('value', val);
+        }
+
+        input.on('change', (ev) => {
+            const target = ev.target;
+            if (target.type === 'checkbox') {
+                this.updatedConfigVars[fieldName] = target.checked;
+            } else {
+                this.updatedConfigVars[fieldName] = target.value;
+            }
+        });
+        return input;
+    }
+
+    private buildFieldRow(fieldName: string, fieldOptions: NumberField | TextInputField | CheckboxField | SelectField): JQuery<HTMLElement> {
+        const row = $(`<div class="nln-field-row"></div>`)
+        const fieldId = `${this.config.id}_${fieldName}`;
+        const label = $(`<label id="${fieldId}_label" for="${fieldId}">${fieldOptions.label}</label>`);
+        row.append(label);
+
+        const val = this.get(fieldName).toString();
+        if (fieldOptions.type === 'select') {
+            row.append(this.buildSelect(fieldId, fieldName, fieldOptions, val));
+        } else {
+            row.append(this.buildInput(fieldId, fieldName, fieldOptions, val));
+        }
+        return row;
+    }
+
     private buildUI(): void {
         const wrapper = $(`<div class="nln-config-wrapper"></div>`)
         // Header
@@ -108,39 +165,8 @@ export class SettingsUI {
             const fieldset = $(`<fieldset></fieldset>`);
             const legend = $(`<legend>${fsName}</legend>`);
             fieldset.append(legend);
-
             Object.entries(fields).forEach(([fieldName, fieldOptions]) => {
-                const row = $(`<div class="nln-field-row"></div>`)
-                const fieldId = `${this.config.id}_${fieldName}`;
-                const label = $(`<label id="${fieldId}_label" for="${fieldId}">${fieldOptions.label}</label>`);
-                row.append(label);
-
-                const val = this.get(fieldName).toString();
-                if (fieldOptions.type === 'select') {
-                    const select = $(`<select></select>`);
-                    select.attr('id', fieldId);
-                    fieldOptions.options.forEach((op) => {
-                        select.append($(`<option value="${op}">${op}</option>`))
-                    });
-                    select.attr('value', val);
-                    row.append(select);
-                } else {
-                    const input = $(`<input>`);
-                    input.attr('id', fieldId);
-                    Object.entries(fieldOptions).forEach(([attributeName, value]) => {
-                        if (!['label', 'default'].includes(attributeName)) {
-                            input.attr(attributeName, value);
-                        }
-                    });
-                    if (fieldOptions.type === 'checkbox') {
-                        if (val === 'true') {
-                            input.attr('checked', val);
-                        }
-                    }
-                    input.attr('value', val);
-                    row.append(input);
-                }
-                fieldset.append(row);
+                fieldset.append(this.buildFieldRow(fieldName, fieldOptions));
             });
             form.append(fieldset);
         });
@@ -152,6 +178,7 @@ export class SettingsUI {
         form.on('submit', (ev) => {
             console.log('SUBMIT');
             ev.preventDefault();
+            console.log({...this.currentConfigVars, ...this.updatedConfigVars});
             // Do Something to handle save and reload
         });
         form.on('reset', (ev) => {
