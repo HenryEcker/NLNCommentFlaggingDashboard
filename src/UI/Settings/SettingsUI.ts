@@ -165,6 +165,7 @@ export class SettingsUI {
         // Form Buttons
         const formButtonWrapper = $(`<div class="nln-config-buttons"></div>`);
         const saveButton = $(`<button class="${this.SO.CSS.buttonPrimary}" type="submit">Save and Reload</button>`);
+        const revertButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="button">Revert Changes</button>`);
         const resetButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="reset">Reset to default</button>`);
 
         form.on('submit', (ev) => {
@@ -176,6 +177,15 @@ export class SettingsUI {
             // Reload window so changes take effect
             window.location.reload();
         });
+
+        revertButton.on('click', (ev) => {
+            ev.preventDefault();
+            // Restore formConfig to default
+            this.formConfigVars = {...this.defaultConfigVars, ...this.currentConfigVars};
+            // Rebuild UI
+            this.buildUI();
+        });
+
         form.on('reset', (ev) => {
             ev.preventDefault();
             // set form config just to default (no current)
@@ -184,8 +194,9 @@ export class SettingsUI {
             this.buildUI();
         });
 
-        formButtonWrapper.append(saveButton);
         formButtonWrapper.append(resetButton);
+        formButtonWrapper.append(revertButton);
+        formButtonWrapper.append(saveButton);
         form.append(formButtonWrapper);
         wrapper.append(form);
         this.mountPoint.append(wrapper);

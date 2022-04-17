@@ -1,23 +1,31 @@
 #nln-flagging-dashboard-settings-modal {
-  $border: 1px solid black;
   $primary: white;
   $secondary: black;
+  $border: 1px solid $secondary;
   $wrapper-top-bottom-padding: 0.5em;
   $header-padding: 0.25em;
   $row-padding: $header-padding 10px;
 
+  // Fixed Full Window Size
   position: fixed;
+  top: 0;
+  left: 0;
   margin: 0;
+  padding: 0;
+  height: 100%;
   width: 100%;
+  // Same level as all other SO modals
+  z-index: var(--zi-modals);
+  // Center the wrapper in the window
   display: flex;
   justify-content: center;
+  align-items: center;
+
+  // Font
   font-family: var(--theme-body-font-family);
   font-size: var(--fs-body2);
-  max-height: 100%;
-  overflow-y: auto;
 
   .nln-config-wrapper {
-    height: 100%;
     max-width: 60vw;
     background-color: $primary;
     color: $secondary;
@@ -36,8 +44,6 @@
     }
 
     form {
-      height: 100%;
-
       fieldset {
         display: flex;
         flex-wrap: nowrap;
@@ -63,7 +69,7 @@
           }
 
           input {
-            padding: unset;
+            padding: 2px;
             box-shadow: unset;
             border-color: $secondary;
             color: $secondary;
@@ -72,6 +78,8 @@
       }
 
       .nln-config-buttons {
+        border-top: $border;
+        padding: $header-padding;
         display: flex;
         justify-content: right;
       }
