@@ -1,5 +1,6 @@
 import {
     AlreadyDeletedError,
+    AlreadyFlaggedError,
     Comment,
     CommentFlagResult,
     FlagAttemptFailed,
@@ -211,7 +212,12 @@ export class FlaggingDashboard {
         }).catch((err) => {
             if (err instanceof RatedLimitedError) {
                 this.toaster.open('Flagging too fast!', 'error');
+            } else if (err instanceof AlreadyFlaggedError) {
+                this.toaster.open(err.message, 'warning', 1000);
+                this.tableData[comment._id].was_flagged = true;
+                this.tableData[comment._id].was_deleted = false;
             } else if (err instanceof AlreadyDeletedError) {
+                this.toaster.open(err.message, 'error', 1000);
                 this.tableData[comment._id].can_flag = false;
                 this.tableData[comment._id].was_deleted = true;
             } else if (err instanceof OutOfFlagsError || err instanceof FlagAttemptFailed) {

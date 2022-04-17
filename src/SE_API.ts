@@ -1,6 +1,7 @@
 import {getFormDataFromObject, getURLSearchParamsFromObject} from "./Utils";
 import {
     AlreadyDeletedError,
+    AlreadyFlaggedError,
     CommentFlagResult,
     FlagAttemptFailed,
     OutOfFlagsError,
@@ -102,10 +103,7 @@ export function flagComment(fkey: string, comment_id: number): Promise<CommentFl
             };
         } else if (!resData.Success && resData.Outcome === 2) {
             if (resData.Message === "You have already flagged this comment") {
-                return {
-                    was_deleted: false,
-                    was_flagged: true
-                };
+                throw new AlreadyFlaggedError(resData.Message);
             } else if (resData.Message === "This comment is deleted and cannot be flagged") {
                 throw new AlreadyDeletedError(resData.Message);
             } else if (resData.Message.toLowerCase().includes('out of flag')) {
