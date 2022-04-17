@@ -79,7 +79,11 @@ export class SettingsUI {
     }
 
     get(key: string): ValueType {
-        return this.currentConfigVars[key] || this.defaultConfigVars[key];
+        if (this.currentConfigVars[key] !== undefined) {
+            return this.currentConfigVars[key];
+        } else {
+            return this.defaultConfigVars[key];
+        }
     }
 
     set(key: string, value: ValueType): void {
