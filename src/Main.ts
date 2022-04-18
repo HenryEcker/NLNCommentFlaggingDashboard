@@ -114,16 +114,6 @@ function UserScript(): void {
                             'step': 0.01
                         }
                     },
-                    'FLAG_QUOTA_LIMIT': {
-                        'label': 'Stop flagging with how many remaining comment flags',
-                        'type': 'number',
-                        'default': 0,
-                        'attributes': {
-                            'step': 1,
-                            'min': 0,
-                            'max': 100,
-                        }
-                    },
                 },
                 'UI Settings': {
                     'DOCUMENT_TITLE_SHOULD_UPDATE': {
@@ -226,6 +216,7 @@ function UserScript(): void {
             toDate
         );
         if (response.quota_remaining <= (settings.get('API_QUOTA_LIMIT') as number)) {
+            toaster.open('Remaining API Threshold below limit. Stopping Script.', 'error', undefined);
             window.clearInterval(mainInterval);
             return; // Exit script
         }
