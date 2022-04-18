@@ -174,87 +174,81 @@ function UserScript(): void {
     const li: JQuery = $('<li></li>')
     li.append(settingsButton);
     $('header ol.s-topbar--content > li:nth-child(2)').after(li);
-
-
     const fkey = StackExchange.options.user.fkey;
 
-    // Prime last successful read
-    let lastSuccessfulRead: number = Math.floor((getOffset(settings.get('HOUR_OFFSET') as number) - API_REQUEST_RATE) / 1000);
+    if ((settings.get('ACTIVE') as boolean)) {
+        // Prime last successful read
+        let lastSuccessfulRead: number = Math.floor((getOffset(settings.get('HOUR_OFFSET') as number) - API_REQUEST_RATE) / 1000);
 
 
-    // Create Toaster for custom Toast Messages
-    const toaster = new Toast("NLN-Toast-Container");
+        // Create Toaster for custom Toast Messages
+        const toaster = new Toast("NLN-Toast-Container");
 
-    // Build UI
-    const UI: FlaggingDashboard = new FlaggingDashboard(
-        $('#mainbar'),
-        fkey,
-        {
-            displayLink: settings.get('UI_DISPLAY_LINK_TO_COMMENT') as boolean,
-            displayPostType: settings.get('UI_DISPLAY_POST_TYPE') as boolean,
-            displayNoiseRatio: settings.get('UI_DISPLAY_NOISE_RATIO') as boolean,
-            displayFlagUI: settings.get('UI_DISPLAY_FLAG_BUTTON') as boolean,
-            displayBlacklistMatches: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
-            displayCommentDeleteState: settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean,
-            shouldUpdateTitle: settings.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean
-        } as FlaggingDashboardConfig,
-        toaster
-    );
-
-    UI.init();
-    // Only Render if Active
-    if (settings.get('ACTIVE')) {
-        UI.render();
-    }
-
-    const main = async (mainInterval?: number) => {
-        const toDate = Math.floor(getOffset(settings.get('HOUR_OFFSET') as number) / 1000);
-        const response: SECommentAPIResponse = await getComments(
-            AUTH_STR,
-            COMMENT_FILTER,
-            lastSuccessfulRead,
-            toDate
+        // Build UI
+        const UI: FlaggingDashboard = new FlaggingDashboard(
+            $('#mainbar'),
+            fkey,
+            {
+                displayLink: settings.get('UI_DISPLAY_LINK_TO_COMMENT') as boolean,
+                displayPostType: settings.get('UI_DISPLAY_POST_TYPE') as boolean,
+                displayNoiseRatio: settings.get('UI_DISPLAY_NOISE_RATIO') as boolean,
+                displayFlagUI: settings.get('UI_DISPLAY_FLAG_BUTTON') as boolean,
+                displayBlacklistMatches: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
+                displayCommentDeleteState: settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean,
+                shouldUpdateTitle: settings.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean
+            } as FlaggingDashboardConfig,
+            toaster
         );
-        if (response.quota_remaining <= (settings.get('API_QUOTA_LIMIT') as number)) {
-            toaster.open('Remaining API Threshold below limit. Stopping Script.', 'error', undefined);
-            window.clearInterval(mainInterval);
-            return; // Exit script
-        }
-        if (response.items.length > 0) {
 
-            // Update last successful read time
-            lastSuccessfulRead = toDate + 1;
+        UI.init();
 
-            response.items.forEach((comment: APIComment) => {
-                if (
-                    postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
-                    comment.body_markdown.length <= (settings.get('MAXIMUM_LENGTH_COMMENT') as number)
-                ) {
-                    const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
-                    const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
-                    if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
-                        const noiseRatio = calcNoiseRatio(
-                            blacklistMatches,
-                            decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
-                        );
-                        if (noiseRatio >= (settings.get('DISPLAY_CERTAINTY') as number)) {
-                            UI.addComment({
-                                can_flag: comment.can_flag,
-                                body: decodedMarkdown,
-                                link: comment.link,
-                                _id: comment.comment_id,
-                                post_id: comment.post_id,
-                                post_type: comment.post_type,
-                                blacklist_matches: blacklistMatches,
-                                noise_ratio: noiseRatio
-                            });
+        const main = async (mainInterval?: number) => {
+            const toDate = Math.floor(getOffset(settings.get('HOUR_OFFSET') as number) / 1000);
+            const response: SECommentAPIResponse = await getComments(
+                AUTH_STR,
+                COMMENT_FILTER,
+                lastSuccessfulRead,
+                toDate
+            );
+            if (response.quota_remaining <= (settings.get('API_QUOTA_LIMIT') as number)) {
+                toaster.open('Remaining API Threshold below limit. Stopping Script.', 'error', undefined);
+                window.clearInterval(mainInterval);
+                return; // Exit script
+            }
+            if (response.items.length > 0) {
+
+                // Update last successful read time
+                lastSuccessfulRead = toDate + 1;
+
+                response.items.forEach((comment: APIComment) => {
+                    if (
+                        postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
+                        comment.body_markdown.length <= (settings.get('MAXIMUM_LENGTH_COMMENT') as number)
+                    ) {
+                        const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
+                        const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
+                        if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
+                            const noiseRatio = calcNoiseRatio(
+                                blacklistMatches,
+                                decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
+                            );
+                            if (noiseRatio >= (settings.get('DISPLAY_CERTAINTY') as number)) {
+                                UI.addComment({
+                                    can_flag: comment.can_flag,
+                                    body: decodedMarkdown,
+                                    link: comment.link,
+                                    _id: comment.comment_id,
+                                    post_id: comment.post_id,
+                                    post_type: comment.post_type,
+                                    blacklist_matches: blacklistMatches,
+                                    noise_ratio: noiseRatio
+                                });
+                            }
                         }
                     }
-                }
-            });
-        }
-    };
-    if ((settings.get('ACTIVE') as boolean)) {
+                });
+            }
+        };
         if ((settings.get('RUN_IMMEDIATELY') as boolean)) {
             main();
         }
