@@ -1,4 +1,4 @@
-#nln-flagging-dashboard-settings-modal {
+.nln-config-modal-background {
   $primary: white;
   $secondary: black;
   $border: 1px solid $secondary;
@@ -25,7 +25,7 @@
   font-family: var(--theme-body-font-family);
   font-size: var(--fs-body2);
 
-  .nln-config-wrapper {
+  .nln-config-modal {
     overflow-y: auto;
     max-height: 100%;
     background-color: $primary;

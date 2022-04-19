@@ -209,8 +209,8 @@ export class SettingsUI {
 
     private buildUI(): void {
         this.mountPoint.empty();
-        const fullScreenModalContainer = $('<div id="nln-flagging-dashboard-settings-modal"></div>');
-        const modalContainer = $(`<div class="nln-config-wrapper"></div>`);
+        const fullScreenModalContainer = $('<div class="nln-config-modal-background"></div>');
+        const modalContainer = $(`<div class="nln-config-modal"></div>`);
 
         // Header
         modalContainer.append(this.buildHeaderUI());

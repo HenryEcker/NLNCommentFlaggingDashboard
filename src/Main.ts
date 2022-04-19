@@ -20,7 +20,7 @@ function postTypeFilter(configPT: PostType, actualPT: PostType): boolean {
 
 
 function UserScript(): void {
-    const settingMountPoint = $('<div></div>');
+    const settingMountPoint = $('<div id="nln-flagging-dashboard-settings-modal"></div>');
     $('body').append(settingMountPoint);
     const settings = new SettingsUI(
         settingMountPoint,
