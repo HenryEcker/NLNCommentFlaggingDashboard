@@ -146,6 +146,11 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'UI_DISPLAY_REMAINING_FLAGS': {
+                        'label': 'Display remaining flags (updated after flagging): ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                     'UI_DISPLAY_COMMENT_DELETE_STATE': {
                         'label': 'Display If comment was deleted or not: ',
                         'type': 'checkbox',
@@ -195,7 +200,8 @@ function UserScript(): void {
                 displayFlagUI: settings.get('UI_DISPLAY_FLAG_BUTTON') as boolean,
                 displayBlacklistMatches: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
                 displayCommentDeleteState: settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean,
-                shouldUpdateTitle: settings.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean
+                shouldUpdateTitle: settings.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean,
+                displayRemainingFlags: settings.get('UI_DISPLAY_REMAINING_FLAGS') as boolean
             } as FlaggingDashboardConfig,
             toaster
         );

@@ -9,11 +9,12 @@ import {
     RatedLimitedError
 } from "../../Types";
 import {capitalise, formatPercentage} from "../../Utils";
-import {flagComment} from "../../SE_API";
+import {flagComment, getFlagQuota} from "../../SE_API";
 import {Toast} from "../Toast/Toast";
 
 export class FlaggingDashboard {
     private readonly mountPoint: JQuery<HTMLElement>;
+    private readonly flagsRemainingDiv: JQuery<HTMLElement>;
     private readonly fkey: string;
     private readonly uiConfig: FlaggingDashboardConfig;
     private readonly toaster: Toast;
@@ -22,7 +23,8 @@ export class FlaggingDashboard {
         containerDivId: "NLN_Comment_Wrapper",
         tableId: "NLN_Comment_Reports_Table",
         tableBodyId: "NLN_Comment_Reports_Table_Body",
-        styleId: "nln-comment-userscript-styles"
+        styleId: "nln-comment-userscript-styles",
+        remainingFlags: "NLN_Remaining_Comment_Flags"
     };
     private readonly SO = {
         'CSS': {
@@ -30,6 +32,8 @@ export class FlaggingDashboard {
             table: 's-table',
             buttonPrimary: 's-btn s-btn__primary',
             buttonGeneral: 's-btn',
+            flagsRemainingDiv: 'flex--item ml-auto fc-light',
+            footer: 'd-flex gs8 gsx ai-center',
         },
         'HTML': {
             pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
@@ -46,6 +50,7 @@ export class FlaggingDashboard {
      */
     constructor(mountPoint: JQuery<HTMLElement>, fkey: string, uiConfig: FlaggingDashboardConfig, toaster: Toast) {
         this.mountPoint = mountPoint;
+        this.flagsRemainingDiv = $(`<div class="${this.SO.CSS.flagsRemainingDiv}" id="${this.htmlIds.remainingFlags}"></div>`);
         this.fkey = fkey;
         this.uiConfig = uiConfig;
         this.toaster = toaster;
@@ -63,7 +68,7 @@ export class FlaggingDashboard {
     /**
      * Create a style element and add CSS
      */
-    buildBaseStyles(): void {
+    private buildBaseStyles(): void {
         // Add Styles
         const styles = document.createElement('style');
         styles.setAttribute('id', this.htmlIds.styleId);
@@ -81,11 +86,11 @@ export class FlaggingDashboard {
     /**
      * Build the UI template (header body footer)
      */
-    buildBaseUI(): void {
-        const container = $(`<div id="${this.htmlIds.containerDivId}""></div>`);
+    private buildBaseUI(): void {
+        const container = $(`<div id="${this.htmlIds.containerDivId}"></div>`);
         // Header Elements
         {
-            const header = $('<div class=nln-header"></div>');
+            const header = $('<div class="nln-header"></div>');
             header.append($(`<h2>NLN Comment Flagging Dashboard</h2>`));
             container.append(header);
         }
@@ -123,13 +128,18 @@ export class FlaggingDashboard {
         }
         // After
         {
-            const footer = $('<div class="nln-footer"></div>');
-            const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
-            clearAllButton.on('click', () => {
-                this.tableData = {};
-                this.render();
-            })
-            footer.append(clearAllButton);
+            const footer = $(`<div class="nln-footer ${this.SO.CSS.footer}"></div>`);
+            {
+                const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
+                clearAllButton.on('click', () => {
+                    this.tableData = {};
+                    this.render();
+                })
+                footer.append(clearAllButton);
+            }
+            {
+                footer.append(this.flagsRemainingDiv);
+            }
             container.append(footer);
         }
         this.mountPoint.before(container);
@@ -138,7 +148,7 @@ export class FlaggingDashboard {
     /**
      * Render the currently available values in tableData
      */
-    render(): void {
+    private render(): void {
         const tbody = $(`#${this.htmlIds.tableBodyId}`);
         tbody.empty();
         Object.values(this.tableData).forEach(comment => {
@@ -205,11 +215,25 @@ export class FlaggingDashboard {
      *
      * @param comment the comment to flag
      */
-    handleFlagComment(comment: Comment) {
-        flagComment(this.fkey, comment._id).then((result: CommentFlagResult) => {
+    private async handleFlagComment(comment: Comment) {
+        let remainingFlags: number | undefined = undefined;
+        // Get remaining flag amount
+        if (this.uiConfig.displayRemainingFlags) {
+            try {
+                remainingFlags = await getFlagQuota(comment._id);
+            } catch (err) {
+                // Pass (It doesn't really matter whether the flag count is updated or not)
+            }
+        }
+        // Do Flag
+        try {
+            const result: CommentFlagResult = await flagComment(this.fkey, comment._id);
             this.tableData[comment._id].was_flagged = result.was_flagged;
             this.tableData[comment._id].was_deleted = result.was_deleted;
-        }).catch((err) => {
+            if (remainingFlags !== undefined) {
+                remainingFlags -= 1; // Flag was consumed
+            }
+        } catch (err) {
             if (err instanceof RatedLimitedError) {
                 this.toaster.open('Flagging too fast!', 'error');
             } else if (err instanceof AlreadyFlaggedError) {
@@ -224,9 +248,13 @@ export class FlaggingDashboard {
                 this.toaster.open(err.message, 'error', 8000);
                 this.tableData[comment._id].can_flag = false;
             }
-        }).finally(() => {
+        } finally {
             this.render();
-        });
+            // Only becomes a number if uiConfig.displayRemainingFlags is true
+            if (remainingFlags !== undefined) {
+                this.updateRemainingFlags(remainingFlags);
+            }
+        }
     }
 
     /**
@@ -253,7 +281,7 @@ export class FlaggingDashboard {
      * Adds (# pending comments) to the start of the tab title
      * Only if the config is set
      */
-    updatePageTitle(): void {
+    private updatePageTitle(): void {
         if (this.uiConfig.shouldUpdateTitle) {
             const pending = Object.values(this.tableData).reduce((acc, comment) => {
                 if (comment.can_flag && !comment.was_flagged) {
@@ -270,5 +298,9 @@ export class FlaggingDashboard {
             }
             document.title = title;
         }
+    }
+
+    private updateRemainingFlags(flagsRemaining: number): void {
+        this.flagsRemainingDiv.text(`You have ${flagsRemaining} flags left today`);
     }
 }
