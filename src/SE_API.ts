@@ -61,7 +61,7 @@ export function getFlagQuota(commentID: number): Promise<number> {
             })
             .fail((err: JQuery.jqXHR) => {
                 if (err.status === 409) {
-                    throw new RatedLimitedError("You may only load the comment flag dialog every 3 seconds");
+                    return reject(new RatedLimitedError("You may only load the comment flag dialog every 3 seconds"));
                 } else {
                     return reject();
                 }
