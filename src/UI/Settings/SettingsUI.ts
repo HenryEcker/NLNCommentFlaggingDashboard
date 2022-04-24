@@ -16,7 +16,7 @@ interface InputFieldConfig extends FieldConfig {
 
 interface SelectFieldConfig extends FieldConfig {
     type: 'select'
-    options: Array<string>
+    options: string[]
     default: string
 }
 

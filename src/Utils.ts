@@ -3,11 +3,11 @@ import {Comment} from "./Types";
 /**
  * Converts an array of distinct RegExp and joins them together using OR (|)
  *
- * @param {Array<RegExp>} arrRegex Array of RegExp that will be ORed (|) together
+ * @param {RegExp[]} arrRegex Array of RegExp that will be ORed (|) together
  * @param {string} flags String representation of flags to apply to the joined RegExp (e.g. 'g', 'i', 'gi', etc.)
  * @returns {RegExp} The joint RegExp
  */
-export function mergeRegexes(arrRegex: Array<RegExp>, flags: string): RegExp {
+export function mergeRegexes(arrRegex: RegExp[], flags: string): RegExp {
     return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
 }
 
@@ -43,11 +43,11 @@ export function formatPercentage(percent: number, precision = 2): string {
 /**
  * Calculate what percentage of the comment is noise
  *
- * @param {Array<string>} matches Result from String.match
+ * @param {string[]} matches Result from String.match
  * @param {number} totalLength Total Length of the String
  * @returns {number} The resulting noise percentage (out of 100)
  */
-export function calcNoiseRatio(matches: Array<string>, totalLength: number): number {
+export function calcNoiseRatio(matches: string[], totalLength: number): number {
     const lengthWeight = matches.reduce((total: number, match: string) => {
         return total + match.length
     }, 0);

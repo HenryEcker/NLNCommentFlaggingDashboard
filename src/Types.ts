@@ -36,7 +36,7 @@ export interface APIComment {
 }
 
 export interface SECommentAPIResponse {
-    items: Array<APIComment>,
+    items: APIComment[],
     has_more: boolean,
     quota_max: number,
     quota_remaining: number
@@ -49,7 +49,8 @@ export interface FlaggingDashboardConfig {
     displayFlagUI: boolean,
     displayBlacklistMatches: boolean,
     displayCommentDeleteState: boolean,
-    shouldUpdateTitle: boolean
+    shouldUpdateTitle: boolean,
+    displayRemainingFlags: boolean
 }
 
 export interface StackExchange {
