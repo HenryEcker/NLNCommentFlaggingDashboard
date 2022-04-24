@@ -1,4 +1,4 @@
-import {calcNoiseRatio, getOffset, htmlDecode} from "./Utils";
+import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from "./Utils";
 import {APIComment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from "./Types";
 import {FlaggingDashboard} from "./UI/Dashboard/FlaggingDashboard";
 import {getComments} from "./SE_API";
@@ -95,15 +95,6 @@ function UserScript(): void {
                             'max': 600, // Maximum length limit
                         }
                     },
-                    'HOUR_OFFSET': {
-                        'label': 'How long ago (in hours) should the calls be offset',
-                        'type': 'number',
-                        'default': 0,
-                        'attributes': {
-                            'min': 0,
-                            'step': 0.01
-                        }
-                    },
                     'DISPLAY_CERTAINTY': {
                         'label': 'How certain should the script be to display in UI (out of 100)',
                         'type': 'number',
@@ -183,7 +174,7 @@ function UserScript(): void {
 
     if ((settings.get('ACTIVE') as boolean)) {
         // Prime last successful read
-        let lastSuccessfulRead: number = Math.floor((getOffset(settings.get('HOUR_OFFSET') as number) - API_REQUEST_RATE) / 1000);
+        let lastSuccessfulRead: number = Math.floor((getCurrentTimestamp() - API_REQUEST_RATE) / 1000);
 
 
         // Create Toaster for custom Toast Messages
@@ -209,7 +200,7 @@ function UserScript(): void {
         UI.init();
 
         const main = async (mainInterval?: number) => {
-            const toDate = Math.floor(getOffset(settings.get('HOUR_OFFSET') as number) / 1000);
+            const toDate = Math.floor(getCurrentTimestamp() / 1000);
             const response: SECommentAPIResponse = await getComments(
                 AUTH_STR,
                 COMMENT_FILTER,

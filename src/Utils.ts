@@ -56,14 +56,12 @@ export function calcNoiseRatio(matches: string[], totalLength: number): number {
 
 
 /**
- * Get timestamp for now offset by a certain number of hours prior.
- * hours=0 will just return the timestamp for now.
+ * @summary Get timestamp for now
  *
- * @param {number} hours Number of hours to offset
- * @returns {number} The timestamp relative to now
+ * @returns {number} The current timestamp
  */
-export function getOffset(hours: number): number {
-    return new Date().getTime() - (hours * 60 * 60 * 1000)
+export function getCurrentTimestamp(): number {
+    return new Date().getTime()
 }
 
 /**
