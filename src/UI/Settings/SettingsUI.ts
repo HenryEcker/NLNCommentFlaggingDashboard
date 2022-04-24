@@ -97,7 +97,7 @@ export class SettingsUI {
             select.append($(`<option value="${op}">${op}</option>`))
         });
         if (val !== undefined) {
-            select.attr('value', val.toString());
+            select.val(val.toString());
         }
         select.on('change', (ev) => {
             this.formConfigVars[fieldName] = (ev.target as HTMLSelectElement).value;
