@@ -221,6 +221,7 @@ export class FlaggingDashboard {
         if (this.uiConfig.displayRemainingFlags) {
             try {
                 remainingFlags = await getFlagQuota(comment._id);
+                this.updateRemainingFlags(remainingFlags);
             } catch (err) {
                 // Pass (It doesn't really matter whether the flag count is updated or not)
             }
@@ -230,8 +231,10 @@ export class FlaggingDashboard {
             const result: CommentFlagResult = await flagComment(this.fkey, comment._id);
             this.tableData[comment._id].was_flagged = result.was_flagged;
             this.tableData[comment._id].was_deleted = result.was_deleted;
+
+            // Only becomes a number if uiConfig.displayRemainingFlags is true
             if (remainingFlags !== undefined) {
-                remainingFlags -= 1; // Flag was consumed
+                this.updateRemainingFlags(remainingFlags - 1); // A Flag was consumed
             }
         } catch (err) {
             if (err instanceof RatedLimitedError) {
@@ -250,10 +253,6 @@ export class FlaggingDashboard {
             }
         } finally {
             this.render();
-            // Only becomes a number if uiConfig.displayRemainingFlags is true
-            if (remainingFlags !== undefined) {
-                this.updateRemainingFlags(remainingFlags);
-            }
         }
     }
 
