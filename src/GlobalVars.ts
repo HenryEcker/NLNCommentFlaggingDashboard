@@ -35,9 +35,9 @@ export const blacklist = mergeRegexes([
     // this was very helpful
     /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
     // excitement
-    /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You\s+)?saved\s+m[ey])/,
-    // life saver
-    /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver/,
+    /(?:perfect|wonderful|brilliant|excellent|marvelous|awesome)/,
+    // saviour
+    /(?:You(?:'?re?|\s*are|'?ve|\s*have)?\s+)?(?:a\s+life\s+saver|saved?\s+(m[ey]|the|it))/,
     // please accept
     /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
     // please upvote
