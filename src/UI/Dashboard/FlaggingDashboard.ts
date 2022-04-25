@@ -249,13 +249,21 @@ export class FlaggingDashboard {
     }
 
     /**
-     * Add a new comment to tableData and render
+     * bulk add new comments to tableData and render
      *
-     * @param comment the Comment to add
+     * @param {Comment[]} comments the array of comments to add
      */
-    addComment(comment: Comment): void {
-        this.tableData[comment._id] = comment;
-        this.render();
+    addComments(comments: Comment[]): void {
+        if (comments.length > 0) {
+            // Update remaining flags once per batch add
+            void this.updateRemainingFlags(comments[0]._id);
+            // Add all comments to table
+            comments.forEach(comment => {
+                this.tableData[comment._id] = comment;
+            });
+            // Re-render
+            this.render();
+        }
     }
 
     /**
@@ -295,7 +303,7 @@ export class FlaggingDashboard {
         this.flagsRemainingDiv.text(`You have ${flagsRemaining} flags left today`);
     }
 
-    async updateRemainingFlags(commentID: number): Promise<number | undefined> {
+    private async updateRemainingFlags(commentID: number): Promise<number | undefined> {
         if (this.uiConfig.displayRemainingFlags) {
             try {
                 const flagsRemaining = await getFlagQuota(commentID);

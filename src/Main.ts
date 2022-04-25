@@ -1,5 +1,5 @@
 import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from "./Utils";
-import {APIComment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from "./Types";
+import {APIComment, Comment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from "./Types";
 import {FlaggingDashboard} from "./UI/Dashboard/FlaggingDashboard";
 import {getComments} from "./SE_API";
 import {blacklist, whitelist} from "./GlobalVars";
@@ -213,38 +213,38 @@ function UserScript(): void {
                 return; // Exit script
             }
             if (response.items.length > 0) {
-
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
-                // Update remaining flags once per fetch
-                await UI.updateRemainingFlags(response.items[0].comment_id);
-                response.items.forEach((comment: APIComment) => {
-                    if (
-                        postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
-                        comment.body_markdown.length <= (settings.get('MAXIMUM_LENGTH_COMMENT') as number)
-                    ) {
-                        const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
-                        const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
-                        if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
-                            const noiseRatio = calcNoiseRatio(
-                                blacklistMatches,
-                                decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
-                            );
-                            if (noiseRatio >= (settings.get('DISPLAY_CERTAINTY') as number)) {
-                                UI.addComment({
-                                    can_flag: comment.can_flag,
-                                    body: decodedMarkdown,
-                                    link: comment.link,
-                                    _id: comment.comment_id,
-                                    post_id: comment.post_id,
-                                    post_type: comment.post_type,
-                                    blacklist_matches: blacklistMatches,
-                                    noise_ratio: noiseRatio
-                                });
+                UI.addComments(
+                    response.items.reduce((acc: Comment[], comment: APIComment) => {
+                        if (
+                            postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
+                            comment.body_markdown.length <= (settings.get('MAXIMUM_LENGTH_COMMENT') as number)
+                        ) {
+                            const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
+                            const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
+                            if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
+                                const noiseRatio = calcNoiseRatio(
+                                    blacklistMatches,
+                                    decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
+                                );
+                                if (noiseRatio >= (settings.get('DISPLAY_CERTAINTY') as number)) {
+                                    acc.push({
+                                        can_flag: comment.can_flag,
+                                        body: decodedMarkdown,
+                                        link: comment.link,
+                                        _id: comment.comment_id,
+                                        post_id: comment.post_id,
+                                        post_type: comment.post_type,
+                                        blacklist_matches: blacklistMatches,
+                                        noise_ratio: noiseRatio
+                                    });
+                                }
                             }
                         }
-                    }
-                });
+                        return acc;
+                    }, [])
+                );
             }
         };
         if ((settings.get('RUN_IMMEDIATELY') as boolean)) {
