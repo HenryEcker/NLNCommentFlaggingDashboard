@@ -217,7 +217,7 @@ export class FlaggingDashboard {
      */
     private async handleFlagComment(comment: Comment) {
         // Get remaining flag amount
-        let remainingFlags = await this.updateRemainingFlags(comment._id);
+        const remainingFlags = await this.updateRemainingFlags(comment._id);
         // Do Flag
         try {
             const result: CommentFlagResult = await flagComment(this.fkey, comment._id);
@@ -298,7 +298,7 @@ export class FlaggingDashboard {
     async updateRemainingFlags(commentID: number): Promise<number | undefined> {
         if (this.uiConfig.displayRemainingFlags) {
             try {
-                let flagsRemaining = await getFlagQuota(commentID);
+                const flagsRemaining = await getFlagQuota(commentID);
                 this.setRemainingFlagDisplay(flagsRemaining);
                 return flagsRemaining;
             } catch (err) {
