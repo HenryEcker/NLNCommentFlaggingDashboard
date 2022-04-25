@@ -216,16 +216,8 @@ export class FlaggingDashboard {
      * @param comment the comment to flag
      */
     private async handleFlagComment(comment: Comment) {
-        let remainingFlags: number | undefined = undefined;
         // Get remaining flag amount
-        if (this.uiConfig.displayRemainingFlags) {
-            try {
-                remainingFlags = await getFlagQuota(comment._id);
-                this.updateRemainingFlags(remainingFlags);
-            } catch (err) {
-                // Pass (It doesn't really matter whether the flag count is updated or not)
-            }
-        }
+        let remainingFlags = await this.updateRemainingFlags(comment._id);
         // Do Flag
         try {
             const result: CommentFlagResult = await flagComment(this.fkey, comment._id);
@@ -234,7 +226,7 @@ export class FlaggingDashboard {
 
             // Only becomes a number if uiConfig.displayRemainingFlags is true
             if (remainingFlags !== undefined) {
-                this.updateRemainingFlags(remainingFlags - 1); // A Flag was consumed
+                this.setRemainingFlagDisplay(remainingFlags - 1); // A Flag was consumed
             }
         } catch (err) {
             if (err instanceof RatedLimitedError) {
@@ -299,7 +291,21 @@ export class FlaggingDashboard {
         }
     }
 
-    private updateRemainingFlags(flagsRemaining: number): void {
+    private setRemainingFlagDisplay(flagsRemaining: number): void {
         this.flagsRemainingDiv.text(`You have ${flagsRemaining} flags left today`);
+    }
+
+    async updateRemainingFlags(commentID: number): Promise<number | undefined> {
+        if (this.uiConfig.displayRemainingFlags) {
+            try {
+                let flagsRemaining = await getFlagQuota(commentID);
+                this.setRemainingFlagDisplay(flagsRemaining);
+                return flagsRemaining;
+            } catch (err) {
+                // Pass (It doesn't really matter whether the flag count is updated or not)
+                return undefined;
+            }
+        }
+        return undefined;
     }
 }

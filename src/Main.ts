@@ -216,7 +216,8 @@ function UserScript(): void {
 
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
-
+                // Update remaining flags once per fetch
+                await UI.updateRemainingFlags(response.items[0].comment_id);
                 response.items.forEach((comment: APIComment) => {
                     if (
                         postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
@@ -247,7 +248,7 @@ function UserScript(): void {
             }
         };
         if ((settings.get('RUN_IMMEDIATELY') as boolean)) {
-            main();
+            void main();
         }
         const mainInterval = window.setInterval(() => main(mainInterval), API_REQUEST_RATE);
     }
