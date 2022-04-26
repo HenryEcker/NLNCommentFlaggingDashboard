@@ -160,9 +160,6 @@ function UserScript(): void {
         settings.open();
         return;
     }
-    const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
-    const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
-    const API_REQUEST_RATE = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
 
     // Add Settings Button
     const settingsButton: JQuery<HTMLElement> = $('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
@@ -170,9 +167,12 @@ function UserScript(): void {
     const li: JQuery = $('<li></li>')
     li.append(settingsButton);
     $('header ol.s-topbar--content > li:nth-child(2)').after(li);
-    const fkey = StackExchange.options.user.fkey;
 
     if ((settings.get('ACTIVE') as boolean)) {
+        const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
+        const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
+        const API_REQUEST_RATE = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
+        const fkey = StackExchange.options.user.fkey;
         // Prime last successful read
         let lastSuccessfulRead: number = Math.floor((getCurrentTimestamp() - API_REQUEST_RATE) / 1000);
 
