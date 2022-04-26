@@ -216,18 +216,13 @@ export class FlaggingDashboard {
      * @param comment the comment to flag
      */
     private async handleFlagComment(comment: Comment) {
-        // Get remaining flag amount
-        const remainingFlags = await this.updateRemainingFlags(comment._id);
         // Do Flag
         try {
             const result: CommentFlagResult = await flagComment(this.fkey, comment._id);
             this.tableData[comment._id].was_flagged = result.was_flagged;
             this.tableData[comment._id].was_deleted = result.was_deleted;
-
-            // Only becomes a number if uiConfig.displayRemainingFlags is true
-            if (remainingFlags !== undefined) {
-                this.setRemainingFlagDisplay(remainingFlags - 1); // A Flag was consumed
-            }
+            // Get remaining flag amount
+            await this.updateRemainingFlags(comment._id);
         } catch (err) {
             if (err instanceof RatedLimitedError) {
                 this.toaster.open('Flagging too fast!', 'error');
@@ -303,17 +298,14 @@ export class FlaggingDashboard {
         this.flagsRemainingDiv.text(`You have ${flagsRemaining} flags left today`);
     }
 
-    private async updateRemainingFlags(commentID: number): Promise<number | undefined> {
+    private async updateRemainingFlags(commentID: number): Promise<void> {
         if (this.uiConfig.displayRemainingFlags) {
             try {
                 const flagsRemaining = await getFlagQuota(commentID);
                 this.setRemainingFlagDisplay(flagsRemaining);
-                return flagsRemaining;
             } catch (err) {
                 // Pass (It doesn't really matter whether the flag count is updated or not)
-                return undefined;
             }
         }
-        return undefined;
     }
 }
