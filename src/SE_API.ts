@@ -94,6 +94,8 @@ export function flagComment(fkey: string, comment_id: number): Promise<CommentFl
             throw new RatedLimitedError("You can only flag once every 5 seconds");
         } else if (res.status === 200) {
             return res.json();
+        } else {
+            throw new FlagAttemptFailed(`Something unexpected went wrong. (${res.status}: "${res.statusText}")`);
         }
     }).then((resData: SEFlagResponse) => {
         if (resData.Success && resData.Outcome === 0) {

@@ -52,7 +52,12 @@ module.exports = {
         minimizer: [new TerserPlugin({
             terserOptions: {
                 ecma: 2021,
-                keep_classnames: true,
+                mangle: {
+                    keep_classnames: false,
+                    keep_fnames: false,
+                    module: true,
+                    toplevel: true
+                },
                 format: {
                     preamble: buildTamperMonkeyPreamble(UserScriptConfig, globals).replace(/^\s+/mg, '')
                 }

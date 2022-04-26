@@ -1,8 +1,15 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "isolatedModules": true,
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "alwaysStrict": true,
     "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "isolatedModules": true,
     "strictBindCallApply": false,
     "removeComments": true,
     "module": "ES6",
