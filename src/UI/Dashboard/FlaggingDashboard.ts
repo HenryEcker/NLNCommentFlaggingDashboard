@@ -299,7 +299,7 @@ export class FlaggingDashboard {
     }
 
     private setRemainingFlagDisplay(flagsRemaining: number): void {
-        this.flagsRemainingDiv.text(`You have ${flagsRemaining} flags left today`);
+        this.flagsRemainingDiv.html(`<span title="The data is updated infrequently the number of flags may be inaccurate">You have ${flagsRemaining} flags left today</span>`);
     }
 
     private async updateRemainingFlags(commentID: number): Promise<number | undefined> {
