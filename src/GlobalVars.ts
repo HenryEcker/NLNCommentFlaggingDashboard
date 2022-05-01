@@ -21,8 +21,10 @@ export const blacklist = mergeRegexes([
     // This solved my issue/This resolved my issue/This fixed my issue
     /(it('?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
     // TRE('bro', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'friendio', 'friendo', 'mate', 'sir', 'fam')
-    // bro often an unknown number of o's so should be bro+ wherever it ends up in pattern (needs manually re-added whenever the TRE is rerun)
-    /\b(?:f(?:riend(?:io|o)?|am)|b(?:ud(?:dy)?|ro+)|ma(?:te|n)|amigo|homie|dude|pal|sir)\b/,
+    // bro often an unknown number of o's so should be bro+
+    // man often has an unknown number of n's so it should be man+
+    // (needs manually re-added whenever the TRE is re-built)
+    /\b(?:f(?:riend(?:io|o)?|am)|b(?:ud(?:dy)?|ro+)|ma(?:te|n+)|amigo|homie|dude|pal|sir)\b/,
     /*
      * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
      */
