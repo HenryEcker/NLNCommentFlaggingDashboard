@@ -37,7 +37,7 @@ export const blacklist = mergeRegexes([
     // this was very helpful
     /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
     // excitement
-    /(?:perfect|wonderful|brilliant|excellent|marvelous|awesome|w+o+w+)/,
+    /(?:ingenious|superb|amazing|fantastic|perfect|wonderful|brilliant|excellent|marvelous|awesome|w+o+w+)/,
     // saviour
     /(?:You(?:'?re?|\s*are|'?ve|\s*have)?\s+)?(?:a\s+life\s+saver|saved?\s+(m[ey]|the|it))/,
     // please accept
