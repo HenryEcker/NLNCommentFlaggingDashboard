@@ -38,8 +38,10 @@ export const blacklist = mergeRegexes([
     /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+/,
     // this was very helpful
     /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
-    // excitement
-    /(?:ingenious|superb|amazing|fantastic|perfect|wonderful|brilliant|excellent|marvelous|awesome|w+o+w+)/,
+    // Excitement
+    // TRE('ingenious', 'superb', 'amazing', 'fantastic', 'perfect', 'wonderful', 'brilliant', 'excellent', 'marvelous', 'awesome', 'bravo')
+    // wow has any number of wow so should be w+o+w+ (should be added at the end of the OR list)
+    /(?:a(?:mazing|wesome)|br(?:illiant|avo)|excellent|fantastic|ingenious|marvelous|wonderful|perfect|superb|w+o+w+)/,
     // saviour
     /(?:You(?:'?re?|\s*are|'?ve|\s*have)?\s+)?(?:a\s+life\s+saver|saved?\s+(m[ey]|the|it))/,
     // please accept
