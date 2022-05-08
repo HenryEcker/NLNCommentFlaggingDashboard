@@ -17,11 +17,11 @@ export const blacklist = mergeRegexes([
     // That's what I was looking for/that's it
     /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s?\s*it)[.!]?/,
     // was what I needed
-    /\b([wa|i]s)\s+(\w+\s+)*?what\s+I\s+(\w+\s+)*?needed\b/,
+    /(this|that|it)?((['’]s?)|\s+((wa|i)s))\s+(\w+\s+)*?what\s+(\w+\s+)*?need(ed|ing)?/,
     // Happy coding
     /(?:happy\s+coding)/,
     // This solved my issue/This resolved my issue/This fixed my issue
-    /(it('?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
+    /(it(['’]?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
     // TRE('bro', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'friendio', 'friendo', 'mate', 'sir', 'fam')
     // bro often an unknown number of o's so should be bro+
     // man often has an unknown number of n's so it should be man+
@@ -35,7 +35,7 @@ export const blacklist = mergeRegexes([
     // it worked like a charm
     /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?/,
     // you are welcome
-    /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+/,
+    /(?:(?:you(?:['’]?re?|\s+are)\s+)?welcome)+/,
     // this was very helpful
     /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
     // Excitement
@@ -43,7 +43,7 @@ export const blacklist = mergeRegexes([
     // wow has any number of wow so should be w+o+w+ (should be added at the end of the OR list)
     /(?:a(?:mazing|wesome)|br(?:illiant|avo)|excellent|fantastic|ingenious|marvelous|wonderful|perfect|superb|w+o+w+)/,
     // saviour
-    /(?:You(?:'?re?|\s*are|'?ve|\s*have)?\s+)?(?:a\s+life\s+saver|saved?\s+(m[ey]|the|it))/,
+    /(?:You(?:['’]?re?|\s*are|['’]?ve|\s*have)?\s+)?(?:a\s+life\s+saver|saved?\s+(m[ey]|the|it))/,
     // please accept
     /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
     // please upvote
