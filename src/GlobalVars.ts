@@ -32,10 +32,10 @@ export const blacklist = mergeRegexes([
      */
     // gratitude
     /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)/,
-    // it worked like a charm
-    /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?/,
-    // you are welcome
-    /(?:(?:you(?:['’]?re?|\s+are)\s+)?welcome)+/,
+    // Your [very excellent] solution [also] worked like a charm
+    /(?:(this|that|it|your)\s+)?(\w+\s+)*?(?:(solution|answer)\s+)?(\w+\s+)*?work(?:ed|s)?\s*(?:now|perfectly|great|for me|(like|as) a charm)?/,
+    // you are welcome/my pleasure
+    /(?:(?:you(?:['’]?re?|\s+are)\s+)?welcome|my pleasure)+/,
     // this was very helpful
     /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
     // Excitement
