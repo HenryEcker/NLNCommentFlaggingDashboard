@@ -17,7 +17,7 @@ export const blacklist = mergeRegexes([
     // That's what I was looking for/that's it
     /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s?\s*it)[.!]?/,
     // was what I needed
-    /(this|that|it)?((['’]s?)|\s+((wa|i)s))\s+(\w+\s+)*?what\s+(\w+\s+)*?need(ed|ing)?/,
+    /(?:(this|that|it)?((['’]s?)|\s+((wa|i)s)\s+)?(\w+\s+)*?)what\s+(\w+\s+)*?need(?:ed|ing)?/,
     // Happy coding
     /(?:happy\s+coding)/,
     // This solved my issue/This resolved my issue/This fixed my issue
