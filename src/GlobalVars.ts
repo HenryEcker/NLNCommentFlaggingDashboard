@@ -2,6 +2,8 @@ import {mergeRegexes} from "./Utils";
 
 
 export const blacklist = mergeRegexes([
+    // @ mentions
+    /@\w+/,
     // Emojis
     /(?:[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/,
     // Ascii Smileys/Punctuation spam
@@ -20,6 +22,8 @@ export const blacklist = mergeRegexes([
     /(?:(this|that|it)?((['’]s?)|\s+((wa|i)s)\s+)?(\w+\s+)*?)what\s+(\w+\s+)*?need(?:ed|ing)?/,
     // Happy coding
     /(?:happy\s+coding)/,
+    // Have a great day
+    /(have a\s+(\w+\s+)*?(day|evening|night)([.!]*)?)/,
     // This solved my issue/This resolved my issue/This fixed my issue
     /(it(['’]?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
     // TRE('broo', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'friendio', 'friendo', 'mate', 'sir', 'fam', 'brother', 'soldier')
@@ -30,7 +34,7 @@ export const blacklist = mergeRegexes([
     // thanks
     /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)/,
     // Your [very excellent] solution [also] worked like a charm
-    /(this|that|it|your)\s+(\w+\s+)*?work(?:ed|s)?\s*(?:now|perfectly|great|for me|(like|as) a charm)?/,
+    /(?:(this|that|it|your)\s+(\w+\s+)*?)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|(like|as) a charm)?/,
     // you are welcome/my pleasure
     /(?:(?:you(?:['’]?re?|\s+are)\s+)?welcome|my pleasure)+/,
     // this was very helpful
