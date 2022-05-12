@@ -27,10 +27,7 @@ export const blacklist = mergeRegexes([
     // man often has an unknown number of n's so it should be man+
     // (needs manually re-added whenever the TRE is re-built)
     /\b(?:b(?:ro(?:ther|o*)|ud(?:dy)?)|f(?:riend(?:io|o)?|am)|s(?:oldier|ir)|ma(?:te|n+)|amigo|homie|dude|pal)\b/,
-    /*
-     * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
-     */
-    // gratitude
+    // thanks
     /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)/,
     // Your [very excellent] solution [also] worked like a charm
     /(this|that|it|your)\s+(\w+\s+)*?(solution|answer|code)\s+(\w+\s+)*?work(?:ed|s)?\s*(?:now|perfectly|great|for me|(like|as) a charm)?/,
@@ -38,7 +35,6 @@ export const blacklist = mergeRegexes([
     /(?:(?:you(?:['’]?re?|\s+are)\s+)?welcome|my pleasure)+/,
     // this was very helpful
     /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
-    // Excitement
     // TRE('ingenious', 'superb', 'amazing', 'fantastic', 'perfect', 'wonderful', 'brilliant', 'excellent', 'marvelous', 'awesome', 'bravo')
     // wow has any number of wow so should be w+o+w+ (should be added at the end of the OR list)
     /(?:a(?:mazing|wesome)|br(?:illiant|avo)|excellent|fantastic|ingenious|marvelous|wonderful|perfect|superb|w+o+w+)/,
@@ -48,6 +44,8 @@ export const blacklist = mergeRegexes([
     /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
     // please upvote
     /(?:please(?:\s+\w+)\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?/,
+    // is/should be the correct/accepted/right answer
+    /(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted)(?:\s+\w+)*\s+(?:answer|solution)/
 ], 'gi');
 
 export const whitelist = mergeRegexes([
