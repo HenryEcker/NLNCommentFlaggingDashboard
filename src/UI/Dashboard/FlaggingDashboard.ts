@@ -137,7 +137,7 @@ export class FlaggingDashboard {
             {
                 const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
                 clearAllButton.on('click', () => {
-                    this.tableData;
+                    this.tableData = {};
                     this.render();
                 })
                 footer.append(clearAllButton);
