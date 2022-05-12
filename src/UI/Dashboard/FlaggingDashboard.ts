@@ -12,13 +12,18 @@ import {capitalise, formatPercentage} from "../../Utils";
 import {flagComment, getFlagQuota} from "../../SE_API";
 import {Toast} from "../Toast/Toast";
 
+
+interface TableData {
+    [key: number]: Comment
+}
+
 export class FlaggingDashboard {
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly flagsRemainingDiv: JQuery<HTMLElement>;
     private readonly fkey: string;
     private readonly uiConfig: FlaggingDashboardConfig;
     private readonly toaster: Toast;
-    private tableData: { [key: number]: Comment };
+    private tableData: TableData;
     private readonly htmlIds = {
         containerDivId: "NLN_Comment_Wrapper",
         tableId: "NLN_Comment_Reports_Table",
@@ -132,10 +137,25 @@ export class FlaggingDashboard {
             {
                 const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
                 clearAllButton.on('click', () => {
-                    this.tableData = {};
+                    this.tableData;
                     this.render();
                 })
                 footer.append(clearAllButton);
+
+                const clearHandledButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear Handled</button>`);
+                clearHandledButton.on('click', () => {
+                    this.tableData = (
+                        Object.entries(this.tableData) as unknown as Array<[number, Comment]>
+                    ).reduce((acc, [key, comment]) => {
+                        // Preserve only those comments not already handled
+                        if (comment.can_flag && !comment?.was_flagged && !comment?.was_deleted) {
+                            acc[key] = comment;
+                        }
+                        return acc;
+                    }, {} as TableData);
+                    this.render();
+                })
+                footer.append(clearHandledButton);
             }
             {
                 footer.append(this.flagsRemainingDiv);
@@ -162,7 +182,7 @@ export class FlaggingDashboard {
                 tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
             }
             if (this.uiConfig.displayBlacklistMatches) {
-                tr.append(`<td>${comment.blacklist_matches.map(e => `"${e}"`).join(', ')}</td>`);
+                tr.append(`<td>${comment.blacklist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
             }
             if (this.uiConfig.displayNoiseRatio) {
                 tr.append(`<td>${formatPercentage(comment.noise_ratio)}</td>`);
@@ -178,7 +198,7 @@ export class FlaggingDashboard {
                     const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
                         flagButton.text('Flagging...');
-                        this.handleFlagComment(comment)
+                        void this.handleFlagComment(comment)
                     });
                     const td = $('<td></td>');
                     td.append(flagButton);
