@@ -41,7 +41,7 @@ export const blacklist = mergeRegexes([
     // wow has any number of wow so should be w+o+w+ (should be added at the end of the OR list)
     /(?:a(?:mazing|wesome)|br(?:illiant|avo)|excellent|fantastic|ingenious|marvelous|wonderful|perfect|superb|w+o+w+)/,
     // saviour
-    /(?:you(?:['’]?re?|\s*are|['’]?ve|\s*have)?\s+)?(?:a\s+life\s+saver|sav(e|ed|ing)\s+(m[ey]|the|it))/,
+    /(?:you(['’]?re?|\s+are|['’]?ve|\s+have)?|this(\s+(wa|i|['’])s)?\s+)?(?:a\s+life(-|\s+)saver|sav(e|ed|ing)\s+(m[ey]|the|it))/,
     // please accept
     /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
     // please upvote
