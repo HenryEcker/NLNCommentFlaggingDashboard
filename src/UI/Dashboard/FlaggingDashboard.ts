@@ -200,11 +200,9 @@ export class FlaggingDashboard {
                 } else {
                     const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
-                        flagButton.html('');
+                        flagButton.text('');
                         const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
-                        const label = $('<span>Flagging...</span>');
-                        spinner.appendTo(flagButton);
-                        label.appendTo(flagButton);
+                        flagButton.append(spinner);
                         void this.handleFlagComment(comment)
                     });
                     const td = $('<td></td>');
