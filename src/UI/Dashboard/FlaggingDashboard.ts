@@ -41,7 +41,8 @@ export class FlaggingDashboard {
             footer: 'd-flex gs8 gsx ai-center',
         },
         'HTML': {
-            pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
+            pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>',
+            spinner: (size: string, text: string) => `<div class="s-spinner s-spinner__${size}"><div class="v-visible-sr">${text}</div></div>`
         }
     };
 
@@ -138,11 +139,12 @@ export class FlaggingDashboard {
                 const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
                 clearAllButton.on('click', () => {
                     this.tableData = {};
+                    clearAllButton.blur();
                     this.render();
                 })
                 footer.append(clearAllButton);
 
-                const clearHandledButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear Handled</button>`);
+                const clearHandledButton = $(`<button class="${this.SO.CSS.buttonGeneral}" style="margin-left: 5px">Clear Handled</button>`);
                 clearHandledButton.on('click', () => {
                     this.tableData = (
                         Object.entries(this.tableData) as unknown as Array<[number, Comment]>
@@ -153,6 +155,7 @@ export class FlaggingDashboard {
                         }
                         return acc;
                     }, {} as TableData);
+                    clearHandledButton.blur();
                     this.render();
                 })
                 footer.append(clearHandledButton);
@@ -197,7 +200,9 @@ export class FlaggingDashboard {
                 } else {
                     const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
-                        flagButton.text('Flagging...');
+                        flagButton.text('');
+                        const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
+                        flagButton.append(spinner);
                         void this.handleFlagComment(comment)
                     });
                     const td = $('<td></td>');
