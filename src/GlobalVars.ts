@@ -30,7 +30,7 @@ export const blacklist = mergeRegexes([
     // (needs manually re-added whenever the TRE is re-built)
     /\b(?:b(?:ro(?:ther|o*)|ud(?:dy)?)|f(?:riend(?:io|o)?|am)|s(?:oldier|ir)|ma(?:te|n+)|amigo|homie|dude|pal)\b/,
     // thanks
-    /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)/,
+    /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:(your|the)\s+)?(?:help(ing)?)?)?|th?anx|thx|cheers)/,
     // Your [very excellent] solution [also] worked like a charm
     /((this|that|it(['’]?s)?|your)\s+)?(?:\s+(\w+\s+)*?(solution|answer|code)\s+(\w+\s+)*?)?work(?:ed|s|ing)?\s*(?:now|perfectly|great|for\s+me|((like|as)\s+)?(a\s+)?charm|again|[!.])?/,
     // you are welcome/my pleasure
