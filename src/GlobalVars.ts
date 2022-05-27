@@ -24,7 +24,12 @@ export const blacklist = mergeRegexes([
     /(have a\s+(\w+\s+)*?(day|evening|night)([.!]*)?)/,
     // This solved my issue/This resolved my issue/This fixed my issue
     /(it(['’]?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
-    // TRE('broo', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'friendio', 'friendo', 'mate', 'sir', 'fam', 'brother', 'soldier')
+    /*
+from trieregex import TrieRegEx as TRE
+
+TRE('broo', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend',
+    'friendio', 'friendo', 'mate', 'sir', 'fam', 'brother', 'soldier')
+     */
     // bro often an unknown number of o's so should be bro+ (broo* so it can be added with brother)
     // man often has an unknown number of n's so it should be man+
     // (needs manually re-added whenever the TRE is re-built)
@@ -55,14 +60,21 @@ export const blacklist = mergeRegexes([
 export const whitelist = mergeRegexes([
     /\b(?:n(?:eed|ot)|unfortunate(ly)?|persists?|require|but|unaccept(ed)?)\b/,
     /*
-    bases = ["would", "could", "should",
-             "do", "did", "does",
-             "have", "has",
-             "ca", "ai",
-             "are", "is"]
-     suffixes = ["n't", "n’t", "n'", "n’", "nt"]
+from itertools import product
+
+from trieregex import TrieRegEx as TRE
+
+bases = ["would", "could", "should",
+         "wo",
+         "do", "did", "does",
+         "have", "has",
+         "ca", "ai",
+         "are", "is"]
+suffixes = ["n't", "n’t", "n'", "n’", "nt"]
+
+TRE(*[f'{b}{s}' for b, s in product(bases, suffixes)]).regex()
      */
-    /(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|wouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))/,
+    /(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|wo(?:uldn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))/,
     /\b(will|I'?ll)\s*try\b/,
     /[?]/
 ], 'gi');
