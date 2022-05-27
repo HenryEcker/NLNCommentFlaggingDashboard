@@ -47,7 +47,9 @@ export const blacklist = mergeRegexes([
     // please upvote
     /(?:please(?:\s+\w+)\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?/,
     // is/should be the correct/accepted/right answer
-    /(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted)(?:\s+\w+)*\s+(?:answer|solution)/
+    /(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted)(?:\s+\w+)*\s+(?:answer|solution)/,
+    // /help/someone-answer or /help/accepted-answer
+    /(?:(https:\/\/stackoverflow.com)?\/help\/(someone-answers|accepted-answer))/
 ], 'gi');
 
 export const whitelist = mergeRegexes([
