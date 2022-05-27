@@ -7,14 +7,14 @@ import {
     FlaggingDashboardConfig,
     OutOfFlagsError,
     RatedLimitedError
-} from "../../Types";
-import {capitalise, formatPercentage} from "../../Utils";
-import {flagComment, getFlagQuota} from "../../SE_API";
-import {Toast} from "../Toast/Toast";
+} from '../../Types';
+import {capitalise, formatPercentage} from '../../Utils';
+import {flagComment, getFlagQuota} from '../../SE_API';
+import {Toast} from '../Toast/Toast';
 
 
 interface TableData {
-    [key: number]: Comment
+    [key: number]: Comment;
 }
 
 export class FlaggingDashboard {
@@ -25,11 +25,11 @@ export class FlaggingDashboard {
     private readonly toaster: Toast;
     private tableData: TableData;
     private readonly htmlIds = {
-        containerDivId: "NLN_Comment_Wrapper",
-        tableId: "NLN_Comment_Reports_Table",
-        tableBodyId: "NLN_Comment_Reports_Table_Body",
-        styleId: "nln-comment-userscript-styles",
-        remainingFlags: "NLN_Remaining_Comment_Flags"
+        containerDivId: 'NLN_Comment_Wrapper',
+        tableId: 'NLN_Comment_Reports_Table',
+        tableBodyId: 'NLN_Comment_Reports_Table_Body',
+        styleId: 'nln-comment-userscript-styles',
+        remainingFlags: 'NLN_Remaining_Comment_Flags'
     };
     private readonly SO = {
         'CSS': {
@@ -97,15 +97,15 @@ export class FlaggingDashboard {
         // Header Elements
         {
             const header = $('<div class="nln-header"></div>');
-            header.append($(`<h2>NLN Comment Flagging Dashboard</h2>`));
+            header.append($('<h2>NLN Comment Flagging Dashboard</h2>'));
             container.append(header);
         }
         // Build Table
         {
             const tableContainer = $(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
             const table = $(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
-            const thead = $('<thead></thead>')
-            const tr = $('<tr></tr>')
+            const thead = $('<thead></thead>');
+            const tr = $('<tr></tr>');
             tr.append($('<th>Comment Text</th>'));
             if (this.uiConfig.displayCommentOwner) {
                 tr.append($('<th>Author</th>'));
@@ -144,13 +144,13 @@ export class FlaggingDashboard {
                     this.tableData = {};
                     clearAllButton.blur();
                     this.render();
-                })
+                });
                 footer.append(clearAllButton);
 
                 const clearHandledButton = $(`<button class="${this.SO.CSS.buttonGeneral}" style="margin-left: 5px">Clear Handled</button>`);
                 clearHandledButton.on('click', () => {
                     this.tableData = (
-                        Object.entries(this.tableData) as unknown as Array<[number, Comment]>
+                        Object.entries(this.tableData) as unknown as [[number, Comment]]
                     ).reduce((acc, [key, comment]) => {
                         // Preserve only those comments not already handled
                         if (comment.can_flag && !comment?.was_flagged && !comment?.was_deleted) {
@@ -160,7 +160,7 @@ export class FlaggingDashboard {
                     }, {} as TableData);
                     clearHandledButton.blur();
                     this.render();
-                })
+                });
                 footer.append(clearHandledButton);
             }
             {
@@ -199,16 +199,16 @@ export class FlaggingDashboard {
             if (this.uiConfig.displayFlagUI) {
                 // Flag Button/Indicators
                 if (!comment.can_flag) {
-                    tr.append(`<td>🚫</td>`);
+                    tr.append('<td>🚫</td>');
                 } else if (comment.was_flagged) {
-                    tr.append(`<td>✓</td>`);
+                    tr.append('<td>✓</td>');
                 } else {
                     const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
                         flagButton.text('');
                         const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
                         flagButton.append(spinner);
-                        void this.handleFlagComment(comment)
+                        void this.handleFlagComment(comment);
                     });
                     const td = $('<td></td>');
                     td.append(flagButton);
@@ -219,21 +219,23 @@ export class FlaggingDashboard {
             if (this.uiConfig.displayCommentDeleteState) {
                 if (comment.was_deleted !== undefined) {
                     if (comment.was_deleted) {
-                        tr.append(`<td>✓</td>`);
+                        tr.append('<td>✓</td>');
                     } else {
                         tr.append(`<td>${this.SO.HTML.pendingSpan}</td>`);
                     }
                 } else {
-                    tr.append(`<td></td>`);
+                    tr.append('<td></td>');
                 }
             }
             // Clear Button
             {
                 const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
-                clearButton.on('click', () => this.removeComment(comment._id));
-                const clearButtonTD = $('<td></td>');
-                clearButtonTD.append(clearButton);
-                tr.append(clearButtonTD);
+                clearButton.on('click', () => {
+                    this.removeComment(comment._id);
+                });
+                const clearButtonTd = $('<td></td>');
+                clearButtonTd.append(clearButton);
+                tr.append(clearButtonTd);
             }
             tbody.append(tr);
         });

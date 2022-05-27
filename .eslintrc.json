@@ -17,5 +17,69 @@
   ],
   "root": true,
   "rules": {
+    "semi": "off",
+    "no-extra-semi": "error",
+    "@typescript-eslint/semi": [
+      "error"
+    ],
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": true
+        }
+      }
+    ],
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        "default": "array"
+      }
+    ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "@typescript-eslint/consistent-type-definitions": [
+      "error",
+      "interface"
+    ],
+    "@typescript-eslint/method-signature-style": [
+      "error",
+      "property"
+    ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "variable",
+        "format": [
+          "strictCamelCase",
+          "StrictPascalCase"
+        ],
+        "leadingUnderscore": "forbid",
+        "trailingUnderscore": "forbid"
+      }
+    ],
+    "@typescript-eslint/no-confusing-void-expression": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-extra-non-null-assertion": "error",
+    "@typescript-eslint/no-extraneous-class": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-for-in-array": "error",
+    "@typescript-eslint/no-inferrable-types": [
+      "error"
+    ],
+    "no-extra-parens": "off",
+    "@typescript-eslint/no-extra-parens": [
+      "error"
+    ]
   }
 }

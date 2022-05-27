@@ -1,10 +1,10 @@
-import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from "./Utils";
-import {APIComment, Comment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from "./Types";
-import {FlaggingDashboard} from "./UI/Dashboard/FlaggingDashboard";
-import {getComments} from "./SE_API";
-import {blacklist, whitelist} from "./GlobalVars";
-import {Toast} from "./UI/Toast/Toast";
-import {SettingsUI} from "./UI/Settings/SettingsUI";
+import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from './Utils';
+import {APIComment, Comment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from './Types';
+import {FlaggingDashboard} from './UI/Dashboard/FlaggingDashboard';
+import {getComments} from './SE_API';
+import {blacklist, whitelist} from './GlobalVars';
+import {Toast} from './UI/Toast/Toast';
+import {SettingsUI} from './UI/Settings/SettingsUI';
 
 
 declare const StackExchange: StackExchange;
@@ -157,10 +157,10 @@ function UserScript(): void {
         }
     );
 
-    const SITE_NAME: string = settings.get('SITE_NAME') as string;
-    const ACCESS_TOKEN: string = settings.get('ACCESS_TOKEN') as string;
-    const KEY: string = settings.get('KEY') as string;
-    if (!ACCESS_TOKEN || !KEY) {
+    const siteName: string = settings.get('SITE_NAME') as string;
+    const accessToken: string = settings.get('ACCESS_TOKEN') as string;
+    const apiKey: string = settings.get('KEY') as string;
+    if (!accessToken || !apiKey) {
         // Will not run without a valid API auth string
         settings.open();
         return;
@@ -168,25 +168,27 @@ function UserScript(): void {
 
     // Add Settings Button
     const settingsButton: JQuery<HTMLElement> = $('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
-    settingsButton.on('click', () => settings.open());
-    const li: JQuery = $('<li></li>')
+    settingsButton.on('click', () => {
+        settings.open();
+    });
+    const li: JQuery = $('<li></li>');
     li.append(settingsButton);
     $('header ol.s-topbar--content > li:nth-child(2)').after(li);
 
-    if ((settings.get('ACTIVE') as boolean)) {
-        const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
-        const COMMENT_FILTER = '!TQs**ij.viKR)b8Sie*Qd';
-        const API_REQUEST_RATE = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
+    if (settings.get('ACTIVE') as boolean) {
+        const authStr = `site=${siteName}&access_token=${accessToken}&key=${apiKey}`;
+        const apiCommentFilter = '!TQs**ij.viKR)b8Sie*Qd';
+        const apiRequestRate = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
         const fkey = StackExchange.options.user.fkey;
         // Prime last successful read
-        let lastSuccessfulRead: number = Math.floor((getCurrentTimestamp() - API_REQUEST_RATE) / 1000);
+        let lastSuccessfulRead: number = Math.floor((getCurrentTimestamp() - apiRequestRate) / 1000);
 
 
         // Create Toaster for custom Toast Messages
-        const toaster = new Toast("NLN-Toast-Container");
+        const toaster = new Toast('NLN-Toast-Container');
 
         // Build UI
-        const UI: FlaggingDashboard = new FlaggingDashboard(
+        const ui: FlaggingDashboard = new FlaggingDashboard(
             $('#mainbar'),
             fkey,
             {
@@ -203,13 +205,13 @@ function UserScript(): void {
             toaster
         );
 
-        UI.init();
+        ui.init();
 
         const main = async (mainInterval?: number) => {
             const toDate = Math.floor(getCurrentTimestamp() / 1000);
             const response: SECommentAPIResponse = await getComments(
-                AUTH_STR,
-                COMMENT_FILTER,
+                authStr,
+                apiCommentFilter,
                 lastSuccessfulRead,
                 toDate
             );
@@ -221,7 +223,7 @@ function UserScript(): void {
             if (response.items.length > 0) {
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
-                UI.addComments(
+                ui.addComments(
                     response.items.reduce((acc: Comment[], comment: APIComment) => {
                         if (
                             postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
@@ -254,10 +256,10 @@ function UserScript(): void {
                 );
             }
         };
-        if ((settings.get('RUN_IMMEDIATELY') as boolean)) {
+        if (settings.get('RUN_IMMEDIATELY') as boolean) {
             void main();
         }
-        const mainInterval = window.setInterval(() => main(mainInterval), API_REQUEST_RATE);
+        const mainInterval = window.setInterval(() => main(mainInterval), apiRequestRate);
     }
 }
 

@@ -67,9 +67,9 @@ export interface FlaggingDashboardConfig {
 export interface StackExchange {
     options: {
         user: {
-            fkey: string
-        }
-    }
+            fkey: string;
+        };
+    };
 }
 
 /**

@@ -1,4 +1,4 @@
-import {Comment} from "./Types";
+import {Comment} from './Types';
 
 /**
  * Converts an array of distinct RegExp and joins them together using OR (|)
@@ -26,7 +26,7 @@ export function capitalise(str: string): string {
  * @returns {string}
  */
 export function htmlDecode(str: string): string | null {
-    return new DOMParser().parseFromString(str, "text/html").documentElement.textContent;
+    return new DOMParser().parseFromString(str, 'text/html').documentElement.textContent;
 }
 
 /**
@@ -49,7 +49,7 @@ export function formatPercentage(percent: number, precision = 2): string {
  */
 export function calcNoiseRatio(matches: string[], totalLength: number): number {
     const lengthWeight = matches.reduce((total: number, match: string) => {
-        return total + match.length
+        return total + match.length;
     }, 0);
     return lengthWeight / totalLength * 100;
 }
@@ -61,7 +61,7 @@ export function calcNoiseRatio(matches: string[], totalLength: number): number {
  * @returns {number} The current timestamp
  */
 export function getCurrentTimestamp(): number {
-    return new Date().getTime()
+    return new Date().getTime();
 }
 
 /**
@@ -90,7 +90,7 @@ export function formatCSSDuration(ms: number) {
  * @param initialAcc Empty return type object (new FormData(), new URLSearchParams(), etc.)
  */
 function reduceObjectToSettableType<Type extends {
-    set: (key: string, value: string) => void
+    set: (key: string, value: string) => void;
 }>(obj: object, initialAcc: Type): Type {
     return Object.entries(obj).reduce((acc, [key, value]) => {
         acc.set(key, value);

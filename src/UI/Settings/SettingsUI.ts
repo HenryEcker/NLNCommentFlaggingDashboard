@@ -3,35 +3,35 @@ import './Settings.scss';
 type ValueType = string | number | boolean;
 
 interface FieldConfig {
-    label: string
-    default?: ValueType
+    label: string;
+    default?: ValueType;
 }
 
 interface InputFieldConfig extends FieldConfig {
-    type: 'number' | 'text' | 'checkbox'
+    type: 'number' | 'text' | 'checkbox';
     attributes?: {
-        [key: string]: ValueType
-    }
+        [key: string]: ValueType;
+    };
 }
 
 interface SelectFieldConfig extends FieldConfig {
-    type: 'select'
-    options: string[]
-    default: string
+    type: 'select';
+    options: string[];
+    default: string;
 }
 
 interface SettingConfigType {
-    id: string,
-    title: string,
+    id: string;
+    title: string;
     fields: {
         [fieldset: string]: {
-            [key: string]: InputFieldConfig | SelectFieldConfig
-        }
-    }
+            [key: string]: InputFieldConfig | SelectFieldConfig;
+        };
+    };
 }
 
 interface ConfigVars {
-    [key: string]: ValueType
+    [key: string]: ValueType;
 }
 
 export class SettingsUI {
@@ -70,7 +70,7 @@ export class SettingsUI {
         if (c) {
             return JSON.parse(c);
         } else {
-            return {}
+            return {};
         }
     }
 
@@ -91,10 +91,10 @@ export class SettingsUI {
     }
 
     private buildSelect(fieldId: string, fieldName: string, fieldOptions: SelectFieldConfig, val: ValueType): JQuery<HTMLSelectElement> {
-        const select: JQuery<HTMLSelectElement> = $(`<select></select>`);
+        const select: JQuery<HTMLSelectElement> = $('<select></select>');
         select.attr('id', fieldId);
         fieldOptions.options.forEach((op) => {
-            select.append($(`<option value="${op}">${op}</option>`))
+            select.append($(`<option value="${op}">${op}</option>`));
         });
         if (val !== undefined) {
             select.val(val.toString());
@@ -106,7 +106,7 @@ export class SettingsUI {
     }
 
     private buildInput(fieldId: string, fieldName: string, fieldOptions: InputFieldConfig, val: ValueType): JQuery<HTMLInputElement> {
-        const input: JQuery<HTMLInputElement> = $(`<input>`);
+        const input: JQuery<HTMLInputElement> = $('<input>');
         input.attr('id', fieldId);
         input.attr('type', fieldOptions.type);
         if (fieldOptions.attributes !== undefined) {
@@ -127,14 +127,14 @@ export class SettingsUI {
             if (target.type === 'checkbox') {
                 this.formConfigVars[fieldName] = target.checked;
             } else {
-                this.formConfigVars[fieldName] = (target.type === 'number') ? Number(target.value) : target.value;
+                this.formConfigVars[fieldName] = target.type === 'number' ? Number(target.value) : target.value;
             }
         });
         return input;
     }
 
     private buildFieldRow(fieldName: string, fieldOptions: InputFieldConfig | SelectFieldConfig): JQuery<HTMLElement> {
-        const row = $(`<div class="nln-field-row"></div>`)
+        const row = $('<div class="nln-field-row"></div>');
         const fieldId = `${this.config.id}_${fieldName}`;
         const label = $(`<label id="${fieldId}_label" for="${fieldId}">${fieldOptions.label}</label>`);
         row.append(label);
@@ -149,18 +149,20 @@ export class SettingsUI {
     }
 
     private buildHeaderUI(): JQuery<HTMLElement> {
-        const header: JQuery<HTMLElement> = $(`<div class="nln-config-header"></div>`)
+        const header: JQuery<HTMLElement> = $('<div class="nln-config-header"></div>');
         header.append($(`<span class="nln-header-text">${this.config.title}</span>`));
-        const closeButton = $(`<button class="nln-config-close-button" title="close this popup (or hit Esc)">×</button>`);
-        closeButton.on('click', () => this.close());
+        const closeButton = $('<button class="nln-config-close-button" title="close this popup (or hit Esc)">×</button>');
+        closeButton.on('click', () => {
+            this.close();
+        });
         header.append(closeButton);
         return header;
     }
 
     private buildFormUI(): JQuery<HTMLFormElement> {
-        const form: JQuery<HTMLFormElement> = $(`<form></form>`);
+        const form: JQuery<HTMLFormElement> = $('<form></form>');
         Object.entries(this.config.fields).forEach(([fsName, fields]) => {
-            const fieldset = $(`<fieldset></fieldset>`);
+            const fieldset = $('<fieldset></fieldset>');
             const legend = $(`<legend>${fsName}</legend>`);
             fieldset.append(legend);
             Object.entries(fields).forEach(([fieldName, fieldOptions]) => {
@@ -169,7 +171,7 @@ export class SettingsUI {
             form.append(fieldset);
         });
         // Form Buttons
-        const formButtonWrapper = $(`<div class="nln-config-buttons"></div>`);
+        const formButtonWrapper = $('<div class="nln-config-buttons"></div>');
         const saveButton = $(`<button class="${this.SO.CSS.buttonPrimary}" type="submit" title="save the current settings and reload the page">Save and Reload</button>`);
         const revertButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="button" title="revert any changes to the last save point">Revert Changes</button>`);
         const resetButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="reset" title="reset all values to their defaults">Reset to default</button>`);
@@ -210,7 +212,7 @@ export class SettingsUI {
     private buildUI(): void {
         this.mountPoint.empty();
         const fullScreenModalContainer = $('<div class="nln-config-modal-background"></div>');
-        const modalContainer = $(`<div class="nln-config-modal"></div>`);
+        const modalContainer = $('<div class="nln-config-modal"></div>');
 
         // Header
         modalContainer.append(this.buildHeaderUI());
@@ -235,12 +237,12 @@ export class SettingsUI {
         // Form
         this.formConfigVars = {...this.defaultConfigVars, ...this.currentConfigVars};
         this.buildUI();
-        window.addEventListener("keydown", this.boundEscapeHandler);
+        window.addEventListener('keydown', this.boundEscapeHandler);
     }
 
     close(): void {
         this.formConfigVars = {}; // empty formConfig when UI is destroyed
         this.mountPoint.empty();
-        window.removeEventListener("keydown", this.boundEscapeHandler);
+        window.removeEventListener('keydown', this.boundEscapeHandler);
     }
 }

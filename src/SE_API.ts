@@ -1,4 +1,4 @@
-import {getFormDataFromObject, getURLSearchParamsFromObject} from "./Utils";
+import {getFormDataFromObject, getURLSearchParamsFromObject} from './Utils';
 import {
     AlreadyDeletedError,
     AlreadyFlaggedError,
@@ -8,7 +8,7 @@ import {
     RatedLimitedError,
     SECommentAPIResponse,
     SEFlagResponse
-} from "./Types";
+} from './Types';
 
 
 /**
@@ -32,7 +32,7 @@ export function getComments(
         'sort': 'creation',
         'filter': COMMENT_FILTER,
         'fromdate': FROM_DATE,
-        ...(TO_DATE && {'todate': TO_DATE})
+        ...TO_DATE && {'todate': TO_DATE}
     });
     return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`)
         .then(res => res.json())
@@ -49,21 +49,25 @@ export function getComments(
  */
 export function getFlagQuota(commentID: number): Promise<number> {
     return new Promise((resolve, reject) => {
-        $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
+        void $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
             .done((data: string) => {
                 const pattern = /you have (\d+) flags left today/i;
-                const match: RegExpMatchArray | null = $('div:contains("flags left today")', data).filter((idx: number, n: HTMLElement): boolean => (n.childElementCount === 0) && Boolean(n.innerText.match(pattern))).last().text().match(pattern);
+                const match: RegExpMatchArray | null = $('div:contains("flags left today")', data).filter((idx: number, n: HTMLElement): boolean => n.childElementCount === 0 && Boolean(n.innerText.match(pattern))).last().text().match(pattern);
                 if (match !== null) {
-                    return resolve(Number(match[1]));
+                    resolve(Number(match[1]));
+                    return;
                 } else {
-                    return resolve(0)
+                    resolve(0);
+                    return;
                 }
             })
             .fail((err: JQuery.jqXHR) => {
                 if (err.status === 409) {
-                    return reject(new RatedLimitedError("You may only load the comment flag dialog every 3 seconds"));
+                    reject(new RatedLimitedError('You may only load the comment flag dialog every 3 seconds'));
+                    return;
                 } else {
-                    return reject();
+                    reject();
+                    return;
                 }
             });
     });
@@ -83,15 +87,15 @@ export function getFlagQuota(commentID: number): Promise<number> {
  */
 export function flagComment(fkey: string, comment_id: number): Promise<CommentFlagResult> {
     return fetch(`https://${location.hostname}/flags/comments/${comment_id}/add/39`, {
-        method: "POST",
+        method: 'POST',
         body: getFormDataFromObject({
             'fkey': fkey,
-            'otherText': "",
+            'otherText': '',
             'overrideWarning': true
         })
     }).then((res: Response) => {
         if (res.status === 409) {
-            throw new RatedLimitedError("You can only flag once every 5 seconds");
+            throw new RatedLimitedError('You can only flag once every 5 seconds');
         } else if (res.status === 200) {
             return res.json();
         } else {
@@ -104,9 +108,9 @@ export function flagComment(fkey: string, comment_id: number): Promise<CommentFl
                 was_flagged: true
             };
         } else if (!resData.Success && resData.Outcome === 2) {
-            if (resData.Message === "You have already flagged this comment") {
+            if (resData.Message === 'You have already flagged this comment') {
                 throw new AlreadyFlaggedError(resData.Message);
-            } else if (resData.Message === "This comment is deleted and cannot be flagged") {
+            } else if (resData.Message === 'This comment is deleted and cannot be flagged') {
                 throw new AlreadyDeletedError(resData.Message);
             } else if (resData.Message.toLowerCase().includes('out of flag')) {
                 throw new OutOfFlagsError(resData.Message);
