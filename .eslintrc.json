@@ -20,7 +20,8 @@
     "semi": "off",
     "no-extra-semi": "error",
     "@typescript-eslint/semi": [
-      "error"
+      "error",
+      "always"
     ],
     "@typescript-eslint/member-delimiter-style": [
       "error",
