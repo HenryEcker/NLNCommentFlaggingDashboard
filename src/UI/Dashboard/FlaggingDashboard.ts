@@ -110,6 +110,9 @@ export class FlaggingDashboard {
             if (this.uiConfig.displayPostType) {
                 tr.append($('<th>Post Type</th>'));
             }
+            if (this.uiConfig.displayCommentOwner) {
+                tr.append($('<th>Author</th>'));
+            }
             if (this.uiConfig.displayLink) {
                 tr.append($('<th>Link</th>'));
             }
@@ -174,10 +177,12 @@ export class FlaggingDashboard {
     private render(): void {
         const tbody = $(`#${this.htmlIds.tableBodyId}`);
         tbody.empty();
-        Object.values(this.tableData).forEach(comment => {
+        Object.values(this.tableData).forEach((comment: Comment) => {
             const tr = $('<tr></tr>');
             tr.append(`<td>${comment.body}</td>`);
-
+            if (this.uiConfig.displayCommentOwner) {
+                tr.append(`<td><a href="${comment.owner.link}" target="_blank">${comment.owner.display_name}</a></td>`);
+            }
             if (this.uiConfig.displayPostType) {
                 tr.append(`<td>${capitalise(comment.post_type)}</td>`);
             }
@@ -230,7 +235,7 @@ export class FlaggingDashboard {
                 clearButtonTD.append(clearButton);
                 tr.append(clearButtonTD);
             }
-            tbody.prepend(tr);
+            tbody.append(tr);
         });
         this.updatePageTitle();
     }

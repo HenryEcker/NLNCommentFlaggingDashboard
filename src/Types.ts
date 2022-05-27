@@ -1,56 +1,67 @@
 export type PostType = 'question' | 'answer' | 'all';
 
 export interface Comment {
-    _id: number,
-    post_id: number,
-    post_type: PostType,
-    body: string,
-    link: string,
-    blacklist_matches: RegExpMatchArray,
-    noise_ratio: number,
-    can_flag: boolean,
-    was_flagged?: boolean,
-    was_deleted?: boolean
+    _id: number;
+    post_id: number;
+    post_type: PostType;
+    body: string;
+    owner: APICommentOwner;
+    link: string;
+    blacklist_matches: RegExpMatchArray;
+    noise_ratio: number;
+    can_flag: boolean;
+    was_flagged?: boolean;
+    was_deleted?: boolean;
 }
 
 export interface CommentFlagResult {
-    was_deleted: boolean,
-    was_flagged: boolean
+    was_deleted: boolean;
+    was_flagged: boolean;
 }
 
 export interface SEFlagResponse {
-    Success: boolean,
-    Outcome: number,
-    ResultChangedState: boolean,
-    Message: string
+    Success: boolean;
+    Outcome: number;
+    ResultChangedState: boolean;
+    Message: string;
+}
+
+export interface APICommentOwner {
+    account_id: number;
+    reputation: number;
+    user_id: number;
+    display_name: string;
+    link: string;
 }
 
 export interface APIComment {
-    can_flag: boolean,
-    post_type: PostType,
-    post_id: number,
-    comment_id: number,
-    body_markdown: string,
-    link: string,
-    body: string
+    owner: APICommentOwner;
+    can_flag: boolean;
+    post_type: PostType;
+    post_id: number;
+    comment_id: number;
+    body_markdown: string;
+    link: string;
+    body: string;
 }
 
 export interface SECommentAPIResponse {
-    items: APIComment[],
-    has_more: boolean,
-    quota_max: number,
-    quota_remaining: number
+    items: APIComment[];
+    has_more: boolean;
+    quota_max: number;
+    quota_remaining: number;
 }
 
 export interface FlaggingDashboardConfig {
-    displayLink: boolean,
-    displayPostType: boolean,
-    displayNoiseRatio: boolean,
-    displayFlagUI: boolean,
-    displayBlacklistMatches: boolean,
-    displayCommentDeleteState: boolean,
-    shouldUpdateTitle: boolean,
-    displayRemainingFlags: boolean
+    displayLink: boolean;
+    displayPostType: boolean;
+    displayNoiseRatio: boolean;
+    displayFlagUI: boolean;
+    displayBlacklistMatches: boolean;
+    displayCommentDeleteState: boolean;
+    shouldUpdateTitle: boolean;
+    displayRemainingFlags: boolean;
+    displayCommentOwner: boolean;
 }
 
 export interface StackExchange {

@@ -112,6 +112,11 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'UI_DISPLAY_COMMENT_OWNER': {
+                        'label': 'Display User Name of Comment Author',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                     'UI_DISPLAY_POST_TYPE': {
                         'label': 'Display Type of Post the comment is under: ',
                         'type': 'checkbox',
@@ -170,7 +175,7 @@ function UserScript(): void {
 
     if ((settings.get('ACTIVE') as boolean)) {
         const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
-        const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
+        const COMMENT_FILTER = '!TQs**ij.viKR)b8Sie*Qd';
         const API_REQUEST_RATE = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
         const fkey = StackExchange.options.user.fkey;
         // Prime last successful read
@@ -192,7 +197,8 @@ function UserScript(): void {
                 displayBlacklistMatches: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
                 displayCommentDeleteState: settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean,
                 shouldUpdateTitle: settings.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean,
-                displayRemainingFlags: settings.get('UI_DISPLAY_REMAINING_FLAGS') as boolean
+                displayRemainingFlags: settings.get('UI_DISPLAY_REMAINING_FLAGS') as boolean,
+                displayCommentOwner: settings.get('UI_DISPLAY_COMMENT_OWNER') as boolean
             } as FlaggingDashboardConfig,
             toaster
         );
@@ -232,6 +238,7 @@ function UserScript(): void {
                                     acc.push({
                                         can_flag: comment.can_flag,
                                         body: decodedMarkdown,
+                                        owner: comment.owner,
                                         link: comment.link,
                                         _id: comment.comment_id,
                                         post_id: comment.post_id,
