@@ -107,11 +107,11 @@ export class FlaggingDashboard {
             const thead = $('<thead></thead>')
             const tr = $('<tr></tr>')
             tr.append($('<th>Comment Text</th>'));
-            if (this.uiConfig.displayPostType) {
-                tr.append($('<th>Post Type</th>'));
-            }
             if (this.uiConfig.displayCommentOwner) {
                 tr.append($('<th>Author</th>'));
+            }
+            if (this.uiConfig.displayPostType) {
+                tr.append($('<th>Post Type</th>'));
             }
             if (this.uiConfig.displayLink) {
                 tr.append($('<th>Link</th>'));
