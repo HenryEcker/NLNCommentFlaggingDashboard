@@ -24,12 +24,14 @@ export class FlaggingDashboard {
     private readonly uiConfig: FlaggingDashboardConfig;
     private readonly toaster: Toast;
     private tableData: TableData;
+    private commentScanAmount: number;
     private readonly htmlIds = {
         containerDivId: 'NLN_Comment_Wrapper',
         tableId: 'NLN_Comment_Reports_Table',
         tableBodyId: 'NLN_Comment_Reports_Table_Body',
         styleId: 'nln-comment-userscript-styles',
-        remainingFlags: 'NLN_Remaining_Comment_Flags'
+        remainingFlags: 'NLN_Remaining_Comment_Flags',
+        commentScanCount: 'nln-comment-scan-count'
     };
     private readonly SO = {
         'CSS': {
@@ -61,6 +63,7 @@ export class FlaggingDashboard {
         this.uiConfig = uiConfig;
         this.toaster = toaster;
         this.tableData = {};
+        this.commentScanAmount = 0;
     }
 
     /**
@@ -97,7 +100,7 @@ export class FlaggingDashboard {
         // Header Elements
         {
             const header = $('<div class="nln-header"></div>');
-            header.append($('<h2>NLN Comment Flagging Dashboard</h2>'));
+            header.append($(`<h2>NLN Comment Flagging Dashboard (<span id="${this.htmlIds.commentScanCount}" title="Number of Comments Scanned">${this.commentScanAmount}</span>)</h2>`));
             container.append(header);
         }
         // Build Table
@@ -295,6 +298,16 @@ export class FlaggingDashboard {
             // Re-render
             this.render();
         }
+    }
+
+    /**
+     * Update the counter which tracks how many comments have been scanned
+     *
+     * @param num to add to amount of comments scanned
+     */
+    updateNumberOfCommentsScanned(num: number): void {
+        this.commentScanAmount += num;
+        $(`#${this.htmlIds.commentScanCount}`).text(this.commentScanAmount);
     }
 
     /**

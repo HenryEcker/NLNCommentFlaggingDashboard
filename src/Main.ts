@@ -221,6 +221,9 @@ function UserScript(): void {
                 return; // Exit script
             }
             if (response.items.length > 0) {
+                // Update the amount of items looked at
+                ui.updateNumberOfCommentsScanned(response.items.length);
+
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
                 ui.addComments(
