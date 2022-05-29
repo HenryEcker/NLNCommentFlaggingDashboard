@@ -1,26 +1,26 @@
 import './Settings.scss';
 
-type ValueType = string | number | boolean;
+export type ValueType = string | number | boolean;
 
-interface FieldConfig {
+export interface FieldConfig {
     label: string;
     default?: ValueType;
 }
 
-interface InputFieldConfig extends FieldConfig {
+export interface InputFieldConfig extends FieldConfig {
     type: 'number' | 'text' | 'checkbox';
     attributes?: {
         [key: string]: ValueType;
     };
 }
 
-interface SelectFieldConfig extends FieldConfig {
+export interface SelectFieldConfig extends FieldConfig {
     type: 'select';
     options: string[];
     default: string;
 }
 
-interface SettingConfigType {
+export interface SettingConfigType {
     id: string;
     title: string;
     fields: {
@@ -30,7 +30,7 @@ interface SettingConfigType {
     };
 }
 
-interface ConfigVars {
+export interface ConfigVars {
     [key: string]: ValueType;
 }
 
@@ -89,6 +89,18 @@ export class SettingsUI {
         } else {
             return this.defaultConfigVars[key];
         }
+    }
+
+    getConfigProfile(key: string): InputFieldConfig | SelectFieldConfig | undefined {
+        let retFieldOptions: InputFieldConfig | SelectFieldConfig | undefined = undefined;
+        Object.entries(this.config.fields).forEach(([, fields]) => {
+            Object.entries(fields).forEach(([fieldName, fieldOptions]) => {
+                if (fieldName === key) {
+                    retFieldOptions = fieldOptions;
+                }
+            });
+        });
+        return retFieldOptions;
     }
 
     set(key: string, value: ValueType): void {

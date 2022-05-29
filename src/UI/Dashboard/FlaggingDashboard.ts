@@ -11,7 +11,7 @@ import {
 import {capitalise, formatPercentage} from '../../Utils';
 import {flagComment, getFlagQuota} from '../../SE_API';
 import {Toast} from '../Toast/Toast';
-import {SettingsUI} from '../Settings/SettingsUI';
+import {InputFieldConfig, SettingsUI} from '../Settings/SettingsUI';
 
 
 interface TableData {
@@ -121,9 +121,10 @@ export class FlaggingDashboard {
                 // Sliders
                 const buildSlider = (
                     settingKey: string, textLabel: string,
-                    min: number, max: number, step: number,
                     type: 'percent' | 'integer'
-                ) => {
+                ): JQuery<HTMLElement> => {
+                    const settingConfig = this.settings.getConfigProfile(settingKey) as InputFieldConfig;
+
                     // Certainty Slider
                     const sliderContainer = $('<div class="nln-slider-container"></div>');
 
@@ -135,7 +136,7 @@ export class FlaggingDashboard {
                         else
                             return '';
                     };
-                    const sliderInput = $(`<input id="SLIDER_${settingKey}" type='range' min='${min}' max='${max}' step='${step}' value='${this.settings.get(settingKey)}' class='slider'>`);
+                    const sliderInput = $(`<input id="SLIDER_${settingKey}" type='range' min='${settingConfig.attributes?.min}' max='${settingConfig.attributes?.max}' step='${settingConfig.attributes?.step}' value='${this.settings.get(settingKey)}' class='slider'>`);
                     const sliderValue = $(`<span>${formatSliderValue(this.settings.get(settingKey) as number)}</span>`);
                     // Update Slider Value
                     sliderInput.on('input', (ev) => {
@@ -143,7 +144,6 @@ export class FlaggingDashboard {
                     });
                     // Update Settings on Mouse Up
                     sliderInput.on('change', (ev) => {
-                        console.log((ev.target as HTMLInputElement).value);
                         this.settings.set(settingKey, Number((ev.target as HTMLInputElement).value));
                         this.render();
                     });
@@ -153,10 +153,10 @@ export class FlaggingDashboard {
                     return sliderContainer;
                 };
                 settingsContainer.append(
-                    buildSlider('DISPLAY_CERTAINTY', 'Display Certainty', 0, 100, 0.01, 'percent')
+                    buildSlider('DISPLAY_CERTAINTY', 'Display Certainty', 'percent')
                 );
                 settingsContainer.append(
-                    buildSlider('MAXIMUM_LENGTH_COMMENT', 'Comment Length', 0, 600, 1, 'integer')
+                    buildSlider('MAXIMUM_LENGTH_COMMENT', 'Comment Length', 'integer')
                 );
             }
             {
