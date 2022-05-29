@@ -74,7 +74,12 @@ export class SettingsUI {
         }
     }
 
-    private save(): void {
+    reload(): void {
+        this.currentConfigVars = this.load();
+    }
+
+
+    save(): void {
         GM_setValue(this.config.id, JSON.stringify(this.currentConfigVars));
     }
 
@@ -89,6 +94,7 @@ export class SettingsUI {
     set(key: string, value: ValueType): void {
         this.currentConfigVars[key] = value;
     }
+
 
     private buildSelect(fieldId: string, fieldName: string, fieldOptions: SelectFieldConfig, val: ValueType): JQuery<HTMLSelectElement> {
         const select: JQuery<HTMLSelectElement> = $('<select></select>');

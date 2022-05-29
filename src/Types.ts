@@ -5,9 +5,11 @@ export interface Comment {
     post_id: number;
     post_type: PostType;
     body: string;
+    body_markdown: string;
     owner: APICommentOwner;
     link: string;
     blacklist_matches: RegExpMatchArray;
+    whitelist_matches: RegExpMatchArray;
     noise_ratio: number;
     can_flag: boolean;
     was_flagged?: boolean;

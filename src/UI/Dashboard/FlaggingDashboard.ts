@@ -4,13 +4,14 @@ import {
     Comment,
     CommentFlagResult,
     FlagAttemptFailed,
-    FlaggingDashboardConfig,
     OutOfFlagsError,
+    PostType,
     RatedLimitedError
 } from '../../Types';
 import {capitalise, formatPercentage} from '../../Utils';
 import {flagComment, getFlagQuota} from '../../SE_API';
 import {Toast} from '../Toast/Toast';
+import {SettingsUI} from '../Settings/SettingsUI';
 
 
 interface TableData {
@@ -21,17 +22,17 @@ export class FlaggingDashboard {
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly flagsRemainingDiv: JQuery<HTMLElement>;
     private readonly fkey: string;
-    private readonly uiConfig: FlaggingDashboardConfig;
+    private readonly settings: SettingsUI;
     private readonly toaster: Toast;
     private tableData: TableData;
-    private commentScanAmount: number;
     private readonly htmlIds = {
         containerDivId: 'NLN_Comment_Wrapper',
         tableId: 'NLN_Comment_Reports_Table',
         tableBodyId: 'NLN_Comment_Reports_Table_Body',
         styleId: 'nln-comment-userscript-styles',
         remainingFlags: 'NLN_Remaining_Comment_Flags',
-        commentScanCount: 'nln-comment-scan-count'
+        commentScanCount: 'nln-comment-scan-count',
+        settingContainerDiv: 'nln-dashboard-settings-container',
     };
     private readonly SO = {
         'CSS': {
@@ -53,17 +54,16 @@ export class FlaggingDashboard {
      *
      * @param {JQuery<HTMLElement>} mountPoint The HTMLElement in which this dashboard will be built
      * @param {string} fkey The user fkey (needed to handle flagging)
-     * @param {FlaggingDashboardConfig} uiConfig Configuration to determine which UI elements to render
+     * @param {SettingsUI} settings Configuration to determine which UI elements to render
      * @param {Toast} toaster A toaster to display custom toast messages.
      */
-    constructor(mountPoint: JQuery<HTMLElement>, fkey: string, uiConfig: FlaggingDashboardConfig, toaster: Toast) {
+    constructor(mountPoint: JQuery<HTMLElement>, fkey: string, settings: SettingsUI, toaster: Toast) {
         this.mountPoint = mountPoint;
         this.flagsRemainingDiv = $(`<div class="${this.SO.CSS.flagsRemainingDiv}" id="${this.htmlIds.remainingFlags}"></div>`);
         this.fkey = fkey;
-        this.uiConfig = uiConfig;
+        this.settings = settings;
         this.toaster = toaster;
         this.tableData = {};
-        this.commentScanAmount = 0;
     }
 
     /**
@@ -85,8 +85,19 @@ export class FlaggingDashboard {
 #${this.htmlIds.containerDivId} {
     padding: 25px 0;
     display: grid;
-    grid-template-rows: 40px 1fr 40px;
+    grid-template-rows: 25px 40px 1fr 40px;
     grid-gap: 10px;
+}
+
+#nln-dashboard-settings-container {
+    display: flex;
+    gap: 25px;
+}
+
+.nln-slider-container{
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
 `;
         document.head.appendChild(styles);
@@ -100,9 +111,76 @@ export class FlaggingDashboard {
         // Header Elements
         {
             const header = $('<div class="nln-header"></div>');
-            header.append($(`<h2>NLN Comment Flagging Dashboard (<span id="${this.htmlIds.commentScanCount}" title="Number of Comments Scanned">${this.commentScanAmount}</span>)</h2>`));
+            header.append($(`<h2>NLN Comment Flagging Dashboard <span id="${this.htmlIds.commentScanCount}" title="Number of Comments Scanned"></span></h2>`));
             container.append(header);
         }
+        const settingsContainer = $('<div id="nln-dashboard-settings-container"></div>');
+        container.append(settingsContainer);
+        const buildSettingContainer = () => {
+            {
+                // Sliders
+                const buildSlider = (
+                    settingKey: string, textLabel: string,
+                    min: number, max: number, step: number,
+                    type: 'percent' | 'integer'
+                ) => {
+                    // Certainty Slider
+                    const sliderContainer = $('<div class="nln-slider-container"></div>');
+
+                    const formatSliderValue = (v: string | number): string => {
+                        if (type === 'percent')
+                            return `${Number(v).toFixed(2)}%`;
+                        else if (type === 'integer')
+                            return `${Number(v).toFixed(0)}`;
+                        else
+                            return '';
+                    };
+                    const sliderInput = $(`<input id="SLIDER_${settingKey}" type='range' min='${min}' max='${max}' step='${step}' value='${this.settings.get(settingKey)}' class='slider'>`);
+                    const sliderValue = $(`<span>${formatSliderValue(this.settings.get(settingKey) as number)}</span>`);
+                    // Update Slider Value
+                    sliderInput.on('input', (ev) => {
+                        sliderValue.text(formatSliderValue((ev.target as HTMLInputElement).value));
+                    });
+                    // Update Settings on Mouse Up
+                    sliderInput.on('change', (ev) => {
+                        console.log((ev.target as HTMLInputElement).value);
+                        this.settings.set(settingKey, Number((ev.target as HTMLInputElement).value));
+                        this.render();
+                    });
+                    sliderContainer.append(`<label for="SLIDER_${settingKey}">${textLabel}</label>`);
+                    sliderContainer.append(sliderInput);
+                    sliderContainer.append(sliderValue);
+                    return sliderContainer;
+                };
+                settingsContainer.append(
+                    buildSlider('DISPLAY_CERTAINTY', 'Display Certainty', 0, 100, 0.01, 'percent')
+                );
+                settingsContainer.append(
+                    buildSlider('MAXIMUM_LENGTH_COMMENT', 'Comment Length', 0, 600, 1, 'integer')
+                );
+            }
+            {
+                const resetSettingsDisplayButton = $(`<button style="margin-left: auto" class="${this.SO.CSS.buttonGeneral}">Reset</button>`);
+                resetSettingsDisplayButton.on('click', (ev) => {
+                    ev.preventDefault();
+                    this.settings.reload();
+                    settingsContainer.empty();
+                    buildSettingContainer();
+                    this.render();
+                });
+                settingsContainer.append(resetSettingsDisplayButton);
+            }
+            {
+                const saveSettingsButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Save</button>`);
+                saveSettingsButton.on('click', (ev) => {
+                    ev.preventDefault();
+                    this.settings.save();
+                    saveSettingsButton.blur();
+                });
+                settingsContainer.append(saveSettingsButton);
+            }
+        };
+        buildSettingContainer();
         // Build Table
         {
             const tableContainer = $(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
@@ -110,25 +188,28 @@ export class FlaggingDashboard {
             const thead = $('<thead></thead>');
             const tr = $('<tr></tr>');
             tr.append($('<th>Comment Text</th>'));
-            if (this.uiConfig.displayCommentOwner) {
+            if (this.settings.get('UI_DISPLAY_COMMENT_OWNER')) {
                 tr.append($('<th>Author</th>'));
             }
-            if (this.uiConfig.displayPostType) {
+            if (this.settings.get('UI_DISPLAY_POST_TYPE')) {
                 tr.append($('<th>Post Type</th>'));
             }
-            if (this.uiConfig.displayLink) {
+            if (this.settings.get('UI_DISPLAY_LINK_TO_COMMENT')) {
                 tr.append($('<th>Link</th>'));
             }
-            if (this.uiConfig.displayBlacklistMatches) {
+            if (this.settings.get('UI_DISPLAY_BLACKLIST_MATCHES')) {
                 tr.append($('<th>Blacklist Matches</th>'));
             }
-            if (this.uiConfig.displayNoiseRatio) {
+            if (this.settings.get('UI_DISPLAY_WHITELIST_MATCHES')) {
+                tr.append($('<th>Whitelist Matches</th>'));
+            }
+            if (this.settings.get('UI_DISPLAY_NOISE_RATIO')) {
                 tr.append($('<th>Noise Ratio</th>'));
             }
-            if (this.uiConfig.displayFlagUI) {
+            if (this.settings.get('UI_DISPLAY_FLAG_BUTTON')) {
                 tr.append($('<th>Flag</th>'));
             }
-            if (this.uiConfig.displayCommentDeleteState) {
+            if (this.settings.get('UI_DISPLAY_COMMENT_DELETE_STATE')) {
                 tr.append($('<th>Deleted</th>'));
             }
             tr.append($('<th>Clear</th>'));
@@ -172,6 +253,21 @@ export class FlaggingDashboard {
             container.append(footer);
         }
         this.mountPoint.before(container);
+        this.updateNumberOfCommentsScanned();
+    }
+
+    private static postTypeFilter(configPT: PostType, actualPT: PostType): boolean {
+        if (configPT === 'all') {
+            return true;
+        } else {
+            return configPT === actualPT;
+        }
+    }
+
+    private shouldRenderRow(comment: Comment): boolean {
+        return FlaggingDashboard.postTypeFilter(this.settings.get('POST_TYPE') as PostType, comment.post_type) &&
+            comment.body_markdown.length <= (this.settings.get('MAXIMUM_LENGTH_COMMENT') as number) &&
+            comment.noise_ratio >= this.settings.get('DISPLAY_CERTAINTY');
     }
 
     /**
@@ -181,68 +277,74 @@ export class FlaggingDashboard {
         const tbody = $(`#${this.htmlIds.tableBodyId}`);
         tbody.empty();
         Object.values(this.tableData).forEach((comment: Comment) => {
-            const tr = $('<tr></tr>');
-            tr.append(`<td>${comment.body}</td>`);
-            if (this.uiConfig.displayCommentOwner) {
-                tr.append(`<td><a href="${comment.owner.link}" target="_blank">${comment.owner.display_name}</a></td>`);
-            }
-            if (this.uiConfig.displayPostType) {
-                tr.append(`<td>${capitalise(comment.post_type)}</td>`);
-            }
-            if (this.uiConfig.displayLink) {
-                tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
-            }
-            if (this.uiConfig.displayBlacklistMatches) {
-                tr.append(`<td>${comment.blacklist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
-            }
-            if (this.uiConfig.displayNoiseRatio) {
-                tr.append(`<td>${formatPercentage(comment.noise_ratio)}</td>`);
-            }
-
-            if (this.uiConfig.displayFlagUI) {
-                // Flag Button/Indicators
-                if (!comment.can_flag) {
-                    tr.append('<td>🚫</td>');
-                } else if (comment.was_flagged) {
-                    tr.append('<td>✓</td>');
-                } else {
-                    const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
-                    flagButton.on('click', () => {
-                        flagButton.text('');
-                        const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
-                        flagButton.append(spinner);
-                        void this.handleFlagComment(comment);
-                    });
-                    const td = $('<td></td>');
-                    td.append(flagButton);
-                    tr.append(td);
+            if (this.shouldRenderRow(comment)) {
+                const tr = $('<tr></tr>');
+                tr.append(`<td>${comment.body}</td>`);
+                if (this.settings.get('UI_DISPLAY_COMMENT_OWNER')) {
+                    tr.append(`<td><a href="${comment.owner.link}" target="_blank">${comment.owner.display_name}</a></td>`);
                 }
-            }
+                if (this.settings.get('UI_DISPLAY_POST_TYPE')) {
+                    tr.append(`<td>${capitalise(comment.post_type)}</td>`);
+                }
+                if (this.settings.get('UI_DISPLAY_LINK_TO_COMMENT')) {
+                    tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
+                }
+                if (this.settings.get('UI_DISPLAY_BLACKLIST_MATCHES')) {
+                    tr.append(`<td>${comment.blacklist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
+                }
+                if (this.settings.get('UI_DISPLAY_WHITELIST_MATCHES')) {
+                    tr.append(`<td>${comment.whitelist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
+                }
+                if (this.settings.get('UI_DISPLAY_NOISE_RATIO')) {
+                    tr.append(`<td>${formatPercentage(comment.noise_ratio)}</td>`);
+                }
 
-            if (this.uiConfig.displayCommentDeleteState) {
-                if (comment.was_deleted !== undefined) {
-                    if (comment.was_deleted) {
+                if (this.settings.get('UI_DISPLAY_FLAG_BUTTON')) {
+                    // Flag Button/Indicators
+                    if (!comment.can_flag) {
+                        tr.append('<td>🚫</td>');
+                    } else if (comment.was_flagged) {
                         tr.append('<td>✓</td>');
                     } else {
-                        tr.append(`<td>${this.SO.HTML.pendingSpan}</td>`);
+                        const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
+                        flagButton.on('click', () => {
+                            flagButton.text('');
+                            const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
+                            flagButton.append(spinner);
+                            void this.handleFlagComment(comment);
+                        });
+                        const td = $('<td></td>');
+                        td.append(flagButton);
+                        tr.append(td);
                     }
-                } else {
-                    tr.append('<td></td>');
                 }
+
+                if (this.settings.get('UI_DISPLAY_COMMENT_DELETE_STATE')) {
+                    if (comment.was_deleted !== undefined) {
+                        if (comment.was_deleted) {
+                            tr.append('<td>✓</td>');
+                        } else {
+                            tr.append(`<td>${this.SO.HTML.pendingSpan}</td>`);
+                        }
+                    } else {
+                        tr.append('<td></td>');
+                    }
+                }
+                // Clear Button
+                {
+                    const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
+                    clearButton.on('click', () => {
+                        this.removeComment(comment._id);
+                    });
+                    const clearButtonTd = $('<td></td>');
+                    clearButtonTd.append(clearButton);
+                    tr.append(clearButtonTd);
+                }
+                tbody.append(tr);
             }
-            // Clear Button
-            {
-                const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
-                clearButton.on('click', () => {
-                    this.removeComment(comment._id);
-                });
-                const clearButtonTd = $('<td></td>');
-                clearButtonTd.append(clearButton);
-                tr.append(clearButtonTd);
-            }
-            tbody.append(tr);
         });
         this.updatePageTitle();
+        this.updateNumberOfCommentsScanned();
     }
 
     /**
@@ -303,11 +405,11 @@ export class FlaggingDashboard {
     /**
      * Update the counter which tracks how many comments have been scanned
      *
-     * @param num to add to amount of comments scanned
      */
-    updateNumberOfCommentsScanned(num: number): void {
-        this.commentScanAmount += num;
-        $(`#${this.htmlIds.commentScanCount}`).text(this.commentScanAmount);
+    updateNumberOfCommentsScanned(): void {
+        if (this.settings.get('NUMBER_OF_SCANS_SHOULD_UPDATE')) {
+            $(`#${this.htmlIds.commentScanCount}`).text(`(${Object.keys(this.tableData).length})`);
+        }
     }
 
     /**
@@ -325,9 +427,9 @@ export class FlaggingDashboard {
      * Only if the config is set
      */
     private updatePageTitle(): void {
-        if (this.uiConfig.shouldUpdateTitle) {
+        if (this.settings.get('DOCUMENT_TITLE_SHOULD_UPDATE')) {
             const pending = Object.values(this.tableData).reduce((acc, comment) => {
-                if (comment.can_flag && !comment.was_flagged) {
+                if (this.shouldRenderRow(comment) && comment.can_flag && !comment.was_flagged) {
                     return acc + 1;
                 } else {
                     return acc;
@@ -348,7 +450,7 @@ export class FlaggingDashboard {
     }
 
     private async updateRemainingFlags(commentID: number): Promise<number | undefined> {
-        if (this.uiConfig.displayRemainingFlags) {
+        if (this.settings.get('UI_DISPLAY_REMAINING_FLAGS')) {
             try {
                 const flagsRemaining = await getFlagQuota(commentID);
                 this.setRemainingFlagDisplay(flagsRemaining);

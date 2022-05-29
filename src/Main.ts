@@ -1,5 +1,5 @@
 import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from './Utils';
-import {APIComment, Comment, FlaggingDashboardConfig, PostType, SECommentAPIResponse, StackExchange} from './Types';
+import {APIComment, Comment, SECommentAPIResponse, StackExchange} from './Types';
 import {FlaggingDashboard} from './UI/Dashboard/FlaggingDashboard';
 import {getComments} from './SE_API';
 import {blacklist, whitelist} from './GlobalVars';
@@ -8,15 +8,6 @@ import {SettingsUI} from './UI/Settings/SettingsUI';
 
 
 declare const StackExchange: StackExchange;
-
-
-function postTypeFilter(configPT: PostType, actualPT: PostType): boolean {
-    if (configPT === 'all') {
-        return true;
-    } else {
-        return configPT === actualPT;
-    }
-}
 
 
 function UserScript(): void {
@@ -112,6 +103,11 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'NUMBER_OF_SCANS_SHOULD_UPDATE': {
+                        'label': 'Update UI with total number of comments scanned: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                     'UI_DISPLAY_COMMENT_OWNER': {
                         'label': 'Display User Name of Comment Author',
                         'type': 'checkbox',
@@ -129,6 +125,11 @@ function UserScript(): void {
                     },
                     'UI_DISPLAY_BLACKLIST_MATCHES': {
                         'label': 'Display Blacklist Matches: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
+                    'UI_DISPLAY_WHITELIST_MATCHES': {
+                        'label': 'Display Whitelist Matches: ',
                         'type': 'checkbox',
                         'default': true
                     },
@@ -191,17 +192,7 @@ function UserScript(): void {
         const ui: FlaggingDashboard = new FlaggingDashboard(
             $('#mainbar'),
             fkey,
-            {
-                displayLink: settings.get('UI_DISPLAY_LINK_TO_COMMENT') as boolean,
-                displayPostType: settings.get('UI_DISPLAY_POST_TYPE') as boolean,
-                displayNoiseRatio: settings.get('UI_DISPLAY_NOISE_RATIO') as boolean,
-                displayFlagUI: settings.get('UI_DISPLAY_FLAG_BUTTON') as boolean,
-                displayBlacklistMatches: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
-                displayCommentDeleteState: settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean,
-                shouldUpdateTitle: settings.get('DOCUMENT_TITLE_SHOULD_UPDATE') as boolean,
-                displayRemainingFlags: settings.get('UI_DISPLAY_REMAINING_FLAGS') as boolean,
-                displayCommentOwner: settings.get('UI_DISPLAY_COMMENT_OWNER') as boolean
-            } as FlaggingDashboardConfig,
+            settings,
             toaster
         );
 
@@ -221,39 +212,30 @@ function UserScript(): void {
                 return; // Exit script
             }
             if (response.items.length > 0) {
-                // Update the amount of items looked at
-                ui.updateNumberOfCommentsScanned(response.items.length);
-
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
                 ui.addComments(
                     response.items.reduce((acc: Comment[], comment: APIComment) => {
-                        if (
-                            postTypeFilter(settings.get('POST_TYPE') as PostType, comment.post_type) &&
-                            comment.body_markdown.length <= (settings.get('MAXIMUM_LENGTH_COMMENT') as number)
-                        ) {
-                            const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
-                            const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
-                            if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
-                                const noiseRatio = calcNoiseRatio(
-                                    blacklistMatches,
-                                    decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
-                                );
-                                if (noiseRatio >= (settings.get('DISPLAY_CERTAINTY') as number)) {
-                                    acc.push({
-                                        can_flag: comment.can_flag,
-                                        body: decodedMarkdown,
-                                        owner: comment.owner,
-                                        link: comment.link,
-                                        _id: comment.comment_id,
-                                        post_id: comment.post_id,
-                                        post_type: comment.post_type,
-                                        blacklist_matches: blacklistMatches,
-                                        noise_ratio: noiseRatio
-                                    });
-                                }
-                            }
-                        }
+                        const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
+                        const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist) || []; // exclude code from analysis
+
+                        const noiseRatio = calcNoiseRatio(
+                            blacklistMatches,
+                            decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
+                        );
+                        acc.push({
+                            can_flag: comment.can_flag,
+                            body: decodedMarkdown,
+                            body_markdown: comment.body_markdown,
+                            owner: comment.owner,
+                            link: comment.link,
+                            _id: comment.comment_id,
+                            post_id: comment.post_id,
+                            post_type: comment.post_type,
+                            blacklist_matches: blacklistMatches,
+                            whitelist_matches: decodedMarkdown.match(whitelist) || [],
+                            noise_ratio: noiseRatio
+                        });
                         return acc;
                     }, [])
                 );
