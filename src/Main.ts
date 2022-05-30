@@ -225,7 +225,7 @@ function UserScript(): void {
                         );
                         acc.push({
                             can_flag: comment.can_flag,
-                            body: decodedMarkdown,
+                            body: comment.body,
                             body_markdown: comment.body_markdown,
                             owner: comment.owner,
                             link: comment.link,

@@ -11,7 +11,7 @@ import {
 import {capitalise, formatPercentage} from '../../Utils';
 import {flagComment, getFlagQuota} from '../../SE_API';
 import {Toast} from '../Toast/Toast';
-import {InputFieldConfig, SettingsUI} from '../Settings/SettingsUI';
+import {InputFieldConfig, SelectFieldConfig, SettingsUI} from '../Settings/SettingsUI';
 
 
 interface TableData {
@@ -85,19 +85,26 @@ export class FlaggingDashboard {
 #${this.htmlIds.containerDivId} {
     padding: 25px 0;
     display: grid;
-    grid-template-rows: 25px 40px 1fr 40px;
+    grid-template-rows: 25px min-content 1fr 40px;
     grid-gap: 10px;
 }
 
-#nln-dashboard-settings-container {
+#${this.htmlIds.settingContainerDiv} {
     display: flex;
     gap: 25px;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
 }
 
-.nln-slider-container{
+.nln-setting-elem-container {
     display: flex;
     align-items: center;
     gap: 7px;
+}
+
+#${this.htmlIds.settingContainerDiv} select {
+    height: min-content;
 }
 `;
         document.head.appendChild(styles);
@@ -124,11 +131,12 @@ export class FlaggingDashboard {
                     formatSliderValue: (v: string | number) => string
                 ): JQuery<HTMLElement> => {
                     const settingConfig = this.settings.getConfigProfile(settingKey) as InputFieldConfig;
+                    const id = `SLIDER_${settingKey}`;
 
                     // Certainty Slider
-                    const sliderContainer = $('<div class="nln-slider-container"></div>');
+                    const sliderContainer = $('<div class="nln-setting-elem-container"></div>');
 
-                    const sliderInput = $(`<input id="SLIDER_${settingKey}" type='range' min='${settingConfig.attributes?.min}' max='${settingConfig.attributes?.max}' step='${settingConfig.attributes?.step}' value='${this.settings.get(settingKey)}' class='slider'>`);
+                    const sliderInput = $(`<input id="${id}" type='range' min='${settingConfig.attributes?.min}' max='${settingConfig.attributes?.max}' step='${settingConfig.attributes?.step}' value='${this.settings.get(settingKey)}' class='slider'>`);
                     const sliderValue = $(`<span>${formatSliderValue(this.settings.get(settingKey) as number)}</span>`);
                     // Update Slider Value
                     sliderInput.on('input', (ev) => {
@@ -139,7 +147,7 @@ export class FlaggingDashboard {
                         this.settings.set(settingKey, Number((ev.target as HTMLInputElement).value));
                         this.render();
                     });
-                    sliderContainer.append(`<label for="SLIDER_${settingKey}">${textLabel}</label>`);
+                    sliderContainer.append(`<label for="${id}">${textLabel}</label>`);
                     sliderContainer.append(sliderInput);
                     sliderContainer.append(sliderValue);
                     return sliderContainer;
@@ -154,9 +162,40 @@ export class FlaggingDashboard {
                 settingsContainer.append(
                     buildSlider(
                         'MAXIMUM_LENGTH_COMMENT',
-                        'Comment Length',
+                        'Maximum Length',
                         (v) => `${Number(v).toFixed(0)}`
                     )
+                );
+            }
+            {
+                // Select Dropdown
+                const buildSelect = (
+                    settingKey: string, textLabel: string
+                ): JQuery<HTMLElement> => {
+                    const settingConfig = this.settings.getConfigProfile(settingKey) as SelectFieldConfig;
+                    const id = `SELECT_${settingKey}`;
+                    const selectContainer = $('<div class="nln-setting-elem-container"></div>');
+
+                    const select = $(`<select id="${id}"></select>`);
+                    settingConfig.options.forEach((op) => {
+                        select.append($(`<option value="${op}">${op}</option>`));
+                    });
+                    const val = this.settings.get(settingKey);
+                    if (val !== undefined) {
+                        select.val(val.toString());
+                    }
+                    select.on('change', (ev) => {
+                        this.settings.set(settingKey, (ev.target as HTMLSelectElement).value);
+                        this.render();
+                    });
+
+                    selectContainer.append(`<label for="SLIDER_${settingKey}">${textLabel}</label>`);
+                    selectContainer.append(select);
+                    return selectContainer;
+                };
+
+                settingsContainer.append(
+                    buildSelect('POST_TYPE', 'Post Type')
                 );
             }
             {
