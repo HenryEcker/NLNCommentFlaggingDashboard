@@ -96,6 +96,11 @@ function UserScript(): void {
                             'step': 0.01
                         }
                     },
+                    'FILTER_WHITELIST': {
+                        'label': 'Do not display rows with any whitelist matches: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                 },
                 'UI Settings': {
                     'DOCUMENT_TITLE_SHOULD_UPDATE': {

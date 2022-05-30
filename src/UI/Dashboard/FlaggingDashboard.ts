@@ -189,13 +189,32 @@ export class FlaggingDashboard {
                         this.render();
                     });
 
-                    selectContainer.append(`<label for="SLIDER_${settingKey}">${textLabel}</label>`);
+                    selectContainer.append(`<label for="${id}">${textLabel}</label>`);
                     selectContainer.append(select);
                     return selectContainer;
                 };
 
                 settingsContainer.append(
                     buildSelect('POST_TYPE', 'Post Type')
+                );
+            }
+            {
+                const buildCheckbox = (settingKey: string, textLabel: string): JQuery<HTMLElement> => {
+                    const checkboxContainer = $('<div class="nln-setting-elem-container"></div>');
+                    const id = `CHECKBOX_${settingKey}`;
+                    const checkbox = $(`<input id='${id}' type="checkbox" checked="${this.settings.get(settingKey)}"/>`);
+
+                    checkbox.on('change', (ev) => {
+                        this.settings.set(settingKey, Boolean((ev.target as HTMLInputElement).checked));
+                        this.render();
+                    });
+
+                    checkboxContainer.append(`<label for="${id}">${textLabel}</label>`);
+                    checkboxContainer.append(checkbox);
+                    return checkboxContainer;
+                };
+                settingsContainer.append(
+                    buildCheckbox('FILTER_WHITELIST', 'Filter Whitelist')
                 );
             }
             {
@@ -305,6 +324,7 @@ export class FlaggingDashboard {
 
     private shouldRenderRow(comment: Comment): boolean {
         return FlaggingDashboard.postTypeFilter(this.settings.get('POST_TYPE') as PostType, comment.post_type) &&
+            (!(this.settings.get('FILTER_WHITELIST') as boolean) || comment.whitelist_matches.length === 0) &&
             comment.body_markdown.length <= (this.settings.get('MAXIMUM_LENGTH_COMMENT') as number) &&
             comment.noise_ratio >= this.settings.get('DISPLAY_CERTAINTY');
     }
