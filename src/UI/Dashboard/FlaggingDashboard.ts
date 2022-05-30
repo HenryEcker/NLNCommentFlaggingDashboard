@@ -121,21 +121,13 @@ export class FlaggingDashboard {
                 // Sliders
                 const buildSlider = (
                     settingKey: string, textLabel: string,
-                    type: 'percent' | 'integer'
+                    formatSliderValue: (v: string | number) => string
                 ): JQuery<HTMLElement> => {
                     const settingConfig = this.settings.getConfigProfile(settingKey) as InputFieldConfig;
 
                     // Certainty Slider
                     const sliderContainer = $('<div class="nln-slider-container"></div>');
 
-                    const formatSliderValue = (v: string | number): string => {
-                        if (type === 'percent')
-                            return `${Number(v).toFixed(2)}%`;
-                        else if (type === 'integer')
-                            return `${Number(v).toFixed(0)}`;
-                        else
-                            return '';
-                    };
                     const sliderInput = $(`<input id="SLIDER_${settingKey}" type='range' min='${settingConfig.attributes?.min}' max='${settingConfig.attributes?.max}' step='${settingConfig.attributes?.step}' value='${this.settings.get(settingKey)}' class='slider'>`);
                     const sliderValue = $(`<span>${formatSliderValue(this.settings.get(settingKey) as number)}</span>`);
                     // Update Slider Value
@@ -153,10 +145,18 @@ export class FlaggingDashboard {
                     return sliderContainer;
                 };
                 settingsContainer.append(
-                    buildSlider('DISPLAY_CERTAINTY', 'Display Certainty', 'percent')
+                    buildSlider(
+                        'DISPLAY_CERTAINTY',
+                        'Display Certainty',
+                        (v) => `${Number(v).toFixed(2)}%`
+                    )
                 );
                 settingsContainer.append(
-                    buildSlider('MAXIMUM_LENGTH_COMMENT', 'Comment Length', 'integer')
+                    buildSlider(
+                        'MAXIMUM_LENGTH_COMMENT',
+                        'Comment Length',
+                        (v) => `${Number(v).toFixed(0)}`
+                    )
                 );
             }
             {
