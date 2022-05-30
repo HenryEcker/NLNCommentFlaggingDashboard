@@ -40,13 +40,14 @@ TRE(
     /*
 from trieregex import TrieRegEx as TRE
 
-TRE('broo', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend',
-    'friendio', 'friendo', 'mate', 'sir', 'fam', 'brother', 'soldier').regex()
+TRE('broo', 'boss', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie',
+    'friend', 'friendio', 'friendo', 'mate', 'sir', 'fam', 'brother',
+    'soldier').regex()
      */
     // bro often an unknown number of o's so should be bro+ (broo* so it can be added with brother)
     // man often has an unknown number of n's so it should be man+
     // (needs manually re-added whenever the TRE is re-built)
-    /\b(?:b(?:ro(?:ther|o*)|ud(?:dy)?)|f(?:riend(?:io|o)?|am)|s(?:oldier|ir)|ma(?:te|n+)|amigo|homie|dude|pal)\b/,
+    /\b(?:b(?:ro(?:ther|o+)|ud(?:dy)?|oss)|f(?:riend(?:io|o)?|am)|s(?:oldier|ir)|ma(?:te|n+)|amigo|homie|dude|pal)\b/,
     // thanks
     /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:(your|the)\s+)?(?:help(ing)?)?)?|th?anx|thx|cheers)/,
     // Your [very excellent] solution [also] worked like a charm
