@@ -103,8 +103,8 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-                    'NUMBER_OF_SCANS_SHOULD_UPDATE': {
-                        'label': 'Update UI with total number of comments scanned: ',
+                    'TOTAL_NUMBER_OF_POSTS_IN_MEMORY': {
+                        'label': 'Display total number of comments in memory: ',
                         'type': 'checkbox',
                         'default': true
                     },

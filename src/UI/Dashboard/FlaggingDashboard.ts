@@ -118,7 +118,7 @@ export class FlaggingDashboard {
         // Header Elements
         {
             const header = $('<div class="nln-header"></div>');
-            header.append($(`<h2>NLN Comment Flagging Dashboard <span id="${this.htmlIds.commentScanCount}" title="Number of Comments Scanned"></span></h2>`));
+            header.append($(`<h2>NLN Comment Flagging Dashboard <span id="${this.htmlIds.commentScanCount}" title="Total Number of Comments (without filters)"></span></h2>`));
             container.append(header);
         }
         const settingsContainer = $('<div id="nln-dashboard-settings-container"></div>');
@@ -292,7 +292,7 @@ export class FlaggingDashboard {
             container.append(footer);
         }
         this.mountPoint.before(container);
-        this.updateNumberOfCommentsScanned();
+        this.updateNumberOfComments();
     }
 
     private static postTypeFilter(configPT: PostType, actualPT: PostType): boolean {
@@ -383,7 +383,7 @@ export class FlaggingDashboard {
             }
         });
         this.updatePageTitle();
-        this.updateNumberOfCommentsScanned();
+        this.updateNumberOfComments();
     }
 
     /**
@@ -445,8 +445,8 @@ export class FlaggingDashboard {
      * Update the counter which tracks how many comments have been scanned
      *
      */
-    updateNumberOfCommentsScanned(): void {
-        if (this.settings.get('NUMBER_OF_SCANS_SHOULD_UPDATE')) {
+    updateNumberOfComments(): void {
+        if (this.settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY')) {
             $(`#${this.htmlIds.commentScanCount}`).text(`(${Object.keys(this.tableData).length})`);
         }
     }
