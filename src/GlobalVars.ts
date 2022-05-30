@@ -7,11 +7,24 @@ export const blacklist = mergeRegexes([
     // Ascii Smileys/Punctuation spam
     /\s+((?=[!-~])[\W_]){2,}\s*/,
     // Text-speak
-    /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
+    /*
+from trieregex import TrieRegEx as TRE
+
+TRE(
+    'ty', 'tysm', 'tyvm', 'thx',
+    'ily', 'ilysm',
+    'k',
+    'omg', 'omfg',
+    'lmao', 'lmfao'
+).regex()
+     */
+    /\b(?:t(?:y(?:sm|vm)?|hx)|lm(?:fao|ao)|ily(?:sm)?|om(?:fg|g)|k)\b/,
     // Glad to help/Happy I could help/Glad to hear
     /(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))/,
     // You're/that's awesome!
-    /(?:you(r|['’]?re|\s+are)?|that['’]?s?)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
+    /(?:you(r|['’]?re|\s+are)?|that['’]?s?)\s+(?:(a\s+)?(\s+rock\s+star|amazing|awesome|incredible|brilliant|wonderful|rock|perfect|genius))[.!]?/,
+    // OMG
+    /(oh\s+)?(my\s+)?(god|goodness)[.!]?|(holy\s+\w+)/,
     // Any help would be appreciated
     /(?:Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
     // That's what I was looking for/that's it
@@ -28,7 +41,7 @@ export const blacklist = mergeRegexes([
 from trieregex import TrieRegEx as TRE
 
 TRE('broo', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend',
-    'friendio', 'friendo', 'mate', 'sir', 'fam', 'brother', 'soldier')
+    'friendio', 'friendo', 'mate', 'sir', 'fam', 'brother', 'soldier').regex()
      */
     // bro often an unknown number of o's so should be bro+ (broo* so it can be added with brother)
     // man often has an unknown number of n's so it should be man+
@@ -74,7 +87,7 @@ suffixes = ["n't", "n’t", "n'", "n’", "nt"]
 
 TRE(*[f'{b}{s}' for b, s in product(bases, suffixes)]).regex()
      */
-    /(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|wo(?:uldn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))/,
+    /\b(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|wo(?:uldn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))\b/,
     /\b(will|I'?ll)\s*try\b/,
     /[?]/
 ], 'gi');
