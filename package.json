@@ -1,6 +1,6 @@
 {
   "name": "nln-comment-flagging-dashboard",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "author": "Henry Ecker (https://github.com/HenryEcker)",
   "description": "Find comments which may potentially be no longer needed and place them in a convenient flagging dashboard",
   "repository": {
