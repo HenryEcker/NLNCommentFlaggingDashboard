@@ -28,7 +28,7 @@ TRE(
     // Any help would be appreciated
     /(?:Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
     // was what I needed/was what I was looking for/that's it
-    /(?:(this|that|it)?((['’]s?)|\s+((wa|i)s)\s+)?(\w+\s+)*?(it|(what\s+(\w+\s+)*?(need(?:ed|ing)?|looking\s*for)))[.!]?)/,
+    /(?:(this|that|it)?(((['’]s?)|\s+((wa|i)s))\s+)?(it|(what\s+(\w+\s+)*?(need(?:ed|ing)?|looking\s*for)))[.!]?)/,
     // Happy coding
     /(?:happy\s+coding)/,
     // Have a great day
