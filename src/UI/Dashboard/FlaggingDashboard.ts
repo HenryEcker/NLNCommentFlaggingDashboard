@@ -24,7 +24,7 @@ export class FlaggingDashboard {
     private readonly fkey: string;
     private readonly settings: SettingsUI;
     private readonly toaster: Toast;
-    private tableData: TableData;
+    private readonly tableData: TableData;
     private readonly htmlIds = {
         containerDivId: 'NLN_Comment_Wrapper',
         tableId: 'NLN_Comment_Reports_Table',
