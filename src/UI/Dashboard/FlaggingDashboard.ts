@@ -48,6 +48,7 @@ export class FlaggingDashboard {
             spinner: (size: string, text: string) => `<div class="s-spinner s-spinner__${size}"><div class="v-visible-sr">${text}</div></div>`
         }
     };
+    private readonly clearedIds: Set<number>;
 
     /**
      * Create a new Flagging Dashboard Object to display potentially flaggable comments
@@ -64,6 +65,7 @@ export class FlaggingDashboard {
         this.settings = settings;
         this.toaster = toaster;
         this.tableData = {};
+        this.clearedIds = new Set<number>();
     }
 
     /**
@@ -283,7 +285,9 @@ export class FlaggingDashboard {
             {
                 const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
                 clearAllButton.on('click', () => {
-                    this.tableData = {};
+                    Object.values(this.tableData).forEach((comment: Comment) => {
+                        this.removeComment(comment._id);
+                    });
                     clearAllButton.blur();
                     this.render();
                 });
@@ -291,15 +295,12 @@ export class FlaggingDashboard {
 
                 const clearHandledButton = $(`<button class="${this.SO.CSS.buttonGeneral}" style="margin-left: 5px">Clear Handled</button>`);
                 clearHandledButton.on('click', () => {
-                    this.tableData = (
-                        Object.entries(this.tableData) as unknown as [[number, Comment]]
-                    ).reduce((acc, [key, comment]) => {
+                    Object.values(this.tableData).forEach(comment => {
                         // Preserve only those comments not already handled
-                        if (comment.can_flag && !comment?.was_flagged && !comment?.was_deleted) {
-                            acc[key] = comment;
+                        if (!comment.can_flag || comment?.was_flagged || comment?.was_deleted) {
+                            this.removeComment(comment._id);
                         }
-                        return acc;
-                    }, {} as TableData);
+                    });
                     clearHandledButton.blur();
                     this.render();
                 });
@@ -323,8 +324,7 @@ export class FlaggingDashboard {
     }
 
     private shouldRenderRow(comment: Comment): boolean {
-        return !comment.was_cleared &&
-            FlaggingDashboard.postTypeFilter(this.settings.get('POST_TYPE') as PostType, comment.post_type) &&
+        return FlaggingDashboard.postTypeFilter(this.settings.get('POST_TYPE') as PostType, comment.post_type) &&
             (!(this.settings.get('FILTER_WHITELIST') as boolean) || comment.whitelist_matches.length === 0) &&
             comment.body_markdown.length <= (this.settings.get('MAXIMUM_LENGTH_COMMENT') as number) &&
             comment.noise_ratio >= this.settings.get('DISPLAY_CERTAINTY');
@@ -464,7 +464,7 @@ export class FlaggingDashboard {
             void this.updateRemainingFlags(comments[0]._id);
             // Add all comments to table
             comments.forEach(comment => {
-                if (this.tableData[comment._id] === undefined) {
+                if (!this.clearedIds.has(comment._id)) {
                     this.tableData[comment._id] = comment;
                 }
             });
@@ -489,7 +489,8 @@ export class FlaggingDashboard {
      * @param comment_id the id of the comment to remove from tableData
      */
     removeComment(comment_id: number): void {
-        this.tableData[comment_id].was_cleared = true;
+        this.clearedIds.add(comment_id);
+        delete this.tableData[comment_id];
         this.render();
     }
 

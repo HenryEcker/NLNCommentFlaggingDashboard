@@ -15,7 +15,6 @@ export interface Comment {
     can_flag: boolean;
     was_flagged?: boolean;
     was_deleted?: boolean;
-    was_cleared?: boolean;
 }
 
 export interface CommentFlagResult {
