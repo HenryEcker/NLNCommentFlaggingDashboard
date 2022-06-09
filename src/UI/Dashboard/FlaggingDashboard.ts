@@ -323,7 +323,8 @@ export class FlaggingDashboard {
     }
 
     private shouldRenderRow(comment: Comment): boolean {
-        return FlaggingDashboard.postTypeFilter(this.settings.get('POST_TYPE') as PostType, comment.post_type) &&
+        return !comment.was_cleared &&
+            FlaggingDashboard.postTypeFilter(this.settings.get('POST_TYPE') as PostType, comment.post_type) &&
             (!(this.settings.get('FILTER_WHITELIST') as boolean) || comment.whitelist_matches.length === 0) &&
             comment.body_markdown.length <= (this.settings.get('MAXIMUM_LENGTH_COMMENT') as number) &&
             comment.noise_ratio >= this.settings.get('DISPLAY_CERTAINTY');
@@ -335,73 +336,82 @@ export class FlaggingDashboard {
     private render(): void {
         const tbody = $(`#${this.htmlIds.tableBodyId}`);
         tbody.empty();
-        Object.values(this.tableData).forEach((comment: Comment) => {
-            if (this.shouldRenderRow(comment)) {
-                const tr = $('<tr></tr>');
-                tr.append(`<td>${comment.body}</td>`);
-                if (this.settings.get('UI_DISPLAY_COMMENT_OWNER')) {
-                    tr.append(`<td><a href="${comment.owner.link}" target="_blank">${comment.owner.display_name}</a></td>`);
+        Object.values(this.tableData)
+            .sort((a: Comment, b: Comment): number => {
+                const tA = a.pulled_date.getTime();
+                const tB = b.pulled_date.getTime();
+                if (tA === tB) {
+                    return a._id - b._id;
                 }
-                if (this.settings.get('UI_DISPLAY_POST_TYPE')) {
-                    tr.append(`<td>${capitalise(comment.post_type)}</td>`);
-                }
-                if (this.settings.get('UI_DISPLAY_LINK_TO_COMMENT')) {
-                    tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
-                }
-                if (this.settings.get('UI_DISPLAY_BLACKLIST_MATCHES')) {
-                    tr.append(`<td>${comment.blacklist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
-                }
-                if (this.settings.get('UI_DISPLAY_WHITELIST_MATCHES')) {
-                    tr.append(`<td>${comment.whitelist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
-                }
-                if (this.settings.get('UI_DISPLAY_NOISE_RATIO')) {
-                    tr.append(`<td>${formatPercentage(comment.noise_ratio)}</td>`);
-                }
-
-                if (this.settings.get('UI_DISPLAY_FLAG_BUTTON')) {
-                    // Flag Button/Indicators
-                    if (!comment.can_flag) {
-                        tr.append('<td>🚫</td>');
-                    } else if (comment.was_flagged) {
-                        tr.append('<td>✓</td>');
-                    } else {
-                        const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
-                        flagButton.on('click', () => {
-                            flagButton.text('');
-                            const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
-                            flagButton.append(spinner);
-                            void this.handleFlagComment(comment);
-                        });
-                        const td = $('<td></td>');
-                        td.append(flagButton);
-                        tr.append(td);
+                return tA - tB;
+            })
+            .forEach((comment: Comment) => {
+                if (this.shouldRenderRow(comment)) {
+                    const tr = $('<tr></tr>');
+                    tr.append(`<td>${comment.body}</td>`);
+                    if (this.settings.get('UI_DISPLAY_COMMENT_OWNER')) {
+                        tr.append(`<td><a href="${comment.owner.link}" target="_blank">${comment.owner.display_name}</a></td>`);
                     }
-                }
+                    if (this.settings.get('UI_DISPLAY_POST_TYPE')) {
+                        tr.append(`<td>${capitalise(comment.post_type)}</td>`);
+                    }
+                    if (this.settings.get('UI_DISPLAY_LINK_TO_COMMENT')) {
+                        tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
+                    }
+                    if (this.settings.get('UI_DISPLAY_BLACKLIST_MATCHES')) {
+                        tr.append(`<td>${comment.blacklist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
+                    }
+                    if (this.settings.get('UI_DISPLAY_WHITELIST_MATCHES')) {
+                        tr.append(`<td>${comment.whitelist_matches.map((e: string) => `"${e}"`).join(', ')}</td>`);
+                    }
+                    if (this.settings.get('UI_DISPLAY_NOISE_RATIO')) {
+                        tr.append(`<td>${formatPercentage(comment.noise_ratio)}</td>`);
+                    }
 
-                if (this.settings.get('UI_DISPLAY_COMMENT_DELETE_STATE')) {
-                    if (comment.was_deleted !== undefined) {
-                        if (comment.was_deleted) {
+                    if (this.settings.get('UI_DISPLAY_FLAG_BUTTON')) {
+                        // Flag Button/Indicators
+                        if (!comment.can_flag) {
+                            tr.append('<td>🚫</td>');
+                        } else if (comment.was_flagged) {
                             tr.append('<td>✓</td>');
                         } else {
-                            tr.append(`<td>${this.SO.HTML.pendingSpan}</td>`);
+                            const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
+                            flagButton.on('click', () => {
+                                flagButton.text('');
+                                const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
+                                flagButton.append(spinner);
+                                void this.handleFlagComment(comment);
+                            });
+                            const td = $('<td></td>');
+                            td.append(flagButton);
+                            tr.append(td);
                         }
-                    } else {
-                        tr.append('<td></td>');
                     }
+
+                    if (this.settings.get('UI_DISPLAY_COMMENT_DELETE_STATE')) {
+                        if (comment.was_deleted !== undefined) {
+                            if (comment.was_deleted) {
+                                tr.append('<td>✓</td>');
+                            } else {
+                                tr.append(`<td>${this.SO.HTML.pendingSpan}</td>`);
+                            }
+                        } else {
+                            tr.append('<td></td>');
+                        }
+                    }
+                    // Clear Button
+                    {
+                        const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
+                        clearButton.on('click', () => {
+                            this.removeComment(comment._id);
+                        });
+                        const clearButtonTd = $('<td></td>');
+                        clearButtonTd.append(clearButton);
+                        tr.append(clearButtonTd);
+                    }
+                    tbody.append(tr);
                 }
-                // Clear Button
-                {
-                    const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
-                    clearButton.on('click', () => {
-                        this.removeComment(comment._id);
-                    });
-                    const clearButtonTd = $('<td></td>');
-                    clearButtonTd.append(clearButton);
-                    tr.append(clearButtonTd);
-                }
-                tbody.append(tr);
-            }
-        });
+            });
         this.updatePageTitle();
         this.updateNumberOfComments();
     }
@@ -454,7 +464,9 @@ export class FlaggingDashboard {
             void this.updateRemainingFlags(comments[0]._id);
             // Add all comments to table
             comments.forEach(comment => {
-                this.tableData[comment._id] = comment;
+                if (this.tableData[comment._id] === undefined) {
+                    this.tableData[comment._id] = comment;
+                }
             });
             // Re-render
             this.render();
@@ -477,7 +489,7 @@ export class FlaggingDashboard {
      * @param comment_id the id of the comment to remove from tableData
      */
     removeComment(comment_id: number): void {
-        delete this.tableData[comment_id];
+        this.tableData[comment_id].was_cleared = true;
         this.render();
     }
 

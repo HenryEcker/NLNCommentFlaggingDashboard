@@ -1,5 +1,5 @@
 import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from './Utils';
-import {APIComment, Comment, SECommentAPIResponse, StackExchange} from './Types';
+import {APIComment, Comment, StackExchange} from './Types';
 import {FlaggingDashboard} from './UI/Dashboard/FlaggingDashboard';
 import {getComments} from './SE_API';
 import {blacklist, whitelist} from './GlobalVars';
@@ -40,15 +40,15 @@ function UserScript(): void {
                             'size': 25
                         }
                     },
-                    'API_QUOTA_LIMIT': {
-                        'label': 'At what API quota should this script stop making new requests',
-                        'type': 'number',
-                        'default': 500,
-                        'attributes': {
-                            'step': 1,
-                            'min': 0,
-                        }
-                    },
+                    // 'API_QUOTA_LIMIT': {
+                    //     'label': 'At what API quota should this script stop making new requests',
+                    //     'type': 'number',
+                    //     'default': 500,
+                    //     'attributes': {
+                    //         'step': 1,
+                    //         'min': 0,
+                    //     }
+                    // },
                     'DELAY_BETWEEN_API_CALLS': {
                         'label': 'How frequently (in seconds) should comments be fetched',
                         'type': 'number',
@@ -183,7 +183,7 @@ function UserScript(): void {
 
     if (settings.get('ACTIVE') as boolean) {
         const authStr = `site=${siteName}&access_token=${accessToken}&key=${apiKey}`;
-        const apiCommentFilter = '!TQs**ij.viKR)b8Sie*Qd';
+        // const apiCommentFilter = '!TQs**ij.viKR)b8Sie*Qd';
         const apiRequestRate = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
         const fkey = StackExchange.options.user.fkey;
         // Prime last successful read
@@ -203,24 +203,19 @@ function UserScript(): void {
 
         ui.init();
 
-        const main = async (mainInterval?: number) => {
+        const main = async () => {
             const toDate = Math.floor(getCurrentTimestamp() / 1000);
-            const response: SECommentAPIResponse = await getComments(
+            const comments: APIComment[] = await getComments(
                 authStr,
-                apiCommentFilter,
                 lastSuccessfulRead,
                 toDate
             );
-            if (response.quota_remaining <= (settings.get('API_QUOTA_LIMIT') as number)) {
-                toaster.open('Remaining API Threshold below limit. Stopping Script.', 'error', undefined);
-                window.clearInterval(mainInterval);
-                return; // Exit script
-            }
-            if (response.items.length > 0) {
+            if (comments.length > 0) {
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
+                const batch = new Date();
                 ui.addComments(
-                    response.items.reduce((acc: Comment[], comment: APIComment) => {
+                    comments.reduce((acc: Comment[], comment: APIComment) => {
                         const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
                         const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist) || []; // exclude code from analysis
 
@@ -237,6 +232,7 @@ function UserScript(): void {
                             _id: comment.comment_id,
                             post_id: comment.post_id,
                             post_type: comment.post_type,
+                            pulled_date: batch,
                             blacklist_matches: blacklistMatches,
                             whitelist_matches: decodedMarkdown.match(whitelist) || [],
                             noise_ratio: noiseRatio
@@ -249,7 +245,7 @@ function UserScript(): void {
         if (settings.get('RUN_IMMEDIATELY') as boolean) {
             void main();
         }
-        const mainInterval = window.setInterval(() => main(mainInterval), apiRequestRate);
+        window.setInterval(main, apiRequestRate);
     }
 }
 

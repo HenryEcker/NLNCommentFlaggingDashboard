@@ -2,11 +2,13 @@ import {getFormDataFromObject, getURLSearchParamsFromObject} from './Utils';
 import {
     AlreadyDeletedError,
     AlreadyFlaggedError,
+    APIComment,
     CommentFlagResult,
     FlagAttemptFailed,
     OutOfFlagsError,
     RatedLimitedError,
     SECommentAPIResponse,
+    SECommentIDOnlyResponse,
     SEFlagResponse
 } from './Types';
 
@@ -15,28 +17,60 @@ import {
  * Get comments to analyse.
  *
  * @param {string} AUTH_STR Complete Auth String needed to make API requests including site, access_token, and key
- * @param {string} COMMENT_FILTER API Filter to specify the returned fields
  * @param {number} FROM_DATE Beginning of comment window (SE API Timestamp is in seconds not milliseconds)
  * @param {number} TO_DATE End of comment window (SE API Timestamp is in seconds not milliseconds)
  * @returns {Promise<JSON>} Fetch returns a JSON response
  */
-export function getComments(
+export async function getComments(
     AUTH_STR: string,
-    COMMENT_FILTER: string,
     FROM_DATE: number,
     TO_DATE: number | undefined = undefined
-): Promise<SECommentAPIResponse> {
-    const usp = getURLSearchParamsFromObject({
-        'pagesize': 100,
+): Promise<APIComment[]> {
+    const pageSize = 100;
+    // Get all the post ids for all comments in time range
+    const commentIdUsp = getURLSearchParamsFromObject({
+        'pagesize': pageSize,
         'order': 'desc',
         'sort': 'creation',
-        'filter': COMMENT_FILTER,
+        'filter': '!4(lY7*YmgVNqomTJ-',
         'fromdate': FROM_DATE,
+        'page': 1,
         ...TO_DATE && {'todate': TO_DATE}
     });
-    return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`)
-        .then(res => res.json())
-        .then(resData => resData as SECommentAPIResponse);
+    let hasMore = true;
+    const postIdSet: Set<number> = new Set();
+    while (hasMore) {
+        const res = await fetch(`https://api.stackexchange.com/2.3/comments?${commentIdUsp.toString()}&${AUTH_STR}`);
+        const resData: SECommentIDOnlyResponse = await res.json();
+        resData.items.forEach(e => {
+            postIdSet.add(e.post_id);
+        });
+        hasMore = resData.has_more;
+        commentIdUsp.set('page', (resData.page + 1).toString()); // Move to next page
+    }
+
+    // Get all comments on the corresponding posts
+    let data: APIComment[] = [];
+    const postUsp = getURLSearchParamsFromObject({
+        'pagesize': pageSize,
+        'order': 'desc',
+        'sort': 'creation',
+        'filter': '!Fc6b7wpFn)sGY)Nt-SMWH.gy22',
+        'page': 1,
+    });
+    const postIds: number[] = [...postIdSet];
+    for (let i = 0; i < postIds.length; i += pageSize) {
+        postUsp.set('page', '1');
+        hasMore = true;
+        while (hasMore) {
+            const res = await fetch(`https://api.stackexchange.com/2.3/posts/${postIds.slice(i, i + pageSize).join(';')}/comments?${postUsp.toString()}&${AUTH_STR}`);
+            const resData: SECommentAPIResponse = await res.json();
+            data = [...data, ...resData.items];
+            hasMore = resData.has_more;
+            postUsp.set('page', (resData.page + 1).toString()); // Move to next page
+        }
+    }
+    return data;
 }
 
 /**

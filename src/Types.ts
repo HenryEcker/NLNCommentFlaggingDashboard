@@ -4,6 +4,7 @@ export interface Comment {
     _id: number;
     post_id: number;
     post_type: PostType;
+    pulled_date: Date;
     body: string;
     body_markdown: string;
     owner: APICommentOwner;
@@ -14,6 +15,7 @@ export interface Comment {
     can_flag: boolean;
     was_flagged?: boolean;
     was_deleted?: boolean;
+    was_cleared?: boolean;
 }
 
 export interface CommentFlagResult {
@@ -47,11 +49,22 @@ export interface APIComment {
     body: string;
 }
 
-export interface SECommentAPIResponse {
-    items: APIComment[];
+export interface SEAPIResponseWrapper {
     has_more: boolean;
     quota_max: number;
     quota_remaining: number;
+    page: number;
+    total: number;
+}
+
+export interface SECommentIDOnlyResponse extends SEAPIResponseWrapper {
+    items: {
+        post_id: number;
+    }[];
+}
+
+export interface SECommentAPIResponse extends SEAPIResponseWrapper {
+    items: APIComment[];
 }
 
 export interface FlaggingDashboardConfig {
