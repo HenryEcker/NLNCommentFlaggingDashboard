@@ -20,22 +20,22 @@ interface TableData {
 
 export class FlaggingDashboard {
     private readonly flagRateLimit = 5000 + 950 /* For some reason it's really not happy with less than 5.65 seconds */;
-    private readonly mountPoint: JQuery<HTMLElement>;
-    private readonly flagsRemainingDiv: JQuery<HTMLElement>;
-    private readonly fkey: string;
-    private readonly settings: SettingsUI;
-    private readonly toaster: Toast;
-    private readonly tableData: TableData;
-    private readonly flagQueue: Comment[];
+    private readonly mountPoint: JQuery<HTMLElement>; // The top-level dashboard container
+    private readonly flagsRemainingDiv: JQuery<HTMLElement>; // The element to display remaining flags
+    private readonly fkey: string; // Necessary to make requests
+    private readonly settings: SettingsUI; // Dashboard Settings
+    private readonly toaster: Toast; // Display Toast messages
+    private readonly tableData: TableData; // All the comments currently in the dashboard
+    private readonly flagQueue: Comment[]; // Comments waiting to be flagged
     private readonly htmlIds = {
-        containerDivId: 'NLN_Comment_Wrapper',
-        tableId: 'NLN_Comment_Reports_Table',
-        tableBodyId: 'NLN_Comment_Reports_Table_Body',
-        styleId: 'nln-comment-userscript-styles',
-        remainingFlags: 'NLN_Remaining_Comment_Flags',
-        commentScanCount: 'nln-comment-scan-count',
-        settingContainerDiv: 'nln-dashboard-settings-container',
-    };
+        containerDivId: 'NLN-Comment-Wrapper',
+        tableId: 'NLN-Comment-Reports-Table',
+        tableBodyId: 'NLN-Comment-Reports-Table-Body',
+        styleId: 'NLN-Comment-Userscript-Styles',
+        remainingFlags: 'NLN-Remaining-Comment-Flags',
+        commentScanCount: 'NLN-Comment-Scan-Count',
+        settingContainerDiv: 'NLN-Dashboard-Settings-Container',
+    }; // various ids used by the script
     private readonly SO = {
         'CSS': {
             tableContainerDiv: 's-table-container',
@@ -49,8 +49,8 @@ export class FlaggingDashboard {
             pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>',
             spinner: (size: string, text: string) => `<div class="s-spinner s-spinner__${size}"><div class="v-visible-sr">${text}</div></div>`
         }
-    };
-    private readonly clearedIds: Set<number>;
+    }; // Borrowed Stack Overflow styles classes and html elements (cannot control the change)
+    private readonly seenComments: Set<number>; // The set of all comment ids seen. (Prevents duplicate in the dashboard comments)
 
     /**
      * Create a new Flagging Dashboard Object to display potentially flaggable comments
@@ -67,7 +67,7 @@ export class FlaggingDashboard {
         this.settings = settings;
         this.toaster = toaster;
         this.tableData = {};
-        this.clearedIds = new Set<number>();
+        this.seenComments = new Set<number>();
         this.flagQueue = [];
     }
 
@@ -319,16 +319,26 @@ export class FlaggingDashboard {
         this.updateNumberOfComments();
     }
 
-    private static postTypeFilter(configPT: PostType, actualPT: PostType): boolean {
-        if (configPT === 'all') {
+    /**
+     * Determine if the current Comment's PostType matches the config
+     * (Really just to handle 'all')
+     * @param {'question' | 'answer'} postType The post type of Comment either 'question' or 'answer'
+     */
+    private postTypeFilter(postType: PostType): boolean {
+        const configPostType = this.settings.get('POST_TYPE') as PostType;
+        if (configPostType === 'all') {
             return true;
         } else {
-            return configPT === actualPT;
+            return configPostType === postType;
         }
     }
 
+    /**
+     * Determine if a comment should be displayed in the Dashboard
+     * @param {Comment} comment
+     */
     private shouldRenderRow(comment: Comment): boolean {
-        return FlaggingDashboard.postTypeFilter(this.settings.get('POST_TYPE') as PostType, comment.post_type) &&
+        return this.postTypeFilter(comment.post_type) &&
             (!(this.settings.get('FILTER_WHITELIST') as boolean) || comment.whitelist_matches.length === 0) &&
             comment.body_markdown.length <= (this.settings.get('MAXIMUM_LENGTH_COMMENT') as number) &&
             comment.noise_ratio >= this.settings.get('DISPLAY_CERTAINTY');
@@ -379,11 +389,11 @@ export class FlaggingDashboard {
                         } else if (comment.was_flagged) {
                             tr.append('<td>✓</td>');
                         } else {
-                            const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">${comment.enqueued ? '' : 'Flag'}</button>`);
+                            const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}"></button>`);
                             if (comment.enqueued) {
-                                const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
-                                flagButton.append(spinner);
+                                flagButton.append($(this.SO.HTML.spinner('sm', 'Flagging...')));
                             } else {
+                                flagButton.text('Flag');
                                 flagButton.on('click', () => {
                                     comment.enqueued = true;
                                     this.flagQueue.push(comment);
@@ -424,8 +434,13 @@ export class FlaggingDashboard {
         this.updateNumberOfComments();
     }
 
+    /**
+     * Create an infinite loop to continually poll and handle any enqueued comments for flagging
+     * This makes flagging easier. Comments can be bulk flagged and the rate limit can be automatically handled.
+     *
+     */
     private async handleFlagQueue() {
-        const infiniteLoop = true;
+        const infiniteLoop = true; // Get around no-constant-condition this is also reduced away by Terser anyway
         while (infiniteLoop) {
             if (this.flagQueue.length > 0) {
                 const c = this.flagQueue.shift();
@@ -486,8 +501,9 @@ export class FlaggingDashboard {
         if (comments.length > 0) {
             // Add all comments to table
             comments.forEach(comment => {
-                if (!this.clearedIds.has(comment._id)) {
+                if (!this.seenComments.has(comment._id)) {
                     this.tableData[comment._id] = comment;
+                    this.seenComments.add(comment._id);
                 }
             });
             // Re-render
@@ -497,7 +513,6 @@ export class FlaggingDashboard {
 
     /**
      * Update the counter which tracks how many comments have been scanned
-     *
      */
     updateNumberOfComments(): void {
         if (this.settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY')) {
@@ -511,7 +526,6 @@ export class FlaggingDashboard {
      * @param comment_id the id of the comment to remove from tableData
      */
     removeComment(comment_id: number): void {
-        this.clearedIds.add(comment_id);
         delete this.tableData[comment_id];
         this.render();
     }
@@ -539,10 +553,21 @@ export class FlaggingDashboard {
         }
     }
 
+    /**
+     * Update the number of remaining flags in the Dashboard footer
+     * @param {number} flagsRemaining the value to display
+     */
     private setRemainingFlagDisplay(flagsRemaining: number): void {
         this.flagsRemainingDiv.html(`<span title="The data is updated infrequently the number of flags may be inaccurate">You have ${flagsRemaining} flags left today</span>`);
     }
 
+    /**
+     * Check the number of remaining flags by simulating opening the flagging dialogue
+     *
+     * This may fail if the comment has been removed or otherwise become unflaggable
+     *
+     * @param {number} commentID the ID of the comment to open the flag dialogue for
+     */
     private async updateRemainingFlags(commentID: number): Promise<number | undefined> {
         if (this.settings.get('UI_DISPLAY_REMAINING_FLAGS')) {
             try {
