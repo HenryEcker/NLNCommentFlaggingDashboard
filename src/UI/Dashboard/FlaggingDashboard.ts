@@ -19,12 +19,14 @@ interface TableData {
 }
 
 export class FlaggingDashboard {
+    private readonly flagRateLimit = 5250;
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly flagsRemainingDiv: JQuery<HTMLElement>;
     private readonly fkey: string;
     private readonly settings: SettingsUI;
     private readonly toaster: Toast;
     private readonly tableData: TableData;
+    private readonly flagQueue: Comment[];
     private readonly htmlIds = {
         containerDivId: 'NLN_Comment_Wrapper',
         tableId: 'NLN_Comment_Reports_Table',
@@ -66,6 +68,7 @@ export class FlaggingDashboard {
         this.toaster = toaster;
         this.tableData = {};
         this.clearedIds = new Set<number>();
+        this.flagQueue = [];
     }
 
     /**
@@ -74,6 +77,7 @@ export class FlaggingDashboard {
     init(): void {
         this.buildBaseStyles();
         this.buildBaseUI();
+        void this.handleFlagQueue();
     }
 
     /**
@@ -375,13 +379,17 @@ export class FlaggingDashboard {
                         } else if (comment.was_flagged) {
                             tr.append('<td>✓</td>');
                         } else {
-                            const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
-                            flagButton.on('click', () => {
-                                flagButton.text('');
+                            const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">${comment.enqueued ? '' : 'Flag'}</button>`);
+                            if (comment.enqueued) {
                                 const spinner = $(this.SO.HTML.spinner('sm', 'Flagging...'));
                                 flagButton.append(spinner);
-                                void this.handleFlagComment(comment);
-                            });
+                            } else {
+                                flagButton.on('click', () => {
+                                    comment.enqueued = true;
+                                    this.flagQueue.push(comment);
+                                    this.render();
+                                });
+                            }
                             const td = $('<td></td>');
                             td.append(flagButton);
                             tr.append(td);
@@ -414,6 +422,21 @@ export class FlaggingDashboard {
             });
         this.updatePageTitle();
         this.updateNumberOfComments();
+    }
+
+    private async handleFlagQueue() {
+        const infiniteLoop = true;
+        while (infiniteLoop) {
+            if (this.flagQueue.length > 0) {
+                const c = this.flagQueue.shift();
+                if (c !== undefined) {
+                    await this.handleFlagComment(c);
+                    await new Promise(resolve => setTimeout(resolve, this.flagRateLimit));
+                }
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
     }
 
     /**
@@ -449,6 +472,7 @@ export class FlaggingDashboard {
                 this.tableData[comment._id].can_flag = false;
             }
         } finally {
+            this.tableData[comment._id].enqueued = false;
             this.render();
         }
     }
@@ -460,8 +484,6 @@ export class FlaggingDashboard {
      */
     addComments(comments: Comment[]): void {
         if (comments.length > 0) {
-            // Update remaining flags once per batch add
-            void this.updateRemainingFlags(comments[0]._id);
             // Add all comments to table
             comments.forEach(comment => {
                 if (!this.clearedIds.has(comment._id)) {
