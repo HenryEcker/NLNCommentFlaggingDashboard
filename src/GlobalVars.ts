@@ -61,8 +61,12 @@ TRE('broo', 'boss', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie',
     /(?:you(['’]?re?|\s+are|['’]?ve|\s+have)?|this(\s+(wa|i|['’])s)?\s+)?(?:a\s+life(-|\s+)saver|sav(e|ed|ing)\s+(m[ey]|the|it))/,
     // please accept
     /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
+    // hit the checkmark
+    /(?:please(?:\s+\w+)*\s+)?(click|hit)\s+the\s+(gr[ae]y\s+)?check(mark)?(((?:\s+\w+)*\s+)?answer)?/,
+    // mark this answer as correct
+    /(?:please(?:\s+\w+)*\s+)?mark\s+th(?:e|is)(\s+answer)?((\s+as)?(\s+the)?(\s+(correct|right))?(\s+answer)?)?/,
     // please upvote
-    /(?:please(?:\s+\w+)\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?/,
+    /(?:please(?:\s+\w+)*\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?/,
     // is/should be the correct/accepted/right answer
     /(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted)(?:\s+\w+)*\s+(?:answer|solution)/,
     // /help/someone-answer or /help/accepted-answer
