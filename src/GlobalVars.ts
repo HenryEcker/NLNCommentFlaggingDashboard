@@ -62,7 +62,7 @@ TRE('broo', 'boss', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie',
     // please accept
     /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
     // hit the checkmark
-    /(?:please(?:\s+\w+)*\s+)?(click|hit)\s+the\s+(gr[ae]y\s+)?check(mark)?(((?:\s+\w+)*\s+)?answer)?/,
+    /(click(ing)?|hit(t?ing)?)\s+(the\s+)?(gr[ae](en|y)\s+)?check(mark)?(\s+to\s+the\s+left|(((?:\s+\w+)*\s+)?answer))?/,
     // mark this answer as correct
     /(?:please(?:\s+\w+)*\s+)?mark\s+th(?:e|is)(\s+answer)?((\s+as)?(\s+the)?(\s+(correct|right))?(\s+answer)?)?/,
     // please upvote
