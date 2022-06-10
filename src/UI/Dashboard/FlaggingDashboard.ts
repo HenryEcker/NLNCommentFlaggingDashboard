@@ -19,7 +19,7 @@ interface TableData {
 }
 
 export class FlaggingDashboard {
-    private readonly flagRateLimit = 5250;
+    private readonly flagRateLimit = 5000 + 950 /* For some reason it's really not happy with less than 5.65 seconds */;
     private readonly mountPoint: JQuery<HTMLElement>;
     private readonly flagsRemainingDiv: JQuery<HTMLElement>;
     private readonly fkey: string;
