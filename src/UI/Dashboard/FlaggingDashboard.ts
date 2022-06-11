@@ -27,15 +27,22 @@ export class FlaggingDashboard {
     private readonly toaster: Toast; // Display Toast messages
     private readonly tableData: TableData; // All the comments currently in the dashboard
     private readonly flagQueue: Comment[]; // Comments waiting to be flagged
-    private readonly htmlIds = {
-        containerDivId: 'NLN-Comment-Wrapper',
-        tableId: 'NLN-Comment-Reports-Table',
-        tableBodyId: 'NLN-Comment-Reports-Table-Body',
-        styleId: 'NLN-Comment-Userscript-Styles',
-        remainingFlags: 'NLN-Remaining-Comment-Flags',
-        commentScanCount: 'NLN-Comment-Scan-Count',
-        settingContainerDiv: 'NLN-Dashboard-Settings-Container',
-    }; // various ids used by the script
+    private readonly styles = {
+        ids: {
+            containerDiv: 'nln-comment-wrapper',
+            table: 'nln-comment-reports-table',
+            tableBody: 'nln-comment-reports-table-body',
+            style: 'nln-comment-userscript-styles',
+            remainingFlags: 'nln-remaining-comment-flags',
+            commentScanCount: 'nln-comment-scan-count',
+            settingContainerDiv: 'nln-dashboard-settings-container'
+        },
+        classes: {
+            settingElementContainer: 'nln-setting-elem-container',
+            header: 'nln-header',
+            footer: 'nln-footer'
+        }
+    }; // various ids and classes used by the script
     private readonly SO = {
         'CSS': {
             tableContainerDiv: 's-table-container',
@@ -62,7 +69,7 @@ export class FlaggingDashboard {
      */
     constructor(mountPoint: JQuery<HTMLElement>, fkey: string, settings: SettingsUI, toaster: Toast) {
         this.mountPoint = mountPoint;
-        this.flagsRemainingDiv = $(`<div class="${this.SO.CSS.flagsRemainingDiv}" id="${this.htmlIds.remainingFlags}"></div>`);
+        this.flagsRemainingDiv = $(`<div class="${this.SO.CSS.flagsRemainingDiv}" id="${this.styles.ids.remainingFlags}"></div>`);
         this.fkey = fkey;
         this.settings = settings;
         this.toaster = toaster;
@@ -86,16 +93,16 @@ export class FlaggingDashboard {
     private buildBaseStyles(): void {
         // Add Styles
         const styles = document.createElement('style');
-        styles.setAttribute('id', this.htmlIds.styleId);
+        styles.setAttribute('id', this.styles.ids.style);
         styles.innerHTML = `
-#${this.htmlIds.containerDivId} {
+#${this.styles.ids.containerDiv} {
     padding: 25px 0;
     display: grid;
     grid-template-rows: 25px min-content 1fr 40px;
     grid-gap: 10px;
 }
 
-#${this.htmlIds.settingContainerDiv} {
+#${this.styles.ids.settingContainerDiv} {
     display: flex;
     gap: 25px;
     flex-wrap: wrap;
@@ -103,13 +110,13 @@ export class FlaggingDashboard {
     align-items: center;
 }
 
-.nln-setting-elem-container {
+.${this.styles.classes.settingElementContainer} {
     display: flex;
     align-items: center;
     gap: 7px;
 }
 
-#${this.htmlIds.settingContainerDiv} select {
+#${this.styles.ids.settingContainerDiv} select {
     height: min-content;
 }
 `;
@@ -120,14 +127,14 @@ export class FlaggingDashboard {
      * Build the UI template (header body footer)
      */
     private buildBaseUI(): void {
-        const container = $(`<div id="${this.htmlIds.containerDivId}"></div>`);
+        const container = $(`<div id="${this.styles.ids.containerDiv}"></div>`);
         // Header Elements
         {
-            const header = $('<div class="nln-header"></div>');
-            header.append($(`<h2>NLN Comment Flagging Dashboard <span id="${this.htmlIds.commentScanCount}" title="Total Number of Comments (without filters)"></span></h2>`));
+            const header = $(`<div class="${this.styles.classes.header}"></div>`);
+            header.append($(`<h2>NLN Comment Flagging Dashboard <span id="${this.styles.ids.commentScanCount}" title="Total Number of Comments (without filters)"></span></h2>`));
             container.append(header);
         }
-        const settingsContainer = $('<div id="nln-dashboard-settings-container"></div>');
+        const settingsContainer = $(`<div id="${this.styles.ids.settingContainerDiv}"></div>`);
         container.append(settingsContainer);
         const buildSettingContainer = () => {
             {
@@ -140,7 +147,7 @@ export class FlaggingDashboard {
                     const id = `SLIDER_${settingKey}`;
 
                     // Certainty Slider
-                    const sliderContainer = $('<div class="nln-setting-elem-container"></div>');
+                    const sliderContainer = $(`<div class="${this.styles.classes.settingElementContainer}"></div>`);
 
                     const sliderInput = $(`<input id="${id}" type='range' min='${settingConfig.attributes?.min}' max='${settingConfig.attributes?.max}' step='${settingConfig.attributes?.step}' value='${this.settings.get(settingKey)}' class='slider'>`);
                     const sliderValue = $(`<span>${formatSliderValue(this.settings.get(settingKey) as number)}</span>`);
@@ -180,7 +187,7 @@ export class FlaggingDashboard {
                 ): JQuery<HTMLElement> => {
                     const settingConfig = this.settings.getConfigProfile(settingKey) as SelectFieldConfig;
                     const id = `SELECT_${settingKey}`;
-                    const selectContainer = $('<div class="nln-setting-elem-container"></div>');
+                    const selectContainer = $(`<div class="${this.styles.classes.settingElementContainer}"></div>`);
 
                     const select = $(`<select id="${id}"></select>`);
                     settingConfig.options.forEach((op) => {
@@ -206,7 +213,7 @@ export class FlaggingDashboard {
             }
             {
                 const buildCheckbox = (settingKey: string, textLabel: string): JQuery<HTMLElement> => {
-                    const checkboxContainer = $('<div class="nln-setting-elem-container"></div>');
+                    const checkboxContainer = $(`<div class="${this.styles.classes.settingElementContainer}"></div>`);
                     const id = `CHECKBOX_${settingKey}`;
                     const checkbox = $(`<input id='${id}' type="checkbox" checked="${this.settings.get(settingKey)}"/>`);
 
@@ -248,7 +255,7 @@ export class FlaggingDashboard {
         // Build Table
         {
             const tableContainer = $(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
-            const table = $(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
+            const table = $(`<table id="${this.styles.ids.table}" class="${this.SO.CSS.table}"></table>`);
             const thead = $('<thead></thead>');
             const tr = $('<tr></tr>');
             tr.append($('<th>Comment Text</th>'));
@@ -279,13 +286,13 @@ export class FlaggingDashboard {
             tr.append($('<th>Clear</th>'));
             thead.append(tr);
             table.append(thead);
-            table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
+            table.append($(`<tbody id="${this.styles.ids.tableBody}"></tbody>`));
             tableContainer.append(table);
             container.append(tableContainer);
         }
         // After
         {
-            const footer = $(`<div class="nln-footer ${this.SO.CSS.footer}"></div>`);
+            const footer = $(`<div class="${this.styles.classes.footer} ${this.SO.CSS.footer}"></div>`);
             {
                 const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
                 clearAllButton.on('click', () => {
@@ -348,7 +355,7 @@ export class FlaggingDashboard {
      * Render the currently available values in tableData
      */
     private render(): void {
-        const tbody = $(`#${this.htmlIds.tableBodyId}`);
+        const tbody = $(`#${this.styles.ids.tableBody}`);
         tbody.empty();
         Object.values(this.tableData)
             .sort((a: Comment, b: Comment): number => {
@@ -516,7 +523,7 @@ export class FlaggingDashboard {
      */
     updateNumberOfComments(): void {
         if (this.settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY')) {
-            $(`#${this.htmlIds.commentScanCount}`).text(`(${Object.keys(this.tableData).length})`);
+            $(`#${this.styles.ids.commentScanCount}`).text(`(${Object.keys(this.tableData).length})`);
         }
     }
 
