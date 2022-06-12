@@ -25,7 +25,7 @@ export class FlaggingDashboard {
     private readonly fkey: string; // Necessary to make requests
     private readonly settings: SettingsUI; // Dashboard Settings
     private readonly toaster: Toast; // Display Toast messages
-    private readonly tableData: TableData; // All the comments currently in the dashboard
+    private tableData: TableData; // All the comments currently in the dashboard
     private readonly flagQueue: Comment[]; // Comments waiting to be flagged
     private readonly styles = {
         ids: {
@@ -296,9 +296,7 @@ export class FlaggingDashboard {
             {
                 const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
                 clearAllButton.on('click', () => {
-                    Object.values(this.tableData).forEach((comment: Comment) => {
-                        this.removeComment(comment._id);
-                    });
+                    this.tableData = {};
                     clearAllButton.blur();
                     this.render();
                 });
