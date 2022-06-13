@@ -60,7 +60,7 @@ TRE('broo', 'boss', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie',
     // saviour
     /\b(?:(you(['’]?re?|\s+are|['’]?ve|\s+have)?|this(\s+(wa|i|['’])s)?)\s+)?(?:a\s+life(-|\s+)saver|sav(e|ed|ing)\s+(m[ey]|the|it))(\s+\w+)?\b/,
     // please accept
-    /\b(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?\b/,
+    /\b(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+th(e|is)\s+answer)?\b/,
     // hit the checkmark
     /\b(click(ing)?|hit(t?ing)?)\s+(the\s+)?(gr[ae](en|y)\s+)?check(mark)?(\s+to\s+the\s+left|(((?:\s+\w+)*\s+)?answer))?\b/,
     // mark this answer as correct
