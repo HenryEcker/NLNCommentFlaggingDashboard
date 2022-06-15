@@ -54,7 +54,6 @@ export interface SEAPIResponseWrapper {
     quota_max: number;
     quota_remaining: number;
     page: number;
-    total: number;
 }
 
 export interface SECommentIDOnlyResponse extends SEAPIResponseWrapper {

@@ -32,7 +32,7 @@ export async function getComments(
         'pagesize': pageSize,
         'order': 'desc',
         'sort': 'creation',
-        'filter': '!4(lY7*YmgVNqomTJ-',
+        'filter': '!bB.Oyz3JP.A122',
         'fromdate': FROM_DATE,
         'page': 1,
         ...TO_DATE && {'todate': TO_DATE}
@@ -55,7 +55,7 @@ export async function getComments(
         'pagesize': pageSize,
         'order': 'desc',
         'sort': 'creation',
-        'filter': '!Fc6b7wpFn)sGY)Nt-SMWH.gy22',
+        'filter': '!)Q0(FwiCnnAsjPFGXySB9-eM',
         'page': 1,
     });
     const postIds: number[] = [...postIdSet];
