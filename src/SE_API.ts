@@ -13,20 +13,12 @@ import {
 } from './Types';
 
 
-/**
- * Get comments to analyse.
- *
- * @param {string} AUTH_STR Complete Auth String needed to make API requests including site, access_token, and key
- * @param {number} FROM_DATE Beginning of comment window (SE API Timestamp is in seconds not milliseconds)
- * @param {number} TO_DATE End of comment window (SE API Timestamp is in seconds not milliseconds)
- * @returns {Promise<JSON>} Fetch returns a JSON response
- */
-export async function getComments(
+async function getActiveComments(
     AUTH_STR: string,
     FROM_DATE: number,
-    TO_DATE: number | undefined = undefined
-): Promise<APIComment[]> {
-    const pageSize = 100;
+    TO_DATE: number | undefined = undefined,
+    pageSize: number
+): Promise<Set<number>> {
     // Get all the post ids for all comments in time range
     const commentIdUsp = getURLSearchParamsFromObject({
         'pagesize': pageSize,
@@ -48,7 +40,14 @@ export async function getComments(
         hasMore = resData.has_more;
         commentIdUsp.set('page', (resData.page + 1).toString()); // Move to next page
     }
+    return postIdSet;
+}
 
+async function getCommentsFromPostIds(
+    AUTH_STR: string,
+    pageSize: number,
+    postIds: number[]
+): Promise<APIComment[]> {
     // Get all comments on the corresponding posts
     let data: APIComment[] = [];
     const postUsp = getURLSearchParamsFromObject({
@@ -58,7 +57,7 @@ export async function getComments(
         'filter': '!)Q0(FwiCnnAsjPFGXySB9-eM',
         'page': 1,
     });
-    const postIds: number[] = [...postIdSet];
+    let hasMore: boolean;
     for (let i = 0; i < postIds.length; i += pageSize) {
         postUsp.set('page', '1');
         hasMore = true;
@@ -71,6 +70,25 @@ export async function getComments(
         }
     }
     return data;
+}
+
+
+/**
+ * Get comments to analyse.
+ *
+ * @param {string} AUTH_STR Complete Auth String needed to make API requests including site, access_token, and key
+ * @param {number} FROM_DATE Beginning of comment window (SE API Timestamp is in seconds not milliseconds)
+ * @param {number} TO_DATE End of comment window (SE API Timestamp is in seconds not milliseconds)
+ * @returns {Promise<JSON>} Fetch returns a JSON response
+ */
+export async function getComments(
+    AUTH_STR: string,
+    FROM_DATE: number,
+    TO_DATE: number | undefined = undefined
+): Promise<APIComment[]> {
+    const pageSize = 100;
+    const postIdSet: Set<number> = await getActiveComments(AUTH_STR, FROM_DATE, TO_DATE, pageSize);
+    return await getCommentsFromPostIds(AUTH_STR, pageSize, [...postIdSet]);
 }
 
 /**
