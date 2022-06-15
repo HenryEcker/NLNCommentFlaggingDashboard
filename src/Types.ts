@@ -66,18 +66,6 @@ export interface SECommentAPIResponse extends SEAPIResponseWrapper {
     items: APIComment[];
 }
 
-export interface FlaggingDashboardConfig {
-    displayLink: boolean;
-    displayPostType: boolean;
-    displayNoiseRatio: boolean;
-    displayFlagUI: boolean;
-    displayBlacklistMatches: boolean;
-    displayCommentDeleteState: boolean;
-    shouldUpdateTitle: boolean;
-    displayRemainingFlags: boolean;
-    displayCommentOwner: boolean;
-}
-
 export interface StackExchange {
     options: {
         user: {
