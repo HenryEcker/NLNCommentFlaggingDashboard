@@ -92,6 +92,5 @@ suffixes = ["n't", "n’t", "n'", "n’", "nt"]
 TRE(*[f'{b}{s}' for b, s in product(bases, suffixes)]).regex()
      */
     /\b(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|wo(?:uldn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))\b/,
-    /\b(will|I['’]?ll)\s*try\b/,
-    /[?]/
+    /\b(will|I['’]?ll)\s*try\b/
 ], 'gi');
