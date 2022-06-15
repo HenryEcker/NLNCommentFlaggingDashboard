@@ -27,8 +27,8 @@ TRE(
     /\b(oh\s+)?(my\s+)?(god|goodness)|(holy\s+\w+)\b(?:[.!])*/,
     // Any help would be appreciated
     /\b(?:Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))\b/,
-    // was what I needed/was what I was looking for/that's it
-    /\b(?:(this|that|it)?(((['’]s?)|\s+((wa|i)s))\s+)(it|(what\s+(\w+\s+)*?(need(?:ed|ing)?|looking\s*for))))\b(?:[.!]*)/,
+    // was [very much] what I needed/was what I was looking for/that's it
+    /\b(?:(this|that|it)?(((['’]s?)|\s+((wa|i)s))\s+)(?:\w+\s+){0,2}?(it|(what\s+(\w+\s+)*?(need(?:ed|ing)?|looking\s*for))))\b(?:[.!]*)/,
     // Happy coding
     /\b(?:happy\s+coding)\b/,
     // Have a great day
