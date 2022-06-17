@@ -11,14 +11,14 @@ export const blacklist = mergeRegexes([
 from trieregex import TrieRegEx as TRE
 
 TRE(
-    'ty', 'tysm', 'tyvm', 'thx',
+    'ty', 'tysm', 'tyvm', 'thx', 'tks', 'thks',
     'ily', 'ilysm',
     'k',
     'omg', 'omfg',
     'lmao', 'lmfao'
 ).regex()
      */
-    /\b(?:t(?:y(?:sm|vm)?|hx)|lm(?:fao|ao)|ily(?:sm)?|om(?:fg|g)|k)\b/,
+    /\b(?:t(?:y(?:sm|vm)?|h(?:ks|x)|ks)|lm(?:fao|ao)|ily(?:sm)?|om(?:fg|g)|k)\b/,
     // Glad to help/Happy I could help/Glad to hear
     /\b(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))\b/,
     // You're/that's awesome!
