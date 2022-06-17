@@ -15,10 +15,11 @@ TRE(
     'ily', 'ilysm',
     'k',
     'omg', 'omfg',
-    'lmao', 'lmfao'
+    'lmao', 'lmfao',
+    'plx', 'pls', 'plox'
 ).regex()
      */
-    /\b(?:t(?:y(?:sm|vm)?|h(?:ks|x)|ks)|lm(?:fao|ao)|ily(?:sm)?|om(?:fg|g)|k)\b/,
+    /\b(?:t(?:y(?:sm|vm)?|h(?:ks|x)|ks)|lm(?:fao|ao)|pl(?:ox|s|x)|ily(?:sm)?|om(?:fg|g)|k)\b/,
     // Glad to help/Happy I could help/Glad to hear
     /\b(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))\b/,
     // You're/that's awesome!
@@ -68,8 +69,8 @@ TRE(
     /\b(?:a(?:mazing|wesome)|br(?:illiant|avo)|excellent|fantastic|ingenious|marvelous|wonderful|perfect|superb|w+o+w+)\b/,
     // saviour
     /\b(?:(you(['’]?re?|\s+are|['’]?ve|\s+have)?|this(\s+(wa|i|['’])s)?)\s+)?(?:a\s+life(-|\s+)saver|sav(e|ed|ing)\s+(m[ey]|the|it))(\s+\w+)?\b/,
-    // please accept
-    /\b(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+th(e|is)\s+answer)?\b/,
+    // please accept/approve
+    /\b(?:please(?:\s+\w+)*\s+)?(accept(?:ed|ing)?|approv(ed?|ing))\b(?:\s+th(e|is)\s+answer)?\b/,
     // hit the checkmark
     /\b(click(ing)?|hit(t?ing)?)\s+(the\s+)?(gr[ae](en|y)\s+)?check(mark)?(\s+to\s+the\s+left|(((?:\s+\w+)*\s+)?answer))?\b/,
     // mark this answer as correct
