@@ -52,9 +52,18 @@ TRE('broo', 'boss', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie',
     /\b((this|that|it(['’]?s)?|your)\s+)?(?:(excellent|wonderful|awesome)\s+)?((solution|answer|code)\s+)?(((doe|i)s|also)\s+)?work(?:ed|s|ing)?(?:\s+(now|perfectly|great|for\s+me|((like|as)\s+)?(a\s+)?charm|again))?\b(?:[!.]*)/,
     // you are welcome/my pleasure
     /\b(?:(?:you(?:['’]?re?|\s+are)\s+)?welcome|my pleasure)+\b/,
+    // no problem
+    /\bno\s+(problems?|worries)(\s+at\s+all)?\b[.!]?/,
     // this was very helpful
     /\b(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+\b/,
-    // TRE('ingenious', 'superb', 'amazing', 'fantastic', 'perfect', 'wonderful', 'brilliant', 'excellent', 'marvelous', 'awesome', 'bravo')
+    /*
+from trieregex import TrieRegEx as TRE
+
+TRE(
+    'ingenious', 'superb', 'amazing', 'fantastic', 'perfect', 'wonderful',
+    'brilliant', 'excellent', 'marvelous', 'awesome', 'bravo'
+).regex()
+     */
     // wow has any number of wow so should be w+o+w+ (should be added at the end of the OR list)
     /\b(?:a(?:mazing|wesome)|br(?:illiant|avo)|excellent|fantastic|ingenious|marvelous|wonderful|perfect|superb|w+o+w+)\b/,
     // saviour
@@ -64,7 +73,7 @@ TRE('broo', 'boss', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie',
     // hit the checkmark
     /\b(click(ing)?|hit(t?ing)?)\s+(the\s+)?(gr[ae](en|y)\s+)?check(mark)?(\s+to\s+the\s+left|(((?:\s+\w+)*\s+)?answer))?\b/,
     // mark this answer as correct
-    /\b(?:please(?:\s+\w+)*\s+)?mark\s+th(?:e|is)(\s+answer)?((\s+as)?(\s+the)?(\s+(correct|right))?(\s+answer)?)?\b/,
+    /\b(?:please(?:\s+\w+)*\s+)?mark\s+th(?:e|is)(\s+(answer|solution))?((\s+as)?(\s+the)?(\s+(correct|right))?(\s+(answer|solution))?)?\b/,
     // please upvote
     /\b(?:please(?:\s+\w+)*\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?\b/,
     // is/should be the correct/accepted/right answer
