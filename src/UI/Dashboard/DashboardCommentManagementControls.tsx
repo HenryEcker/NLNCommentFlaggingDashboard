@@ -1,5 +1,4 @@
 import {Comment, TableData} from '../../Types';
-import React from 'react';
 
 
 const DashboardCommentManagementControls = ({setTableData, shouldRenderRow, remainingFlagCount}: {
@@ -9,14 +8,15 @@ const DashboardCommentManagementControls = ({setTableData, shouldRenderRow, rema
 }): JSX.Element => {
     return (
         <div className={'nln-comment-management-toolbar d-flex gs8 gsx ai-center'}>
-            <button className={'s-btn s-btn__primary'} onClick={ev => {
-                ev.preventDefault();
-                // Remove All Values
-                setTableData(() => {
-                    return {};
-                });
-                ev.currentTarget.blur();
-            }}>
+            <button className={'s-btn s-btn__primary'}
+                    onClick={ev => {
+                        ev.preventDefault();
+                        // Remove All Values
+                        setTableData(() => {
+                            return {};
+                        });
+                        ev.currentTarget.blur();
+                    }}>
                 Clear All
             </button>
             <button className={'s-btn'}

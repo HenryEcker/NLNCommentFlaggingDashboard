@@ -1,6 +1,6 @@
 import {InputFieldConfig, SelectFieldConfig, SettingsUI} from '../Settings/SettingsUI';
 import {ConfigurableSettings, PostType} from '../../Types';
-import React, {useEffect, useId, useState} from 'react';
+import {useEffect, useId, useState} from 'react';
 
 const settingElemContainer = 'nln-setting-elem-container';
 
@@ -29,7 +29,9 @@ const SettingSlider = (
 
     return (
         <div className={settingElemContainer}>
-            <label htmlFor={id}>{textLabel}</label>
+            <label htmlFor={id}>
+                {textLabel}
+            </label>
             <input id={id}
                    type={'range'}
                    min={settingConfig.attributes?.min as number | undefined}
@@ -85,9 +87,9 @@ const SettingSelect = (
                 }}
             >
                 {
-                    settingConfig.options.map((op, idx) => {
+                    settingConfig.options.map((op) => {
                         return (
-                            <option value={op} key={idx}>{op}</option>
+                            <option value={op} key={op}>{op}</option>
                         );
                     })
                 }

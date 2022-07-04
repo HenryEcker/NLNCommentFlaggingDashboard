@@ -3,11 +3,11 @@ const DashboardHeader = ({totalComments, shouldDisplayTotal}: {
     shouldDisplayTotal: boolean;
 }): JSX.Element => {
     return (
-        <div className="nln-header">
+        <div className={'nln-header'}>
             <h2>NLN Comment Flagging Dashboard
                 {
                     shouldDisplayTotal &&
-                    <span title="Total Number of Comments (without filters)"> ({totalComments})</span>
+                    <span title={'Total Number of Comments (without filters)'}> ({totalComments})</span>
                 }
             </h2>
         </div>

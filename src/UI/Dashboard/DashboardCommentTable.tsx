@@ -92,7 +92,7 @@ const DashboardCommentTable = ({
                             <tr key={comment._id}>
                                 <td dangerouslySetInnerHTML={{__html: comment.body}}/>
                                 {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <td>
-                                    <a href={comment.owner.link} target="_blank">
+                                    <a href={comment.owner.link} target={'_blank'} rel={'noreferrer'}>
                                         <span dangerouslySetInnerHTML={{__html: comment.owner.display_name}}/>
                                     </a>
                                 </td>}
@@ -100,7 +100,7 @@ const DashboardCommentTable = ({
                                     {capitalise(comment.post_type)}
                                 </td>}
                                 {displaySettings['UI_DISPLAY_LINK_TO_COMMENT'] && <td>
-                                    <a href={comment.link} target="_blank">{comment._id}</a>
+                                    <a href={comment.link} target={'_blank'} rel={'noreferrer'}>{comment._id}</a>
                                 </td>}
                                 {displaySettings['UI_DISPLAY_BLACKLIST_MATCHES'] && <td>
                                     {comment.blacklist_matches.map((e: string) => `"${e}"`).join(', ')}
@@ -120,7 +120,7 @@ const DashboardCommentTable = ({
                                 }
                                 <td>
                                     <button
-                                        className="s-btn"
+                                        className={'s-btn'}
                                         onClick={ev => {
                                             ev.preventDefault();
                                             handleRemoveComment(comment._id);

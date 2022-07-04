@@ -1,5 +1,3 @@
-import {Comment} from './Types';
-
 /**
  * Converts an array of distinct RegExp and joins them together using OR (|)
  *
@@ -62,16 +60,6 @@ export function calcNoiseRatio(matches: string[], totalLength: number): number {
  */
 export function getCurrentTimestamp(): number {
     return new Date().getTime();
-}
-
-/**
- * Easily format comment as a String. Includes noise ratio, blacklist matches, and link to comment
- *
- * @param {Comment} comment
- * @returns {`${string}% [${*}] (${*})`}
- */
-export function formatComment(comment: Comment): string {
-    return `${formatPercentage(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
 
 /**
