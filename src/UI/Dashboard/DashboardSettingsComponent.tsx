@@ -1,6 +1,6 @@
 import {InputFieldConfig, SelectFieldConfig, SettingsUI} from '../Settings/SettingsUI';
 import {ConfigurableSettings, PostType} from '../../Types';
-import {useEffect, useState} from 'react';
+import {useEffect, useId, useState} from 'react';
 
 const settingElemContainer = 'nln-setting-elem-container';
 
@@ -19,7 +19,7 @@ const SettingSlider = (
     }
 ) => {
     const settingConfig = settings.getConfigProfile(settingKey) as InputFieldConfig;
-    const id = `SLIDER_${settingKey}`;
+    const id = useId();
 
     const [value, setValue] = useState<number>(configurableSettings[settingKey]);
 
@@ -31,12 +31,12 @@ const SettingSlider = (
         <div className={settingElemContainer}>
             <label htmlFor={id}>{textLabel}</label>
             <input id={id}
-                   type="range"
+                   type={'range'}
                    min={settingConfig.attributes?.min as number | undefined}
                    max={settingConfig.attributes?.max as number | undefined}
                    step={settingConfig.attributes?.step as number | undefined}
                    value={value}
-                   className="slider"
+                   className={'slider'}
                    onChange={ev => {
                        setValue(() => {
                            return Number((ev.target as HTMLInputElement).value);
@@ -69,7 +69,7 @@ const SettingSelect = (
 ) => {
     const value = configurableSettings[settingKey];
     const settingConfig = settings.getConfigProfile(settingKey) as SelectFieldConfig;
-    const id = `SELECT_${settingKey}`;
+    const id = useId();
     return (
         <div className={settingElemContainer}>
             <label htmlFor={id}>{textLabel}</label>
@@ -109,13 +109,13 @@ const SettingCheckbox = (
     }
 ) => {
     const value = configurableSettings[settingKey];
-    const id = `CHECKBOX_${settingKey}`;
+    const id = useId();
     return (
         <div className={settingElemContainer}>
             <label htmlFor={id}>{textLabel}</label>
             <input
                 id={id}
-                type="checkbox"
+                type={'checkbox'}
                 checked={value}
                 onChange={ev => {
                     setConfigurableSettings(oldConfigurableSettings => {
@@ -137,35 +137,35 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
 }) => {
 
     return (
-        <div id="nln-dashboard-settings-container">
+        <div className={'nln-dashboard-settings-container'}>
             <SettingSlider settings={settings}
                            configurableSettings={configurableSettings}
                            setConfigurableSettings={setConfigurableSettings}
-                           settingKey="DISPLAY_CERTAINTY"
-                           textLabel="Display Certainty"
+                           settingKey={'DISPLAY_CERTAINTY'}
+                           textLabel={'Display Certainty'}
                            formatSliderValue={(v) => `${Number(v).toFixed(2)}%`}
             />
             <SettingSlider settings={settings}
                            configurableSettings={configurableSettings}
                            setConfigurableSettings={setConfigurableSettings}
-                           settingKey="MAXIMUM_LENGTH_COMMENT"
-                           textLabel="Maximum Length"
+                           settingKey={'MAXIMUM_LENGTH_COMMENT'}
+                           textLabel={'Maximum Length'}
                            formatSliderValue={(v) => `${Number(v).toFixed(0)}`}
             />
             <SettingSelect settings={settings}
                            configurableSettings={configurableSettings}
                            setConfigurableSettings={setConfigurableSettings}
-                           settingKey='POST_TYPE'
-                           textLabel='Post Type'
+                           settingKey={'POST_TYPE'}
+                           textLabel={'Post Type'}
             />
             <SettingCheckbox settings={settings}
                              configurableSettings={configurableSettings}
                              setConfigurableSettings={setConfigurableSettings}
-                             settingKey='FILTER_WHITELIST'
-                             textLabel='Filter Whitelist'
+                             settingKey={'FILTER_WHITELIST'}
+                             textLabel={'Filter Whitelist'}
             />
             <button
-                className="s-btn"
+                className={'s-btn'}
                 style={{marginLeft: 'auto'}}
                 onClick={ev => {
                     ev.preventDefault();
