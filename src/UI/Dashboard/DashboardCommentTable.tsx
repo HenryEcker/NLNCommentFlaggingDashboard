@@ -12,14 +12,14 @@ const DashboardFlagButton = ({comment, handleEnqueueComment}: {
         return <td>✓</td>;
     } else if (comment.enqueued) {
         return <td>
-            <div className="s-spinner">
-                <div className="v-visible-sr">Flagging...</div>
+            <div className={'s-spinner'}>
+                <div className={'v-visible-sr'}>Flagging...</div>
             </div>
         </td>;
     } else {
         return <td>
             <button data-comment-id={comment._id}
-                    className='s-btn s-btn__primary'
+                    className={'s-btn s-btn__primary'}
                     onClick={ev => {
                         ev.preventDefault();
                         handleEnqueueComment(comment._id);
@@ -35,7 +35,7 @@ const DashboardDeleteIndicator = ({comment}: { comment: Comment; }) => {
         if (comment.was_deleted) {
             return <td>✓</td>;
         } else {
-            return <td><span className="supernovabg mod-flag-indicator">pending</span></td>;
+            return <td><span className={'supernovabg mod-flag-indicator'}>pending</span></td>;
         }
     } else {
         return <td></td>;
@@ -57,8 +57,8 @@ const DashboardCommentTable = ({
     handleRemoveComment: (comment_id: number) => void;
 }) => {
     return (
-        <div className="s-table-container">
-            <table className="s-table" id="nln-comment-reports-table">
+        <div className={'s-table-container'}>
+            <table className={'s-table'}>
                 <thead>
                 <tr>
                     <th>Comment Text</th>
