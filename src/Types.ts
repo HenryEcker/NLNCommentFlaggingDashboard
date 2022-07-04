@@ -13,6 +13,7 @@ export interface FlaggingDashboardProps {
     flagRateLimit: number;
     fkey: string;
     settings: SettingsUI;
+    dashboardCommentDisplaySettings: DashboardCommentTableDisplaySettings;
     toaster: Toast;
 }
 
@@ -21,6 +22,17 @@ export interface ConfigurableSettings {
     MAXIMUM_LENGTH_COMMENT: number;
     POST_TYPE: PostType;
     FILTER_WHITELIST: boolean;
+}
+
+export interface DashboardCommentTableDisplaySettings {
+    UI_DISPLAY_COMMENT_OWNER: boolean;
+    UI_DISPLAY_POST_TYPE: boolean;
+    UI_DISPLAY_LINK_TO_COMMENT: boolean;
+    UI_DISPLAY_BLACKLIST_MATCHES: boolean;
+    UI_DISPLAY_WHITELIST_MATCHES: boolean;
+    UI_DISPLAY_NOISE_RATIO: boolean;
+    UI_DISPLAY_FLAG_BUTTON: boolean;
+    UI_DISPLAY_COMMENT_DELETE_STATE: boolean;
 }
 
 export interface Comment {

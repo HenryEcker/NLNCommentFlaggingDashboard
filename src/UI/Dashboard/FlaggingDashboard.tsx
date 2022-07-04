@@ -32,11 +32,10 @@ const postTypeFilter = (configPostType: PostType, postType: PostType): boolean =
 
 const FlaggingDashboard = (
     {
-        authStr, apiRequestRate, flagRateLimit, fkey, settings, toaster
+        authStr, apiRequestRate, flagRateLimit, fkey, settings, dashboardCommentDisplaySettings, toaster
     }: FlaggingDashboardProps
 ) => {
     const [tableData, setTableData] = useState<TableData>({});
-    const [seenCommentIds,] = useState<Set<number>>(new Set());
     const [configurableSettings, setConfigurableSettings] = useState<ConfigurableSettings>({
         DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
         MAXIMUM_LENGTH_COMMENT: settings.get('MAXIMUM_LENGTH_COMMENT') as number,
@@ -151,6 +150,7 @@ const FlaggingDashboard = (
     useEffect(() => {
         // Prime last successful read
         let lastSuccessfulRead: number = Math.floor((getCurrentTimestamp() - apiRequestRate) / 1000);
+        const seenCommentIds = new Set<number>();
         const pullDownComments = async () => {
             const toDate = Math.floor(getCurrentTimestamp() / 1000);
             const comments: APIComment[] = await getComments(
@@ -284,11 +284,10 @@ const FlaggingDashboard = (
                     }
                 </h2>
             </div>
-            <DashboardSettingsComponent
-                settings={settings}
-                configurableSettings={configurableSettings}
-                setConfigurableSettings={setConfigurableSettings}/>
-            <DashboardCommentTable settings={settings}
+            <DashboardSettingsComponent settings={settings}
+                                        configurableSettings={configurableSettings}
+                                        setConfigurableSettings={setConfigurableSettings}/>
+            <DashboardCommentTable displaySettings={dashboardCommentDisplaySettings}
                                    tableData={tableData}
                                    shouldRenderRow={shouldRenderRow}
                                    handleEnqueueComment={handleEnqueueComment}

@@ -1,5 +1,4 @@
-import {Comment, TableData} from '../../Types';
-import {SettingsUI} from '../Settings/SettingsUI';
+import {Comment, DashboardCommentTableDisplaySettings, TableData} from '../../Types';
 import {capitalise, formatPercentage} from '../../Utils';
 
 
@@ -44,8 +43,14 @@ const DashboardDeleteIndicator = ({comment}: { comment: Comment; }) => {
 };
 
 
-const DashboardCommentTable = ({settings, tableData, shouldRenderRow, handleEnqueueComment, handleRemoveComment}: {
-    settings: SettingsUI;
+const DashboardCommentTable = ({
+                                   displaySettings,
+                                   tableData,
+                                   shouldRenderRow,
+                                   handleEnqueueComment,
+                                   handleRemoveComment
+                               }: {
+    displaySettings: DashboardCommentTableDisplaySettings;
     tableData: TableData;
     shouldRenderRow: (c: Comment) => boolean;
     handleEnqueueComment: (comment_id: number) => void;
@@ -57,14 +62,14 @@ const DashboardCommentTable = ({settings, tableData, shouldRenderRow, handleEnqu
                 <thead>
                 <tr>
                     <th>Comment Text</th>
-                    {settings.get('UI_DISPLAY_COMMENT_OWNER') && <th>Author</th>}
-                    {settings.get('UI_DISPLAY_POST_TYPE') && <th>Post Type</th>}
-                    {settings.get('UI_DISPLAY_LINK_TO_COMMENT') && <th>Link</th>}
-                    {settings.get('UI_DISPLAY_BLACKLIST_MATCHES') && <th>Blacklist Matches</th>}
-                    {settings.get('UI_DISPLAY_WHITELIST_MATCHES') && <th>Whitelist Matches</th>}
-                    {settings.get('UI_DISPLAY_NOISE_RATIO') && <th>Noise Ratio</th>}
-                    {settings.get('UI_DISPLAY_FLAG_BUTTON') && <th>Flag</th>}
-                    {settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') && <th>Deleted</th>}
+                    {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <th>Author</th>}
+                    {displaySettings['UI_DISPLAY_POST_TYPE'] && <th>Post Type</th>}
+                    {displaySettings['UI_DISPLAY_LINK_TO_COMMENT'] && <th>Link</th>}
+                    {displaySettings['UI_DISPLAY_BLACKLIST_MATCHES'] && <th>Blacklist Matches</th>}
+                    {displaySettings['UI_DISPLAY_WHITELIST_MATCHES'] && <th>Whitelist Matches</th>}
+                    {displaySettings['UI_DISPLAY_NOISE_RATIO'] && <th>Noise Ratio</th>}
+                    {displaySettings['UI_DISPLAY_FLAG_BUTTON'] && <th>Flag</th>}
+                    {displaySettings['UI_DISPLAY_COMMENT_DELETE_STATE'] && <th>Deleted</th>}
                     <th>Clear</th>
                 </tr>
                 </thead>
@@ -87,31 +92,31 @@ const DashboardCommentTable = ({settings, tableData, shouldRenderRow, handleEnqu
                             return (
                                 <tr key={comment._id}>
                                     <td dangerouslySetInnerHTML={{__html: comment.body}}/>
-                                    {settings.get('UI_DISPLAY_COMMENT_OWNER') && <td>
+                                    {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <td>
                                         <a href={comment.owner.link} target="_blank">
                                             <span dangerouslySetInnerHTML={{__html: comment.owner.display_name}}/>
                                         </a>
                                     </td>}
-                                    {settings.get('UI_DISPLAY_POST_TYPE') && <td>
+                                    {displaySettings['UI_DISPLAY_POST_TYPE'] && <td>
                                         {capitalise(comment.post_type)}
                                     </td>}
-                                    {settings.get('UI_DISPLAY_LINK_TO_COMMENT') && <td>
+                                    {displaySettings['UI_DISPLAY_LINK_TO_COMMENT'] && <td>
                                         <a href={comment.link} target="_blank">{comment._id}</a>
                                     </td>}
-                                    {settings.get('UI_DISPLAY_BLACKLIST_MATCHES') && <td>
+                                    {displaySettings['UI_DISPLAY_BLACKLIST_MATCHES'] && <td>
                                         {comment.blacklist_matches.map((e: string) => `"${e}"`).join(', ')}
                                     </td>}
-                                    {settings.get('UI_DISPLAY_WHITELIST_MATCHES') && <td>
+                                    {displaySettings['UI_DISPLAY_WHITELIST_MATCHES'] && <td>
                                         {comment.whitelist_matches.map((e: string) => `"${e}"`).join(', ')}
                                     </td>}
-                                    {settings.get('UI_DISPLAY_NOISE_RATIO') && <td>
+                                    {displaySettings['UI_DISPLAY_NOISE_RATIO'] && <td>
                                         {formatPercentage(comment.noise_ratio)}
                                     </td>}
-                                    {settings.get('UI_DISPLAY_FLAG_BUTTON') &&
+                                    {displaySettings['UI_DISPLAY_FLAG_BUTTON'] &&
                                         <DashboardFlagButton comment={comment}
                                                              handleEnqueueComment={handleEnqueueComment}/>
                                     }
-                                    {settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') &&
+                                    {displaySettings['UI_DISPLAY_COMMENT_DELETE_STATE'] &&
                                         <DashboardDeleteIndicator comment={comment}/>
                                     }
                                     <td>

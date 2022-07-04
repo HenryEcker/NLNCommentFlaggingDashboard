@@ -189,7 +189,6 @@ function UserScript(): void {
         const toaster = new Toast('NLN-Toast-Container');
 
         // Build UI
-
         const container = document.createElement('div');
         $('#mainbar').before(container);
 
@@ -203,6 +202,18 @@ function UserScript(): void {
                     flagRateLimit={5000 + 950}
                     fkey={fkey}
                     settings={settings}
+                    dashboardCommentDisplaySettings={
+                        {
+                            UI_DISPLAY_COMMENT_OWNER: settings.get('UI_DISPLAY_COMMENT_OWNER') as boolean,
+                            UI_DISPLAY_POST_TYPE: settings.get('UI_DISPLAY_POST_TYPE') as boolean,
+                            UI_DISPLAY_LINK_TO_COMMENT: settings.get('UI_DISPLAY_LINK_TO_COMMENT') as boolean,
+                            UI_DISPLAY_BLACKLIST_MATCHES: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
+                            UI_DISPLAY_WHITELIST_MATCHES: settings.get('UI_DISPLAY_WHITELIST_MATCHES') as boolean,
+                            UI_DISPLAY_NOISE_RATIO: settings.get('UI_DISPLAY_NOISE_RATIO') as boolean,
+                            UI_DISPLAY_FLAG_BUTTON: settings.get('UI_DISPLAY_FLAG_BUTTON') as boolean,
+                            UI_DISPLAY_COMMENT_DELETE_STATE: settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean
+                        }
+                    }
                     toaster={toaster}
                 />
             </React.StrictMode>
