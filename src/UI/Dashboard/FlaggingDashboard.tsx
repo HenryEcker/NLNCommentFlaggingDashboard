@@ -276,27 +276,22 @@ const FlaggingDashboard = (
     }, [settings, tableData]);
 
     return (
-        <div id="nln-comment-wrapper">
+        <>
             <div className="nln-header">
                 <h2>NLN Comment Flagging Dashboard
                     {
                         settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') &&
-                        <span id="nln-comment-scan-count"
-                              title="Total Number of Comments (without filters)"> ({Object.keys(tableData).length})</span>
+                        <span
+                            title="Total Number of Comments (without filters)"> ({Object.keys(tableData).length})</span>
                     }
                 </h2>
             </div>
             <DashboardSettingsComponent settings={settings}
                                         configurableSettings={configurableSettings}
                                         setConfigurableSettings={setConfigurableSettings}/>
-            <DashboardCommentTable displaySettings={dashboardCommentDisplaySettings}
-                                   tableData={tableData}
-                                   shouldRenderRow={shouldRenderRow}
-                                   handleEnqueueComment={handleEnqueueComment}
-                                   handleRemoveComment={handleRemoveComment}
-            />
-            <div className="nln-footer d-flex gs8 gsx ai-center">
-                <button className="s-btn s-btn__primary" onClick={ev => {
+
+            <div className={'nln-comment-management-toolbar d-flex gs8 gsx ai-center'}>
+                <button className={'s-btn s-btn__primary'} onClick={ev => {
                     ev.preventDefault();
                     // Remove All Values
                     setTableData(() => {
@@ -306,9 +301,9 @@ const FlaggingDashboard = (
                 }}>
                     Clear All
                 </button>
-                <button className="s-btn"
+                <button className={'s-btn'}
                         style={{marginLeft: '5px'}}
-                        title="Remove all comments that are not currently visible"
+                        title={'Remove all comments that are not currently visible'}
                         onClick={ev => {
                             ev.preventDefault();
 
@@ -325,7 +320,7 @@ const FlaggingDashboard = (
                         }}>
                     Clear Hidden
                 </button>
-                <button className="s-btn"
+                <button className={'s-btn'}
                         style={{marginLeft: '5px'}}
                         onClick={ev => {
                             ev.preventDefault();
@@ -338,21 +333,26 @@ const FlaggingDashboard = (
                                     }
                                     newTableData[commentId] = {...comment};
                                 }
-                        return newTableData;
-                    });
-                    ev.currentTarget.blur();
-                }}>
+                                return newTableData;
+                            });
+                            ev.currentTarget.blur();
+                        }}>
                     Clear Handled
                 </button>
-                {remainingFlagCount &&
-                    <div className="flex--item ml-auto fc-light"
-                         id="nln-remaining-comment-flags">
-                    <span title="The data is updated infrequently the number of flags may be inaccurate">
+                {remainingFlagCount !== undefined &&
+                    <div className={'flex--item ml-auto fc-light'}>
+                    <span title={'The data is updated infrequently the number of flags may be inaccurate'}>
                         You have {remainingFlagCount} flags left today
                     </span>
                     </div>}
             </div>
-        </div>
+            <DashboardCommentTable displaySettings={dashboardCommentDisplaySettings}
+                                   tableData={tableData}
+                                   shouldRenderRow={shouldRenderRow}
+                                   handleEnqueueComment={handleEnqueueComment}
+                                   handleRemoveComment={handleRemoveComment}
+            />
+        </>
     );
 };
 
