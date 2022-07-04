@@ -19,6 +19,8 @@ import DashboardCommentTable from './DashboardCommentTable';
 import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from '../../Utils';
 import {flagComment, getComments, getFlagQuota} from '../../SE_API';
 import {blacklist, whitelist} from '../../GlobalVars';
+import DashboardCommentManagementControls from './DashboardCommentManagementControls';
+import DashboardHeader from './DashboardHeader';
 
 
 const postTypeFilter = (configPostType: PostType, postType: PostType): boolean => {
@@ -34,7 +36,7 @@ const FlaggingDashboard = (
     {
         authStr, apiRequestRate, flagRateLimit, fkey, settings, dashboardCommentDisplaySettings, toaster
     }: FlaggingDashboardProps
-) => {
+): JSX.Element => {
     const [tableData, setTableData] = useState<TableData>({});
     const [configurableSettings, setConfigurableSettings] = useState<ConfigurableSettings>({
         DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
@@ -208,7 +210,7 @@ const FlaggingDashboard = (
         }
         window.setInterval(pullDownComments, apiRequestRate);
 
-    }, [settings]);
+    }, [settings, apiRequestRate, authStr, setTableData]);
 
     /**
      * Determine if row should be rendered or not
@@ -220,8 +222,8 @@ const FlaggingDashboard = (
             comment.noise_ratio >= configurableSettings.DISPLAY_CERTAINTY;
     }, [configurableSettings]);
 
-    /*
-    Handle removing a comment from table
+    /**
+     * Handle removing a comment from table
      */
     const handleRemoveComment = useCallback((commentId: number) => {
         setTableData(oldTableData => {
@@ -277,75 +279,17 @@ const FlaggingDashboard = (
 
     return (
         <>
-            <div className="nln-header">
-                <h2>NLN Comment Flagging Dashboard
-                    {
-                        settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') &&
-                        <span
-                            title="Total Number of Comments (without filters)"> ({Object.keys(tableData).length})</span>
-                    }
-                </h2>
-            </div>
+            <DashboardHeader totalComments={Object.keys(tableData).length}
+                             shouldDisplayTotal={settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') as boolean}
+            />
             <DashboardSettingsComponent settings={settings}
                                         configurableSettings={configurableSettings}
-                                        setConfigurableSettings={setConfigurableSettings}/>
-
-            <div className={'nln-comment-management-toolbar d-flex gs8 gsx ai-center'}>
-                <button className={'s-btn s-btn__primary'} onClick={ev => {
-                    ev.preventDefault();
-                    // Remove All Values
-                    setTableData(() => {
-                        return {};
-                    });
-                    ev.currentTarget.blur();
-                }}>
-                    Clear All
-                </button>
-                <button className={'s-btn'}
-                        style={{marginLeft: '5px'}}
-                        title={'Remove all comments that are not currently visible'}
-                        onClick={ev => {
-                            ev.preventDefault();
-
-                            setTableData(oldTableData => {
-                                const newTableData: TableData = {};
-                                for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
-                                    if (shouldRenderRow(comment)) {
-                                        newTableData[commentId] = {...comment};
-                                    }
-                                }
-                                return newTableData;
-                            });
-                            ev.currentTarget.blur();
-                        }}>
-                    Clear Hidden
-                </button>
-                <button className={'s-btn'}
-                        style={{marginLeft: '5px'}}
-                        onClick={ev => {
-                            ev.preventDefault();
-
-                            setTableData(oldTableData => {
-                                const newTableData: TableData = {};
-                                for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
-                                    if (!comment.can_flag || comment?.was_flagged || comment?.was_deleted) {
-                                        continue;
-                                    }
-                                    newTableData[commentId] = {...comment};
-                                }
-                                return newTableData;
-                            });
-                            ev.currentTarget.blur();
-                        }}>
-                    Clear Handled
-                </button>
-                {remainingFlagCount !== undefined &&
-                    <div className={'flex--item ml-auto fc-light'}>
-                    <span title={'The data is updated infrequently the number of flags may be inaccurate'}>
-                        You have {remainingFlagCount} flags left today
-                    </span>
-                    </div>}
-            </div>
+                                        setConfigurableSettings={setConfigurableSettings}
+            />
+            <DashboardCommentManagementControls setTableData={setTableData}
+                                                shouldRenderRow={shouldRenderRow}
+                                                remainingFlagCount={remainingFlagCount}
+            />
             <DashboardCommentTable displaySettings={dashboardCommentDisplaySettings}
                                    tableData={tableData}
                                    shouldRenderRow={shouldRenderRow}

@@ -1,6 +1,6 @@
 import {InputFieldConfig, SelectFieldConfig, SettingsUI} from '../Settings/SettingsUI';
 import {ConfigurableSettings, PostType} from '../../Types';
-import {useEffect, useId, useState} from 'react';
+import React, {useEffect, useId, useState} from 'react';
 
 const settingElemContainer = 'nln-setting-elem-container';
 
@@ -17,7 +17,7 @@ const SettingSlider = (
         textLabel: string;
         formatSliderValue: (v: string | number) => string;
     }
-) => {
+): JSX.Element => {
     const settingConfig = settings.getConfigProfile(settingKey) as InputFieldConfig;
     const id = useId();
 
@@ -66,7 +66,7 @@ const SettingSelect = (
         settingKey: 'POST_TYPE';
         textLabel: string;
     }
-) => {
+): JSX.Element => {
     const value = configurableSettings[settingKey];
     const settingConfig = settings.getConfigProfile(settingKey) as SelectFieldConfig;
     const id = useId();
@@ -107,7 +107,7 @@ const SettingCheckbox = (
         settingKey: 'FILTER_WHITELIST';
         textLabel: string;
     }
-) => {
+): JSX.Element => {
     const value = configurableSettings[settingKey];
     const id = useId();
     return (
@@ -134,7 +134,7 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
     settings: SettingsUI;
     configurableSettings: ConfigurableSettings;
     setConfigurableSettings: React.Dispatch<React.SetStateAction<ConfigurableSettings>>;
-}) => {
+}): JSX.Element => {
 
     return (
         <div className={'nln-dashboard-settings-container'}>
