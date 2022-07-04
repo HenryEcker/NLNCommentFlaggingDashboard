@@ -1,10 +1,9 @@
-import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from './Utils';
-import {APIComment, Comment, StackExchange} from './Types';
-import {FlaggingDashboard} from './UI/Dashboard/FlaggingDashboard';
-import {getComments} from './SE_API';
-import {blacklist, whitelist} from './GlobalVars';
+import {StackExchange} from './Types';
+import FlaggingDashboard from './UI/Dashboard/FlaggingDashboard';
 import {Toast} from './UI/Toast/Toast';
 import {SettingsUI} from './UI/Settings/SettingsUI';
+import React from 'react';
+import {createRoot} from 'react-dom/client';
 
 
 declare const StackExchange: StackExchange;
@@ -183,69 +182,31 @@ function UserScript(): void {
 
     if (settings.get('ACTIVE') as boolean) {
         const authStr = `site=${siteName}&access_token=${accessToken}&key=${apiKey}`;
-        // const apiCommentFilter = '!TQs**ij.viKR)b8Sie*Qd';
         const apiRequestRate = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
         const fkey = StackExchange.options.user.fkey;
-        // Prime last successful read
-        let lastSuccessfulRead: number = Math.floor((getCurrentTimestamp() - apiRequestRate) / 1000);
-
 
         // Create Toaster for custom Toast Messages
         const toaster = new Toast('NLN-Toast-Container');
 
         // Build UI
-        const ui: FlaggingDashboard = new FlaggingDashboard(
-            $('#mainbar'),
-            fkey,
-            settings,
-            toaster
+
+        const container = document.createElement('div');
+        $('#mainbar').before(container);
+
+        createRoot(
+            container
+        ).render(
+            <React.StrictMode>
+                <FlaggingDashboard
+                    authStr={authStr}
+                    apiRequestRate={apiRequestRate}
+                    flagRateLimit={5000 + 950}
+                    fkey={fkey}
+                    settings={settings}
+                    toaster={toaster}
+                />
+            </React.StrictMode>
         );
-
-        ui.init();
-
-        const main = async () => {
-            const toDate = Math.floor(getCurrentTimestamp() / 1000);
-            const comments: APIComment[] = await getComments(
-                authStr,
-                lastSuccessfulRead,
-                toDate
-            );
-            if (comments.length > 0) {
-                // Update last successful read time
-                lastSuccessfulRead = toDate + 1;
-                const batch = new Date();
-                ui.addComments(
-                    comments.reduce((acc: Comment[], comment: APIComment) => {
-                        const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
-                        const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist) || []; // exclude code from analysis
-
-                        const noiseRatio = calcNoiseRatio(
-                            blacklistMatches,
-                            decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
-                        );
-                        acc.push({
-                            can_flag: comment.can_flag,
-                            body: comment.body,
-                            body_markdown: comment.body_markdown,
-                            owner: comment.owner,
-                            link: comment.link,
-                            _id: comment.comment_id,
-                            post_id: comment.post_id,
-                            post_type: comment.post_type,
-                            pulled_date: batch,
-                            blacklist_matches: blacklistMatches,
-                            whitelist_matches: decodedMarkdown.match(whitelist) || [],
-                            noise_ratio: noiseRatio
-                        });
-                        return acc;
-                    }, [])
-                );
-            }
-        };
-        if (settings.get('RUN_IMMEDIATELY') as boolean) {
-            void main();
-        }
-        window.setInterval(main, apiRequestRate);
     }
 }
 

@@ -20,8 +20,8 @@ const globals = ['$', 'StackExchange'];
 
 
 module.exports = {
-    entry: './src/Main.ts',
-    mode: 'none',
+    entry: './src/Main.tsx',
+    mode: 'production',
     target: 'node',
     output: {
         path: path.resolve(__dirname, 'dist'),

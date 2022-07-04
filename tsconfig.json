@@ -1,6 +1,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
@@ -12,7 +17,10 @@
     "isolatedModules": true,
     "strictBindCallApply": false,
     "removeComments": true,
+    "allowSyntheticDefaultImports": true,
     "module": "ES6",
-    "target": "ES2021"
+    "moduleResolution": "node",
+    "target": "ES2021",
+    "jsx": "react-jsx"
   }
 }

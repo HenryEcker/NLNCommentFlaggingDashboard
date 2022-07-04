@@ -1,4 +1,27 @@
+import {SettingsUI} from './UI/Settings/SettingsUI';
+import {Toast} from './UI/Toast/Toast';
+
 export type PostType = 'question' | 'answer' | 'all';
+
+export interface TableData {
+    [key: number]: Comment;
+}
+
+export interface FlaggingDashboardProps {
+    authStr: string;
+    apiRequestRate: number;
+    flagRateLimit: number;
+    fkey: string;
+    settings: SettingsUI;
+    toaster: Toast;
+}
+
+export interface ConfigurableSettings {
+    DISPLAY_CERTAINTY: number;
+    MAXIMUM_LENGTH_COMMENT: number;
+    POST_TYPE: PostType;
+    FILTER_WHITELIST: boolean;
+}
 
 export interface Comment {
     _id: number;
