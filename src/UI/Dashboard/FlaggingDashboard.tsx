@@ -306,17 +306,38 @@ const FlaggingDashboard = (
                 }}>
                     Clear All
                 </button>
-                <button className="s-btn" style={{marginLeft: '5px'}} onClick={ev => {
-                    ev.preventDefault();
+                <button className="s-btn"
+                        style={{marginLeft: '5px'}}
+                        title="Remove all comments that are not currently visible"
+                        onClick={ev => {
+                            ev.preventDefault();
 
-                    setTableData(oldTableData => {
-                        const newTableData: TableData = {};
-                        for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
-                            if (!comment.can_flag || comment?.was_flagged || comment?.was_deleted) {
-                                continue;
-                            }
-                            newTableData[commentId] = {...comment};
-                        }
+                            setTableData(oldTableData => {
+                                const newTableData: TableData = {};
+                                for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
+                                    if (shouldRenderRow(comment)) {
+                                        newTableData[commentId] = {...comment};
+                                    }
+                                }
+                                return newTableData;
+                            });
+                            ev.currentTarget.blur();
+                        }}>
+                    Clear Hidden
+                </button>
+                <button className="s-btn"
+                        style={{marginLeft: '5px'}}
+                        onClick={ev => {
+                            ev.preventDefault();
+
+                            setTableData(oldTableData => {
+                                const newTableData: TableData = {};
+                                for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
+                                    if (!comment.can_flag || comment?.was_flagged || comment?.was_deleted) {
+                                        continue;
+                                    }
+                                    newTableData[commentId] = {...comment};
+                                }
                         return newTableData;
                     });
                     ev.currentTarget.blur();
