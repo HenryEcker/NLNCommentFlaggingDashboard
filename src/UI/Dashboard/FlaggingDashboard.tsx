@@ -165,37 +165,39 @@ const FlaggingDashboard = (
                 setTableData(oldTableData => {
                     return {
                         ...oldTableData,
-                        ...comments.reduce((newTableData: TableData, comment) => {
-                            if (seenCommentIds.has(comment.comment_id)) {
-                                if (!Object.hasOwn(oldTableData, comment.comment_id)) {
-                                    return tableData;
+                        ...comments.reduce((acc: TableData, currComment) => {
+                            const hasOwnCommentId = Object.hasOwn(oldTableData, currComment.comment_id);
+                            if (seenCommentIds.has(currComment.comment_id)) {
+                                if (!hasOwnCommentId) {
+                                    return acc;
                                 }
                             } else {
-                                seenCommentIds.add(comment.comment_id);
+                                seenCommentIds.add(currComment.comment_id);
                             }
 
-                            const decodedMarkdown = htmlDecode(comment.body_markdown) || '';
+                            const decodedMarkdown = htmlDecode(currComment.body_markdown) || '';
                             const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist) || []; // exclude code from analysis
 
                             const noiseRatio = calcNoiseRatio(
                                 blacklistMatches,
                                 decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
                             );
-                            newTableData[comment.comment_id] = {
-                                can_flag: comment.can_flag,
-                                body: comment.body,
-                                body_markdown: comment.body_markdown,
-                                owner: comment.owner,
-                                link: comment.link,
-                                _id: comment.comment_id,
-                                post_id: comment.post_id,
-                                post_type: comment.post_type,
+                            acc[currComment.comment_id] = {
+                                ...hasOwnCommentId && oldTableData[currComment.comment_id],
+                                can_flag: currComment.can_flag,
+                                body: currComment.body,
+                                body_markdown: currComment.body_markdown,
+                                owner: currComment.owner,
+                                link: currComment.link,
+                                _id: currComment.comment_id,
+                                post_id: currComment.post_id,
+                                post_type: currComment.post_type,
                                 pulled_date: batch,
                                 blacklist_matches: blacklistMatches,
                                 whitelist_matches: decodedMarkdown.match(whitelist) || [],
                                 noise_ratio: noiseRatio
                             };
-                            return newTableData;
+                            return acc;
                         }, {} as TableData)
                     };
                 });
