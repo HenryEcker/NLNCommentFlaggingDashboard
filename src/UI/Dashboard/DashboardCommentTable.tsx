@@ -75,6 +75,7 @@ const DashboardCommentTable = ({
             <tbody>
             {
                 Object.values(tableData)
+                    .filter(shouldRenderRow)
                     .sort((a: Comment, b: Comment): number => {
                         const tA = a.pulled_date.getTime();
                         const tB = b.pulled_date.getTime();
@@ -86,7 +87,6 @@ const DashboardCommentTable = ({
                         }
                         return tA - tB;
                     })
-                    .filter(shouldRenderRow)
                     .map((comment: Comment) => {
                         return (
                             <tr key={comment._id}>
