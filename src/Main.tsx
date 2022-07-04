@@ -190,10 +190,12 @@ function UserScript(): void {
 
         // Build UI
         const container = document.createElement('div');
+        container.id = 'nln-comment-wrapper';
         $('#mainbar').before(container);
 
         createRoot(
-            container
+            container,
+            {identifierPrefix: 'nln-'}
         ).render(
             <React.StrictMode>
                 <FlaggingDashboard
