@@ -50,7 +50,7 @@ TRE('broo', 'boss', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie',
     // thanks
     /\b(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:(your|the)\s+)?(?:help(ing)?)?)?|th?anx|thx|cheers)\b/,
     // Your [very excellent] solution [also] worked like a charm
-    /\b((this|that|it(['’]?s)?|your)\s+)?(?:(excellent|wonderful|awesome)\s+)?((solution|answer|code)\s+)?(((doe|i)s|also)\s+)?work(?:ed|s|ing)?(?:\s+(now|perfectly|great|for\s+me|((like|as)\s+)?(a\s+)?charm|again))?\b(?:[!.]*)/,
+    /\b((this|that|it(['’]?s)?|your)\s+)?(?:(excellent|wonderful|awesome|best)\s+)?((solution|answer|code)\s+)?(((doe|i)s|also)\s+)?work(?:ed|s|ing)?(?:\s+(now|perfectly|great|for\s+me|((like|as)\s+)?(a\s+)?charm|again))?\b(?:[!.]*)/,
     // you are welcome/my pleasure
     /\b(?:(?:you(?:['’]?re?|\s+are)\s+)?welcome|my pleasure)+\b/,
     // no problem
@@ -62,23 +62,26 @@ from trieregex import TrieRegEx as TRE
 
 TRE(
     'ingenious', 'superb', 'amazing', 'fantastic', 'perfect', 'wonderful',
-    'brilliant', 'excellent', 'marvelous', 'awesome', 'bravo'
+    'brilliant', 'excellent', 'marvelous', 'awesome', 'bravo', 'elegant',
+    'concise'
 ).regex()
      */
-    // wow has any number of wow so should be w+o+w+ (should be added at the end of the OR list)
-    /\b(?:a(?:mazing|wesome)|br(?:illiant|avo)|excellent|fantastic|ingenious|marvelous|wonderful|perfect|superb|w+o+w+)\b/,
+    // wow has any number of wow so should be |w+o+w+ (should be added at the end of the OR list)
+    /\b(?:e(?:xcellent|legant)|a(?:mazing|wesome)|br(?:illiant|avo)|fantastic|ingenious|marvelous|wonderful|concise|perfect|superb|w+o+w+)\b/,
     // saviour
     /\b(?:(you(['’]?re?|\s+are|['’]?ve|\s+have)?|this(\s+(wa|i|['’])s)?)\s+)?(?:a\s+life(-|\s+)saver|sav(e|ed|ing)\s+(m[ey]|the|it))(\s+\w+)?\b/,
-    // please accept/approve
-    /\b(?:please(?:\s+\w+)*\s+)?(accept(?:ed|ing)?|approv(ed?|ing))\b(?:\s+th(e|is)\s+answer)?\b/,
+    // please accept/approve/rate
+    /\b(?:(please|plz|pls)(?:\s+\w+)*\s+)?(accept(?:ed|ing)?|approv(ed?|ing)|rat(?:ed?|ing))\b(?:\s+(th(e|is)|my)\s+answer)?\b/,
     // hit the checkmark
     /\b(click(ing)?|hit(t?ing)?)\s+(the\s+)?(gr[ae](en|y)\s+)?check(mark)?(\s+to\s+the\s+left|(((?:\s+\w+)*\s+)?answer))?\b/,
     // mark this answer as correct
     /\b(?:please(?:\s+\w+)*\s+)?mark\s+th(?:e|is)(\s+(answer|solution))?((\s+as)?(\s+the)?(\s+(correct|right))?(\s+(answer|solution))?)?\b/,
     // please upvote
     /\b(?:please(?:\s+\w+)*\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?\b/,
-    // is/should be the correct/accepted/right answer
-    /\b(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted)(?:\s+\w+)*\s+(?:answer|solution)\b/,
+    // is/should be the correct/accepted/right/best answer
+    /\b(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted|best)(?:\s+\w+)*\s+(?:answer|solution)\b/,
+    // this is [by far] the best answer/ this is a superior answer
+    /\b(this\s+is\s+)?((by|the|a)\s+)?(far\s+)?(the\s+)?(best(est)?|great(est)?|awesome(st)?|superior)\s+(answer|solution)\b/,
     // /help/someone-answer or /help/accepted-answer
     /\b(?:(https:\/\/stackoverflow.com)?\/help\/(someone-answers|accepted-answer))\b/,
     /\b(?:b+u+m+p+)\b(?:[!.?~@#$^%]*)/
@@ -102,5 +105,7 @@ suffixes = ["n't", "n’t", "n'", "n’", "nt"]
 TRE(*[f'{b}{s}' for b, s in product(bases, suffixes)]).regex()
      */
     /\b(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|wo(?:uldn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))\b/,
-    /\b(will|I['’]?ll)\s*try\b/
+    /\b(will|I['’]?ll)\s*try\b/,
+    // Auto Review Comment
+    / - \[From Review]\(\/review\/[a-z-]+\/\d+\)$/
 ], 'gi');
