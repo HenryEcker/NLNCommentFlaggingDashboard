@@ -1,6 +1,7 @@
 import {InputFieldConfig, SelectFieldConfig, SettingsUI} from '../Settings/SettingsUI';
-import {ConfigurableSettings, PostType} from '../../Types';
+import {PostType} from '../../Types';
 import {useEffect, useId, useState} from 'react';
+import {ConfigurableSettings} from './DashboardTypes';
 
 const settingElemContainer = 'nln-setting-elem-container';
 

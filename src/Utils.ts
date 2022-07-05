@@ -54,6 +54,18 @@ export function calcNoiseRatio(matches: string[], totalLength: number): number {
 
 
 /**
+ * Joins RegExpMatchArray and separates values by delimiter
+ *
+ * @param {RegExpMatchArray} matches a RegExpMatchArray to join
+ * @param {string} sep the value to separate each value with
+ * @returns {string} The resulting regex matches mapped to strings (in quotes) and separated by delimiter
+ */
+export function displayFormatRegExpMatchArray(matches: RegExpMatchArray, sep = ', '): string {
+    return matches.map((e: string) => `"${e}"`).join(sep);
+}
+
+
+/**
  * @summary Get timestamp for now
  *
  * @returns {number} The current timestamp

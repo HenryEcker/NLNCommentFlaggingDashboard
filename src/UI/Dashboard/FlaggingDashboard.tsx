@@ -5,13 +5,10 @@ import {
     APIComment,
     Comment,
     CommentFlagResult,
-    ConfigurableSettings,
     FlagAttemptFailed,
-    FlaggingDashboardProps,
     OutOfFlagsError,
     PostType,
-    RatedLimitedError,
-    TableData
+    RatedLimitedError
 } from '../../Types';
 import './FlaggingDashboard.scss';
 import DashboardSettingsComponent from './DashboardSettingsComponent';
@@ -21,6 +18,8 @@ import {flagComment, getComments, getFlagQuota} from '../../SE_API';
 import {blacklist, whitelist} from '../../GlobalVars';
 import DashboardCommentManagementControls from './DashboardCommentManagementControls';
 import DashboardHeader from './DashboardHeader';
+import globalFlagQueue from './FlagQueue/FlagQueue';
+import {ConfigurableSettings, FlaggingDashboardProps, TableData} from './DashboardTypes';
 
 
 const postTypeFilter = (configPostType: PostType, postType: PostType): boolean => {
@@ -34,7 +33,7 @@ const postTypeFilter = (configPostType: PostType, postType: PostType): boolean =
 
 const FlaggingDashboard = (
     {
-        authStr, apiRequestRate, flagRateLimit, fkey, settings, dashboardCommentDisplaySettings, toaster
+        authStr, apiRequestRate, fkey, settings, dashboardCommentDisplaySettings, toaster
     }: FlaggingDashboardProps
 ): JSX.Element => {
     const [tableData, setTableData] = useState<TableData>({});
@@ -45,8 +44,6 @@ const FlaggingDashboard = (
         FILTER_WHITELIST: settings.get('FILTER_WHITELIST') as boolean
     });
     const [remainingFlagCount, setRemainingFlagCount] = useState<number | undefined>(undefined);
-    const [, setPendingFlagCount] = useState<number>(0);
-
     /**
      * Fetch remaining comment count from flagging dialogue and update remainingFlagCount
      */
@@ -64,17 +61,17 @@ const FlaggingDashboard = (
     /**
      * Handle the Flagging of the comment and update the TableData with the result
      */
-    const handleFlagComment = useCallback(async (comment: Comment) => {
+    const handleFlagComment = useCallback(async (commentId: number) => {
         // Get remaining flag amount (Need to do this before flagging because it's not accessible after the comment was deleted)
-        void pullDownRemainingFlagsFromFlagDialogue(comment._id);
+        void pullDownRemainingFlagsFromFlagDialogue(commentId);
         // Do Flag
         try {
-            const result: CommentFlagResult = await flagComment(fkey, comment._id);
+            const result: CommentFlagResult = await flagComment(fkey, commentId);
             setTableData(oldTableData => {
                 return {
                     ...oldTableData,
-                    [comment._id]: {
-                        ...oldTableData[comment._id],
+                    [commentId]: {
+                        ...oldTableData[commentId],
                         was_flagged: result.was_flagged,
                         was_deleted: result.was_deleted,
                     }
@@ -97,8 +94,8 @@ const FlaggingDashboard = (
                 setTableData(oldTableData => {
                     return {
                         ...oldTableData,
-                        [comment._id]: {
-                            ...oldTableData[comment._id],
+                        [commentId]: {
+                            ...oldTableData[commentId],
                             was_flagged: true,
                             was_deleted: false
                         }
@@ -110,8 +107,8 @@ const FlaggingDashboard = (
                 setTableData(oldTableData => {
                     return {
                         ...oldTableData,
-                        [comment._id]: {
-                            ...oldTableData[comment._id],
+                        [commentId]: {
+                            ...oldTableData[commentId],
                             can_flag: false,
                             was_deleted: true
                         }
@@ -122,22 +119,19 @@ const FlaggingDashboard = (
                 setTableData(oldTableData => {
                     return {
                         ...oldTableData,
-                        [comment._id]: {
-                            ...oldTableData[comment._id],
+                        [commentId]: {
+                            ...oldTableData[commentId],
                             can_flag: false
                         }
                     };
                 });
             }
         } finally {
-            setTimeout(() => {
-                setPendingFlagCount(pfc => pfc - 1);
-            }, flagRateLimit); // Don't consider pending complete until after the timelimit is done
             setTableData(oldTableData => {
                 return {
                     ...oldTableData,
-                    [comment._id]: {
-                        ...oldTableData[comment._id],
+                    [commentId]: {
+                        ...oldTableData[commentId],
                         enqueued: false
                     }
                 };
@@ -240,12 +234,8 @@ const FlaggingDashboard = (
     const handleEnqueueComment = useCallback((commentId: number) => {
         setTableData(oldTableData => {
             // Set Timeout to Handle Flag after time based on number of pending flags
-            const c: Comment = {...oldTableData[commentId]};
-            setPendingFlagCount(pfc => {
-                setTimeout(() => {
-                    void handleFlagComment(c);
-                }, pfc * flagRateLimit);
-                return pfc + 1;
+            globalFlagQueue.enqueue(() => {
+                return handleFlagComment(commentId);
             });
             // Update Table Data to show as enqueued
             return {
@@ -253,7 +243,7 @@ const FlaggingDashboard = (
                 [commentId]: {...oldTableData[commentId], enqueued: true}
             };
         });
-    }, [setPendingFlagCount, setTableData]);
+    }, [setTableData]);
 
     /**
      * Update Page Title based on number of visible and actionable comments

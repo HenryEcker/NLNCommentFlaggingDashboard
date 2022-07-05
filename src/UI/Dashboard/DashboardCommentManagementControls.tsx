@@ -1,4 +1,5 @@
-import {Comment, TableData} from '../../Types';
+import {Comment} from '../../Types';
+import {TableData} from './DashboardTypes';
 
 
 const DashboardCommentManagementControls = ({setTableData, shouldRenderRow, remainingFlagCount}: {
