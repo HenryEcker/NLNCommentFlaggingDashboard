@@ -122,6 +122,11 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'UI_DISPLAY_POST_ID': {
+                        'label': 'Display ID of Post the comment is under: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                     'UI_DISPLAY_LINK_TO_COMMENT': {
                         'label': 'Display Link to Comment: ',
                         'type': 'checkbox',
@@ -201,13 +206,13 @@ function UserScript(): void {
                 <FlaggingDashboard
                     authStr={authStr}
                     apiRequestRate={apiRequestRate}
-                    flagRateLimit={5000 + 950}
                     fkey={fkey}
                     settings={settings}
                     dashboardCommentDisplaySettings={
                         {
                             UI_DISPLAY_COMMENT_OWNER: settings.get('UI_DISPLAY_COMMENT_OWNER') as boolean,
                             UI_DISPLAY_POST_TYPE: settings.get('UI_DISPLAY_POST_TYPE') as boolean,
+                            UI_DISPLAY_POST_ID: settings.get('UI_DISPLAY_POST_ID') as boolean,
                             UI_DISPLAY_LINK_TO_COMMENT: settings.get('UI_DISPLAY_LINK_TO_COMMENT') as boolean,
                             UI_DISPLAY_BLACKLIST_MATCHES: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
                             UI_DISPLAY_WHITELIST_MATCHES: settings.get('UI_DISPLAY_WHITELIST_MATCHES') as boolean,
