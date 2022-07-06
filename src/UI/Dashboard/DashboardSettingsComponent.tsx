@@ -30,7 +30,7 @@ const SettingSlider = (
 
     return (
         <div className={settingElemContainer}>
-            <label htmlFor={id}>
+            <label htmlFor={id} className={'s-label fw-normal'}>
                 {textLabel}
             </label>
             <input id={id}
@@ -75,26 +75,28 @@ const SettingSelect = (
     const id = useId();
     return (
         <div className={settingElemContainer}>
-            <label htmlFor={id}>{textLabel}</label>
-            <select
-                id={id}
-                value={value}
-                onChange={ev => {
-                    setConfigurableSettings(oldConfigurableSettings => {
-                        const newValue = (ev.target as HTMLSelectElement).value as PostType;
-                        settings.set(settingKey, newValue);
-                        return {...oldConfigurableSettings, [settingKey]: newValue};
-                    });
-                }}
-            >
-                {
-                    settingConfig.options.map((op) => {
-                        return (
-                            <option value={op} key={op}>{op}</option>
-                        );
-                    })
-                }
-            </select>
+            <label htmlFor={id} className={'s-label fw-normal'}>{textLabel}</label>
+            <div className={'s-select'}>
+                <select
+                    id={id}
+                    value={value}
+                    onChange={ev => {
+                        setConfigurableSettings(oldConfigurableSettings => {
+                            const newValue = (ev.target as HTMLSelectElement).value as PostType;
+                            settings.set(settingKey, newValue);
+                            return {...oldConfigurableSettings, [settingKey]: newValue};
+                        });
+                    }}
+                >
+                    {
+                        settingConfig.options.map((op) => {
+                            return (
+                                <option value={op} key={op}>{op}</option>
+                            );
+                        })
+                    }
+                </select>
+            </div>
         </div>
     );
 };
@@ -115,9 +117,10 @@ const SettingCheckbox = (
     const id = useId();
     return (
         <div className={settingElemContainer}>
-            <label htmlFor={id}>{textLabel}</label>
+            <label htmlFor={id} className={'s-label fw-normal'}>{textLabel}</label>
             <input
                 id={id}
+                className={'s-checkbox'}
                 type={'checkbox'}
                 checked={value}
                 onChange={ev => {
