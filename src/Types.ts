@@ -16,6 +16,7 @@ export interface Comment {
     was_flagged?: boolean;
     was_deleted?: boolean;
     enqueued?: boolean;
+    pinned?: boolean;
 }
 
 export interface CommentFlagResult {

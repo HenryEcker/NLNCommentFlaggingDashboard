@@ -51,18 +51,21 @@ const DashboardCommentTable = ({
                                    tableData,
                                    shouldRenderRow,
                                    handleEnqueueComment,
-                                   handleRemoveComment
+                                   handleRemoveComment,
+                                   handlePinComment
                                }: {
     displaySettings: DashboardCommentTableDisplaySettings;
     tableData: TableData;
     shouldRenderRow: (c: Comment) => boolean;
     handleEnqueueComment: (comment_id: number) => void;
     handleRemoveComment: (comment_id: number) => void;
+    handlePinComment: (comment_id: number, pinStatus: boolean) => void;
 }): JSX.Element => {
     return (
         <table className={'s-table'}>
             <thead>
             <tr>
+                {displaySettings['UI_DISPLAY_PIN_COMMENT'] && <th>🖈</th>}
                 <th>Comment Text</th>
                 {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <th>Author</th>}
                 {displaySettings['UI_DISPLAY_POST_TYPE'] && <th>Post Type</th>}
@@ -91,9 +94,22 @@ const DashboardCommentTable = ({
                         }
                         return tA - tB;
                     })
-                    .map((comment: Comment) => {
+                    .map((comment: Comment, index: number) => {
                         return (
                             <tr key={comment._id}>
+                                {displaySettings['UI_DISPLAY_PIN_COMMENT'] &&
+                                    <td>
+                                        <input type={'checkbox'}
+                                               className={'s-checkbox'}
+                                               id={`nln-pin-${comment._id}`}
+                                               title={`(${index + 1}). Check to pin comment to dashboard (ignores filters)`}
+                                               onChange={ev => {
+                                                   handlePinComment(comment._id, ev.target.checked);
+                                               }}
+                                               checked={comment.pinned === true}
+                                        />
+                                    </td>
+                                }
                                 <td dangerouslySetInnerHTML={{__html: comment.body}}/>
                                 {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <td>
                                     <a href={comment.owner.link} target={'_blank'} rel={'noreferrer'}>

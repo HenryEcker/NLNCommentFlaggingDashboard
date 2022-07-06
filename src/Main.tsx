@@ -4,6 +4,7 @@ import {Toast} from './UI/Toast/Toast';
 import {SettingsUI} from './UI/Settings/SettingsUI';
 import React from 'react';
 import {createRoot} from 'react-dom/client';
+import {DashboardCommentTableDisplaySettings} from './UI/Dashboard/DashboardTypes';
 
 
 declare const StackExchange: StackExchange;
@@ -117,6 +118,11 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'UI_DISPLAY_PIN_COMMENT': {
+                        'label': 'Display Checkbox to allow comments to be pinned. (Forces them to stay in dashboard regardless of filters)',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                     'UI_DISPLAY_POST_TYPE': {
                         'label': 'Display Type of Post the comment is under: ',
                         'type': 'checkbox',
@@ -198,6 +204,24 @@ function UserScript(): void {
         container.id = 'nln-comment-wrapper';
         $('#mainbar').before(container);
 
+        const dashboardCommentDisplaySettings = (
+            [
+                'UI_DISPLAY_PIN_COMMENT',
+                'UI_DISPLAY_COMMENT_OWNER',
+                'UI_DISPLAY_POST_TYPE',
+                'UI_DISPLAY_POST_ID',
+                'UI_DISPLAY_LINK_TO_COMMENT',
+                'UI_DISPLAY_BLACKLIST_MATCHES',
+                'UI_DISPLAY_WHITELIST_MATCHES',
+                'UI_DISPLAY_NOISE_RATIO',
+                'UI_DISPLAY_FLAG_BUTTON',
+                'UI_DISPLAY_COMMENT_DELETE_STATE'
+            ] as (keyof DashboardCommentTableDisplaySettings)[]
+        ).reduce((acc, v) => {
+            acc[v] = settings.get(v) as boolean;
+            return acc;
+        }, {} as DashboardCommentTableDisplaySettings);
+
         createRoot(
             container,
             {identifierPrefix: 'nln-'}
@@ -208,19 +232,7 @@ function UserScript(): void {
                     apiRequestRate={apiRequestRate}
                     fkey={fkey}
                     settings={settings}
-                    dashboardCommentDisplaySettings={
-                        {
-                            UI_DISPLAY_COMMENT_OWNER: settings.get('UI_DISPLAY_COMMENT_OWNER') as boolean,
-                            UI_DISPLAY_POST_TYPE: settings.get('UI_DISPLAY_POST_TYPE') as boolean,
-                            UI_DISPLAY_POST_ID: settings.get('UI_DISPLAY_POST_ID') as boolean,
-                            UI_DISPLAY_LINK_TO_COMMENT: settings.get('UI_DISPLAY_LINK_TO_COMMENT') as boolean,
-                            UI_DISPLAY_BLACKLIST_MATCHES: settings.get('UI_DISPLAY_BLACKLIST_MATCHES') as boolean,
-                            UI_DISPLAY_WHITELIST_MATCHES: settings.get('UI_DISPLAY_WHITELIST_MATCHES') as boolean,
-                            UI_DISPLAY_NOISE_RATIO: settings.get('UI_DISPLAY_NOISE_RATIO') as boolean,
-                            UI_DISPLAY_FLAG_BUTTON: settings.get('UI_DISPLAY_FLAG_BUTTON') as boolean,
-                            UI_DISPLAY_COMMENT_DELETE_STATE: settings.get('UI_DISPLAY_COMMENT_DELETE_STATE') as boolean
-                        }
-                    }
+                    dashboardCommentDisplaySettings={dashboardCommentDisplaySettings}
                     toaster={toaster}
                 />
             </React.StrictMode>

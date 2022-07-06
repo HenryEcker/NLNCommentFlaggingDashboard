@@ -63,7 +63,7 @@ const FlaggingDashboard = (
      */
     const handleFlagComment = useCallback(async (commentId: number) => {
         // Get remaining flag amount (Need to do this before flagging because it's not accessible after the comment was deleted)
-        void pullDownRemainingFlagsFromFlagDialogue(commentId);
+        await pullDownRemainingFlagsFromFlagDialogue(commentId);
         // Do Flag
         try {
             const result: CommentFlagResult = await flagComment(fkey, commentId);
@@ -210,6 +210,10 @@ const FlaggingDashboard = (
      * Determine if row should be rendered or not
      */
     const shouldRenderRow = useCallback((comment: Comment): boolean => {
+        // Pinned comments should always render
+        if (comment.pinned === true) {
+            return true;
+        }
         return postTypeFilter(configurableSettings.POST_TYPE, comment.post_type) &&
             (!configurableSettings.FILTER_WHITELIST || comment.whitelist_matches.length === 0) &&
             comment.body_markdown.length <= configurableSettings.MAXIMUM_LENGTH_COMMENT &&
@@ -224,6 +228,21 @@ const FlaggingDashboard = (
             const newTableData = {...oldTableData};
             delete newTableData[commentId];
             return newTableData;
+        });
+    }, [setTableData]);
+
+    /**
+     * Handle pinning (and unpinning) comments
+     */
+    const handlePinComment = useCallback((commentId: number, pinStatus: boolean) => {
+        setTableData(oldTableData => {
+            return {
+                ...oldTableData,
+                [commentId]: {
+                    ...oldTableData[commentId],
+                    pinned: pinStatus
+                }
+            };
         });
     }, [setTableData]);
 
@@ -285,6 +304,7 @@ const FlaggingDashboard = (
                                    shouldRenderRow={shouldRenderRow}
                                    handleEnqueueComment={handleEnqueueComment}
                                    handleRemoveComment={handleRemoveComment}
+                                   handlePinComment={handlePinComment}
             />
         </>
     );
