@@ -26,7 +26,7 @@ class FlagQueue {
             const cb = this.queue.shift();
             if (cb !== undefined) {
                 cb().finally(() => {
-                    // Rate Limit is from Flag _response_
+                    this.handlerIsActive = true;
                     setTimeout(() => {
                         this.handleQueue();
                     }, this.flagRateLimit);
@@ -39,7 +39,6 @@ class FlagQueue {
     };
 }
 
-const globalFlagQueue = new FlagQueue(5000 + 450);
-Object.freeze(FlagQueue);
+const globalFlagQueue = Object.freeze(new FlagQueue(5000 + 650));
 
 export default globalFlagQueue;
