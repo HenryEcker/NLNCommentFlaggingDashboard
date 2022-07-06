@@ -1,3 +1,5 @@
+import {flagRateLimit} from '../../../GlobalVars';
+
 type FlagQueueEntry = () => Promise<void>;
 
 class FlagQueue {
@@ -39,6 +41,6 @@ class FlagQueue {
     };
 }
 
-const globalFlagQueue = Object.freeze(new FlagQueue(5000 + 650));
+const globalFlagQueue = Object.freeze(new FlagQueue(flagRateLimit));
 
 export default globalFlagQueue;

@@ -1,5 +1,6 @@
 import {mergeRegexes} from './Utils';
 
+export const flagRateLimit = 5000 + 650;
 
 export const blacklist = mergeRegexes([
     // Emojis
