@@ -129,7 +129,8 @@ export function getFlagQuota(commentID: number): Promise<number> {
  * Flag the comment using an HTML POST to the route. The NLN flag type is hard coded (39).
  *
  * @param {string} fkey Needed to identify the user
- * @param {number} comment_id the complete comment object
+ * @param {number} comment_id the ID of the flag to use (NLN = 39)
+ * @param {number} flag_id the complete comment object
  * @returns {Promise<CommentFlagResult>} Resolves a CommentFlagResult with information about what happened to the comment
  *
  * @throws {RatedLimitedError} Throws a RateLimitedError when attempting to flag too quickly. The flags can only be added every 5 seconds (globally)
@@ -137,8 +138,8 @@ export function getFlagQuota(commentID: number): Promise<number> {
  * @throws {AlreadyDeletedError} Throws an AlreadyDeletedError when attempting to flag a comment that has already been deleted
  * @throws {FlagAttemptFailed} Throws a FlagAttemptFailed if the flag attempt failed for some other reason than RateLimit, AlreadyFlagged, or Already Deleted.
  */
-export function flagComment(fkey: string, comment_id: number): Promise<CommentFlagResult> {
-    return fetch(`https://${location.hostname}/flags/comments/${comment_id}/add/39`, {
+export function flagComment(fkey: string, comment_id: number, flag_id = 39): Promise<CommentFlagResult> {
+    return fetch(`https://${location.hostname}/flags/comments/${comment_id}/add/${flag_id}`, {
         method: 'POST',
         body: getFormDataFromObject({
             'fkey': fkey,
