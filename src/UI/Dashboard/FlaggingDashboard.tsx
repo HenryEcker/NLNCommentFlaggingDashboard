@@ -157,7 +157,7 @@ const FlaggingDashboard = (
             if (comments.length > 0) {
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
-                const batch = new Date();
+                const batch = new Date().getTime();
                 setTableData(oldTableData => {
                     return {
                         ...oldTableData,
@@ -183,12 +183,13 @@ const FlaggingDashboard = (
                                 can_flag: currComment.can_flag,
                                 body: currComment.body,
                                 body_markdown: currComment.body_markdown,
+                                body_markdown_length: decodedMarkdown.length,
                                 owner: currComment.owner,
                                 link: currComment.link,
                                 _id: currComment.comment_id,
                                 post_id: currComment.post_id,
                                 post_type: currComment.post_type,
-                                pulled_date: batch,
+                                batch_timestamp: batch,
                                 blacklist_matches: blacklistMatches,
                                 whitelist_matches: decodedMarkdown.match(whitelist) || [],
                                 noise_ratio: noiseRatio
@@ -216,7 +217,7 @@ const FlaggingDashboard = (
         }
         return postTypeFilter(configurableSettings.POST_TYPE, comment.post_type) &&
             (!configurableSettings.FILTER_WHITELIST || comment.whitelist_matches.length === 0) &&
-            comment.body_markdown.length <= configurableSettings.MAXIMUM_LENGTH_COMMENT &&
+            comment.body_markdown_length <= configurableSettings.MAXIMUM_LENGTH_COMMENT &&
             comment.noise_ratio >= configurableSettings.DISPLAY_CERTAINTY;
     }, [configurableSettings]);
 

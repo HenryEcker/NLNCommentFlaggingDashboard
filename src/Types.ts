@@ -4,9 +4,10 @@ export interface Comment {
     _id: number;
     post_id: number;
     post_type: PostType;
-    pulled_date: Date;
+    batch_timestamp: number; // Timestamp of when the comment was added to dashboard (for sorting)
     body: string;
     body_markdown: string;
+    body_markdown_length: number; // can't use raw body_markdown length because " counts as length 1 though it is encoded as &quot; (length 6)
     owner: APICommentOwner;
     link: string;
     blacklist_matches: RegExpMatchArray;
