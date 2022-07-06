@@ -22,13 +22,13 @@ const globals = ['$', 'StackExchange'];
 module.exports = {
     entry: './src/Main.tsx',
     mode: 'production',
-    target: 'node',
+    target: 'browserslist',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: './NLNCommentFlaggingDashboard.user.js'
     },
     resolve: {
-        extensions: ['.webpack.js', '.ts', '.tsx', '.js']
+        extensions: ['.webpack.js', '.ts', '.tsx', '.js', '.css', '.scss']
     },
     plugins: [
         new CleanWebpackPlugin()
@@ -43,7 +43,11 @@ module.exports = {
             {
                 test: /\.s[ac]ss$/i,
                 include: path.resolve(__dirname, 'src'),
-                use: ['style-loader', 'css-loader', 'sass-loader']
+                use: [
+                    {loader: 'style-loader'},
+                    {loader: 'css-loader', options: {modules: true}},
+                    {loader: 'sass-loader'}
+                ]
             }
         ]
     },

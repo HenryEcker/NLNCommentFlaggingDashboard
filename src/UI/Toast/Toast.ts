@@ -1,4 +1,4 @@
-import './Toast.scss';
+import styles from './Toast.module.scss';
 import {formatCSSDuration} from '../../Utils';
 
 export type ToastTheme = 'error' | 'warning';
@@ -13,18 +13,18 @@ export class Toast {
         this.openCloseDuration = openCloseDuration;
     }
 
-    open(message: string, toastTheme: ToastTheme, toastDuration: number | undefined = 5000): void {
-        const toastDiv = $(`<div class="nln-toast open ${toastTheme}"></div>`);
+    open(message: string, toastTheme: ToastTheme, toastDuration: number | null = 5000): void {
+        const toastDiv = $(`<div class="${styles['toast']} ${styles['open']} ${styles[toastTheme]}"></div>`);
         toastDiv.css('animation-duration', formatCSSDuration(this.openCloseDuration));
         {
-            const toastContent = $('<div class="toast-content"></div></div>');
+            const toastContent = $(`<div class="${styles['toast-content']}"></div></div>`);
             {
-                const toastText = $(`<div class="toast-text"><span>${message}</span></div>`);
+                const toastText = $(`<div class="${styles['toast-text']}"><span>${message}</span></div>`);
                 toastContent.append(toastText);
             }
             {
-                const toastCloseWrapper = $('<div class="toast-close-wrapper"></div>');
-                const toastCloseButton = $('<button title="close" class="toast-close-button">X</button>');
+                const toastCloseWrapper = $(`<div class="${styles['toast-close-wrapper']}"></div>`);
+                const toastCloseButton = $(`<button title="close" class="${styles['toast-close-button']}">X</button>`);
                 toastCloseButton.on('click', () => {
                     this.close(toastDiv);
                 });
@@ -34,9 +34,9 @@ export class Toast {
             toastDiv.append(toastContent);
         }
         // Only add progress bar and autoclose if toast has duration
-        if (toastDuration !== undefined) {
-            const toastProgressWrapper = $('<div class="toast-progress-wrapper"></div>');
-            const toastProgress = $('<div class="toast-progress"></div>');
+        if (toastDuration !== null) {
+            const toastProgressWrapper = $(`<div class="${styles['toast-progress-wrapper']}"></div>`);
+            const toastProgress = $(`<div class="${styles['toast-progress']}"></div>`);
             toastProgress.css('animation-delay', formatCSSDuration(this.openCloseDuration));
             toastProgress.css('animation-duration', formatCSSDuration(toastDuration));
             toastProgressWrapper.append(toastProgress);
@@ -51,8 +51,8 @@ export class Toast {
     }
 
     close(toastDiv: JQuery<HTMLElement>): void {
-        toastDiv.removeClass('open');
-        toastDiv.addClass('close');
+        toastDiv.removeClass(styles['open']);
+        toastDiv.addClass(styles['close']);
         window.setTimeout(() => {
             toastDiv.remove();
         }, this.openCloseDuration);

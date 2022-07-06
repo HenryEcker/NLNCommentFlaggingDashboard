@@ -2,8 +2,7 @@ import {InputFieldConfig, SelectFieldConfig, SettingsUI} from '../Settings/Setti
 import {PostType} from '../../Types';
 import {useEffect, useId, useState} from 'react';
 import {ConfigurableSettings} from './DashboardTypes';
-
-const settingElemContainer = 'nln-setting-elem-container';
+import styles from './FlaggingDashboard.module.scss';
 
 
 const SettingSlider = (
@@ -29,7 +28,7 @@ const SettingSlider = (
     }, [configurableSettings[settingKey]]);
 
     return (
-        <div className={settingElemContainer}>
+        <div className={styles['setting-elem-container']}>
             <label htmlFor={id} className={'s-label fw-normal'}>
                 {textLabel}
             </label>
@@ -74,7 +73,7 @@ const SettingSelect = (
     const settingConfig = settings.getConfigProfile(settingKey) as SelectFieldConfig;
     const id = useId();
     return (
-        <div className={settingElemContainer}>
+        <div className={styles['setting-elem-container']}>
             <label htmlFor={id} className={'s-label fw-normal'}>{textLabel}</label>
             <div className={'s-select'}>
                 <select
@@ -116,7 +115,7 @@ const SettingCheckbox = (
     const value = configurableSettings[settingKey];
     const id = useId();
     return (
-        <div className={settingElemContainer}>
+        <div className={styles['setting-elem-container']}>
             <label htmlFor={id} className={'s-label fw-normal'}>{textLabel}</label>
             <input
                 id={id}
@@ -143,7 +142,7 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
 }): JSX.Element => {
 
     return (
-        <div className={'nln-dashboard-settings-container'}>
+        <div className={styles['dashboard-settings-container']}>
             <SettingSlider settings={settings}
                            configurableSettings={configurableSettings}
                            setConfigurableSettings={setConfigurableSettings}

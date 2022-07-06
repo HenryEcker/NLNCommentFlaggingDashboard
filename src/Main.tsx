@@ -197,11 +197,11 @@ function UserScript(): void {
         const fkey = StackExchange.options.user.fkey;
 
         // Create Toaster for custom Toast Messages
-        const toaster = new Toast('NLN-Toast-Container');
+        const toaster = new Toast('nln-toast-container');
 
         // Build UI
         const container = document.createElement('div');
-        container.id = 'nln-comment-wrapper';
+        container.id = 'nln-dashboard-mount-point';
         $('#mainbar').before(container);
 
         const dashboardCommentDisplaySettings = (

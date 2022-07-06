@@ -10,7 +10,6 @@ import {
     PostType,
     RatedLimitedError
 } from '../../Types';
-import './FlaggingDashboard.scss';
 import DashboardSettingsComponent from './DashboardSettingsComponent';
 import DashboardCommentTable from './DashboardCommentTable';
 import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from '../../Utils';
@@ -20,6 +19,7 @@ import DashboardCommentManagementControls from './DashboardCommentManagementCont
 import DashboardHeader from './DashboardHeader';
 import globalFlagQueue from './FlagQueue/FlagQueue';
 import {ConfigurableSettings, FlaggingDashboardProps, TableData} from './DashboardTypes';
+import styles from './FlaggingDashboard.module.scss';
 
 
 const postTypeFilter = (configPostType: PostType, postType: PostType): boolean => {
@@ -287,7 +287,7 @@ const FlaggingDashboard = (
     }, [settings, tableData]);
 
     return (
-        <>
+        <div className={styles['comment-wrapper']}>
             <DashboardHeader totalComments={Object.keys(tableData).length}
                              shouldDisplayTotal={settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') as boolean}
             />
@@ -306,7 +306,7 @@ const FlaggingDashboard = (
                                    handleRemoveComment={handleRemoveComment}
                                    handlePinComment={handlePinComment}
             />
-        </>
+        </div>
     );
 };
 

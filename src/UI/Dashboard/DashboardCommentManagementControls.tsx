@@ -8,7 +8,7 @@ const DashboardCommentManagementControls = ({setTableData, shouldRenderRow, rema
     remainingFlagCount: number | undefined;
 }): JSX.Element => {
     return (
-        <div className={'nln-comment-management-toolbar d-flex gs8 gsx ai-center'}>
+        <div className={'d-flex gs8 gsx ai-center'}>
             <button className={'s-btn s-btn__primary'}
                     onClick={ev => {
                         ev.preventDefault();

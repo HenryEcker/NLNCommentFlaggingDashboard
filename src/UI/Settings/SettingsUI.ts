@@ -1,4 +1,4 @@
-import './Settings.scss';
+import styles from './Settings.module.scss';
 
 export type ValueType = string | number | boolean;
 
@@ -152,7 +152,7 @@ export class SettingsUI {
     }
 
     private buildFieldRow(fieldName: string, fieldOptions: InputFieldConfig | SelectFieldConfig): JQuery<HTMLElement> {
-        const row = $('<div class="nln-field-row"></div>');
+        const row = $(`<div class="${styles['field-row']}"></div>`);
         const fieldId = `${this.config.id}_${fieldName}`;
         const label = $(`<label id="${fieldId}_label" for="${fieldId}">${fieldOptions.label}</label>`);
         row.append(label);
@@ -167,9 +167,9 @@ export class SettingsUI {
     }
 
     private buildHeaderUI(): JQuery<HTMLElement> {
-        const header: JQuery<HTMLElement> = $('<div class="nln-config-header"></div>');
-        header.append($(`<span class="nln-header-text">${this.config.title}</span>`));
-        const closeButton = $('<button class="nln-config-close-button" title="close this popup (or hit Esc)">×</button>');
+        const header: JQuery<HTMLElement> = $(`<div class="${styles['config-header']}"></div>`);
+        header.append($(`<span class="${styles['header-text']}">${this.config.title}</span>`));
+        const closeButton = $(`<button class="${styles['config-close-button']}" title="close this popup (or hit Esc)">×</button>`);
         closeButton.on('click', () => {
             this.close();
         });
@@ -189,7 +189,7 @@ export class SettingsUI {
             form.append(fieldset);
         });
         // Form Buttons
-        const formButtonWrapper = $('<div class="nln-config-buttons"></div>');
+        const formButtonWrapper = $(`<div class="${styles['config-buttons']}"></div>`);
         const saveButton = $(`<button class="${this.SO.CSS.buttonPrimary}" type="submit" title="save the current settings and reload the page">Save and Reload</button>`);
         const revertButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="button" title="revert any changes to the last save point">Revert Changes</button>`);
         const resetButton = $(`<button class="${this.SO.CSS.buttonGeneral}" type="reset" title="reset all values to their defaults">Reset to default</button>`);
@@ -229,8 +229,8 @@ export class SettingsUI {
 
     private buildUI(): void {
         this.mountPoint.empty();
-        const fullScreenModalContainer = $('<div class="nln-config-modal-background"></div>');
-        const modalContainer = $('<div class="nln-config-modal"></div>');
+        const fullScreenModalContainer = $(`<div class="${styles['config-modal-background']}"></div>`);
+        const modalContainer = $(`<div class="${styles['config-modal']}"></div>`);
 
         // Header
         modalContainer.append(this.buildHeaderUI());
