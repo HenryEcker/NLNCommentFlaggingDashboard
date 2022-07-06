@@ -4,12 +4,12 @@ type FlagQueueEntry = () => Promise<void>;
 
 class FlagQueue {
     private readonly queue: FlagQueueEntry[];
-    private readonly flagRateLimit: number;
+    private readonly queueDelay: number;
     private handlerIsActive: boolean;
 
-    constructor(flagRateLimit: number) {
+    constructor(queueDelay: number) {
         this.queue = [];
-        this.flagRateLimit = flagRateLimit; // in ms
+        this.queueDelay = queueDelay; // in ms
         this.handlerIsActive = false;
     }
 
@@ -31,7 +31,7 @@ class FlagQueue {
                     this.handlerIsActive = true;
                     setTimeout(() => {
                         this.handleQueue();
-                    }, this.flagRateLimit);
+                    }, this.queueDelay);
                 });
             }
         } else {
@@ -41,6 +41,7 @@ class FlagQueue {
     };
 }
 
-const globalFlagQueue = Object.freeze(new FlagQueue(flagRateLimit));
+const globalFlagQueue = new FlagQueue(flagRateLimit);
+Object.freeze(FlagQueue);
 
 export default globalFlagQueue;
