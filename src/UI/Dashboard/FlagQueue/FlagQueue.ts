@@ -18,21 +18,20 @@ class FlagQueue {
         // Prevents multiple instances of handleQueue from running
         if (!this.handlerIsActive) {
             this.handlerIsActive = true;
-            this.handleQueue();
+            void this.handleQueue();
         }
     };
 
-    handleQueue = () => {
+    handleQueue = async () => {
         if (this.queue.length > 0) {
             this.handlerIsActive = true;
             const cb = this.queue.shift();
             if (cb !== undefined) {
-                cb().finally(() => {
+                await cb();
+                setTimeout(() => {
                     this.handlerIsActive = true;
-                    setTimeout(() => {
-                        this.handleQueue();
-                    }, this.queueDelay);
-                });
+                    void this.handleQueue();
+                }, this.queueDelay);
             }
         } else {
             this.handlerIsActive = false;
