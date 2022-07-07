@@ -211,8 +211,8 @@ const FlaggingDashboard = (
      * Determine if row should be rendered or not
      */
     const shouldRenderRow = useCallback((comment: Comment): boolean => {
-        // Pinned comments should always render
-        if (comment.pinned === true) {
+        // Pinned/queued comments should always render
+        if (comment?.pinned === true || comment?.enqueued === true) {
             return true;
         }
         return postTypeFilter(configurableSettings.POST_TYPE, comment.post_type) &&
@@ -226,6 +226,14 @@ const FlaggingDashboard = (
      */
     const handleRemoveComment = useCallback((commentId: number) => {
         setTableData(oldTableData => {
+            if (oldTableData[commentId]?.enqueued === true) {
+                toaster.open(
+                    'Comments that are queued cannot be cleared',
+                    'error',
+                    3000
+                );
+                return oldTableData;
+            }
             const newTableData = {...oldTableData};
             delete newTableData[commentId];
             return newTableData;

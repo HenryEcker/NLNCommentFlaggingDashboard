@@ -98,7 +98,7 @@ const DashboardCommentTable = ({
                                                onChange={ev => {
                                                    handlePinComment(comment._id, ev.target.checked);
                                                }}
-                                               checked={comment.pinned === true}
+                                               checked={comment?.pinned === true}
                                         />
                                     </td>
                                 }

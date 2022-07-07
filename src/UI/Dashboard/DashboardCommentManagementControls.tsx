@@ -12,9 +12,15 @@ const DashboardCommentManagementControls = ({setTableData, shouldRenderRow, rema
             <button className={'s-btn s-btn__primary'}
                     onClick={ev => {
                         ev.preventDefault();
-                        // Remove All Values
-                        setTableData(() => {
-                            return {};
+                        // Remove All Values (Enqueued values cannot be removed)
+                        setTableData(oldTableData => {
+                            const newTableData: TableData = {};
+                            for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
+                                if (comment?.enqueued === true) {
+                                    newTableData[commentId] = {...comment};
+                                }
+                            }
+                            return newTableData;
                         });
                         ev.currentTarget.blur();
                     }}>
