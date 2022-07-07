@@ -157,7 +157,6 @@ const FlaggingDashboard = (
             if (comments.length > 0) {
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
-                const batch = new Date().getTime();
                 setTableData(oldTableData => {
                     return {
                         ...oldTableData,
@@ -189,7 +188,6 @@ const FlaggingDashboard = (
                                 _id: currComment.comment_id,
                                 post_id: currComment.post_id,
                                 post_type: currComment.post_type,
-                                batch_timestamp: batch,
                                 blacklist_matches: blacklistMatches,
                                 whitelist_matches: decodedMarkdown.match(whitelist) || [],
                                 noise_ratio: noiseRatio

@@ -84,7 +84,7 @@ const DashboardCommentTable = ({
                 Object.values(tableData)
                     .filter(shouldRenderRow)
                     .sort((a: Comment, b: Comment): number => {
-                        return a.batch_timestamp - b.batch_timestamp || a.post_id - b.post_id || a._id - b._id;
+                        return a.post_id - b.post_id || a._id - b._id;
                     })
                     .map((comment: Comment, index: number) => {
                         return (
