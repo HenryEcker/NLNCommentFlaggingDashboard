@@ -291,7 +291,7 @@ const FlaggingDashboard = (
             }
             document.title = title;
         }
-    }, [settings, tableData]);
+    }, [settings, shouldRenderRow, tableData]);
 
     return (
         <div className={styles['comment-wrapper']}>

@@ -1,6 +1,6 @@
 {
   "name": "nln-comment-flagging-dashboard",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "author": "Henry Ecker (https://github.com/HenryEcker)",
   "description": "Find comments which may potentially be no longer needed and place them in a convenient flagging dashboard",
   "repository": {
@@ -11,7 +11,7 @@
   },
   "scripts": {
     "lint": "eslint src",
-    "build-scss-types": "typed-scss-modules src -n none -e default --banner \"/* eslint-disable @typescript-eslint/consistent-type-definitions */\"",
+    "build-scss-types": "typed-scss-modules src -n none -e default --banner \"/* eslint-disable @typescript-eslint/consistent-type-definitions */\" --updateStaleOnly",
     "build": "npm run lint && npm run build-scss-types && webpack"
   },
   "devDependencies": {
