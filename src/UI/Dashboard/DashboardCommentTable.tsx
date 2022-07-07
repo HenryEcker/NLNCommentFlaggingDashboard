@@ -65,7 +65,7 @@ const DashboardCommentTable = ({
         <table className={'s-table'}>
             <thead>
             <tr>
-                {displaySettings['UI_DISPLAY_PIN_COMMENT'] && <th>🖈</th>}
+                {displaySettings['UI_DISPLAY_PIN_COMMENT'] && <th>Pin</th>}
                 <th>Comment Text</th>
                 {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <th>Author</th>}
                 {displaySettings['UI_DISPLAY_POST_TYPE'] && <th>Post Type</th>}
