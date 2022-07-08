@@ -7,7 +7,7 @@ const DashboardHeader = ({totalComments, shouldDisplayTotal}: {
             <h2>NLN Comment Flagging Dashboard
                 {
                     shouldDisplayTotal &&
-                    <span title={'Total Number of Comments (without filters)'}> ({totalComments})</span>
+                        <>&nbsp;<span title={'Total Number of Comments (without filters)'}>({totalComments})</span></>
                 }
             </h2>
         </div>

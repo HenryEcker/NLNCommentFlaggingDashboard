@@ -1,14 +1,13 @@
-import {StackExchange} from './Types';
 import FlaggingDashboard from './UI/Dashboard/FlaggingDashboard';
 import {Toast} from './UI/Toast/Toast';
 import {SettingsUI} from './UI/Settings/SettingsUI';
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {DashboardCommentTableDisplaySettings} from './UI/Dashboard/DashboardTypes';
+import {StackExchangeAPI} from './Types';
 
 
-declare const StackExchange: StackExchange;
-
+declare const StackExchange: StackExchangeAPI;
 
 function UserScript(): void {
     const settingMountPoint = $('<div id="nln-flagging-dashboard-settings-modal"></div>');

@@ -67,11 +67,25 @@ export interface SECommentAPIResponse extends SEAPIResponseWrapper {
     items: APIComment[];
 }
 
-export interface StackExchange {
+/**
+ * Modal Options can have:
+ *   - title OR titleHtml but not both [required]
+ *   - body OR bodyHtml but not both [required]
+ *   - neither buttonLabel NOR buttonLabelHtml [optional] OR either buttonLabel OR buttonLabelHtml but not both
+ */
+type ShowConfirmModalOptions =
+    ({ title: string; titleHtml?: never; } | { title?: never; titleHtml: string; })
+    & ({ body: string; bodyHtml?: never; } | { body?: never; bodyHtml: string; })
+    & ({ buttonLabel?: string; buttonLabelHtml?: never; } | { buttonLabel?: never; buttonLabelHtml: string; });
+
+export interface StackExchangeAPI {
     options: {
         user: {
             fkey: string;
         };
+    };
+    helpers: {
+        showConfirmModal: (options: ShowConfirmModalOptions) => Promise<boolean>;
     };
 }
 

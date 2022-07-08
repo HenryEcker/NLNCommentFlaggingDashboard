@@ -1,7 +1,21 @@
-import {Comment} from '../../Types';
+import {Comment, StackExchangeAPI} from '../../Types';
 import {capitalise, displayFormatRegExpMatchArray, formatPercentage} from '../../Utils';
 import {DashboardCommentTableDisplaySettings, TableData} from './DashboardTypes';
 
+declare const StackExchange: StackExchangeAPI;
+
+
+const DashboardPinTh = ({numberOfPinnedComments}: {
+    numberOfPinnedComments: number;
+}): JSX.Element => {
+    return (
+        <th>Pin&nbsp;<span
+            title={`There ${numberOfPinnedComments === 1 ? 'is' : 'are'} ${numberOfPinnedComments} comment${numberOfPinnedComments === 1 ? '' : 's'} pinned.`}>
+            ({numberOfPinnedComments})
+        </span>
+        </th>
+    );
+};
 
 const DashboardFlagButton = ({comment, handleEnqueueComment}: {
     comment: Comment;
@@ -65,7 +79,9 @@ const DashboardCommentTable = ({
         <table className={'s-table'}>
             <thead>
             <tr>
-                {displaySettings['UI_DISPLAY_PIN_COMMENT'] && <th>Pin</th>}
+                {displaySettings['UI_DISPLAY_PIN_COMMENT'] &&
+                    <DashboardPinTh numberOfPinnedComments={Object.values(tableData).filter(c => c?.pinned).length}/>
+                }
                 <th>Comment Text</th>
                 {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <th>Author</th>}
                 {displaySettings['UI_DISPLAY_POST_TYPE'] && <th>Post Type</th>}
@@ -151,7 +167,19 @@ const DashboardCommentTable = ({
                                         title={'Click to remove this comment from the Dashboard.'}
                                         onClick={ev => {
                                             ev.preventDefault();
-                                            handleRemoveComment(comment._id);
+                                            if (comment?.pinned === true) {
+                                                void StackExchange.helpers.showConfirmModal(
+                                                    {
+                                                        title: 'Clear pinned comment',
+                                                        bodyHtml: '<span>The comment you are trying to clear is currently pinned. <br/> Are you sure you want to unpin and clear it (this cannot be undone)?</span>',
+                                                        buttonLabel: 'Clear Comment',
+                                                    }
+                                                ).then((confirm: boolean) => {
+                                                    if (confirm) {
+                                                        handleRemoveComment(comment._id);
+                                                    }
+                                                });
+                                            }
                                         }}>
                                         Clear
                                     </button>
