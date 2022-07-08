@@ -8,9 +8,10 @@ declare const StackExchange: StackExchangeAPI;
 const DashboardPinTh = ({numberOfPinnedComments}: {
     numberOfPinnedComments: number;
 }): JSX.Element => {
+    const isSingular = numberOfPinnedComments === 1;
     return (
         <th>Pin&nbsp;<span
-            title={`There ${numberOfPinnedComments === 1 ? 'is' : 'are'} ${numberOfPinnedComments} comment${numberOfPinnedComments === 1 ? '' : 's'} pinned.`}>
+            title={`There ${isSingular ? 'is' : 'are'} ${numberOfPinnedComments} comment${isSingular ? '' : 's'} pinned.`}>
             ({numberOfPinnedComments})
         </span>
         </th>
@@ -179,6 +180,8 @@ const DashboardCommentTable = ({
                                                         handleRemoveComment(comment._id);
                                                     }
                                                 });
+                                            } else {
+                                                handleRemoveComment(comment._id);
                                             }
                                         }}>
                                         Clear
