@@ -2,10 +2,10 @@ import {useCallback, useEffect, useState} from 'react';
 import {
     AlreadyDeletedError,
     AlreadyFlaggedError,
-    APIComment,
     Comment,
     CommentFlagResult,
     FlagAttemptFailed,
+    IndexedAPIComment,
     OutOfFlagsError,
     PostType,
     RatedLimitedError
@@ -149,7 +149,7 @@ const FlaggingDashboard = (
         const seenCommentIds = new Set<number>();
         const pullDownComments = async () => {
             const toDate = Math.floor(getCurrentTimestamp() / 1000);
-            const comments: APIComment[] = await getComments(
+            const comments: IndexedAPIComment[] = await getComments(
                 authStr,
                 lastSuccessfulRead,
                 toDate
@@ -190,7 +190,9 @@ const FlaggingDashboard = (
                                 post_type: currComment.post_type,
                                 blacklist_matches: blacklistMatches,
                                 whitelist_matches: decodedMarkdown.match(whitelist) || [],
-                                noise_ratio: noiseRatio
+                                noise_ratio: noiseRatio,
+                                postCommentIndex: currComment.postCommentIndex,
+                                totalPostComments: currComment.totalCommentPosts
                             };
                             return acc;
                         }, {} as TableData)

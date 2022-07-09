@@ -85,7 +85,7 @@ TRE(
     // please upvote
     /\b(?:please(?:\s+\w+)*\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?\b/,
     // is/should be the correct/accepted/right/best answer
-    /\b(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted|best)(?:\s+\w+)*\s+(?:answer|solution)\b/,
+    /\b(?:is|should be)(?:\s+\w+)*\s+(?:right|correct|accepted|best|top)(?:\s+\w+)*\s+(?:answer|solution)\b/,
     // this is [by far] the best answer/ this is a superior answer
     /\b(this\s+is\s+)?((by|the|a)\s+)?(far\s+)?(the\s+)?(best(est)?|great(est)?|awesome(st)?|superior)\s+(answer|solution)\b/,
     // /help/someone-answer or /help/accepted-answer

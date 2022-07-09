@@ -2,9 +2,9 @@ import {getFormDataFromObject, getURLSearchParamsFromObject} from './Utils';
 import {
     AlreadyDeletedError,
     AlreadyFlaggedError,
-    APIComment,
     CommentFlagResult,
     FlagAttemptFailed,
+    IndexedAPIComment,
     OutOfFlagsError,
     RatedLimitedError,
     SECommentAPIResponse,
@@ -47,14 +47,14 @@ async function getCommentsFromPostIds(
     AUTH_STR: string,
     pageSize: number,
     postIds: number[]
-): Promise<APIComment[]> {
+): Promise<IndexedAPIComment[]> {
     // Get all comments on the corresponding posts
-    let data: APIComment[] = [];
+    let data: IndexedAPIComment[] = [];
     const postUsp = getURLSearchParamsFromObject({
         'pagesize': pageSize,
         'order': 'desc',
         'sort': 'creation',
-        'filter': '!)Q0(FwiCnnAsjPFGXySB9-eM',
+        'filter': '!B8mctK08QdxNYO2U*fwtj6Igw_7BDr',
         'page': 1,
     });
     let hasMore: boolean;
@@ -62,9 +62,27 @@ async function getCommentsFromPostIds(
         postUsp.set('page', '1');
         hasMore = true;
         while (hasMore) {
-            const res = await fetch(`https://api.stackexchange.com/2.3/posts/${postIds.slice(i, i + pageSize).join(';')}/comments?${postUsp.toString()}&${AUTH_STR}`);
+            const res = await fetch(`https://api.stackexchange.com/2.3/posts/${postIds.slice(i, i + pageSize).join(';')}?${postUsp.toString()}&${AUTH_STR}`);
             const resData: SECommentAPIResponse = await res.json();
-            data = [...data, ...resData.items];
+            if (resData.items.length > 0) {
+                data = [
+                    ...data,
+                    ...resData.items.reduce((acc, post) => {
+
+                        const totalComments = post.comments.length;
+                        return [
+                            ...acc,
+                            ...post.comments.map((c, i) => {
+                                return {
+                                    ...c,
+                                    postCommentIndex: i + 1,
+                                    totalCommentPosts: totalComments
+                                };
+                            })
+                        ];
+                    }, [] as IndexedAPIComment[])
+                ];
+            }
             hasMore = resData.has_more;
             postUsp.set('page', (resData.page + 1).toString()); // Move to next page
         }
@@ -85,7 +103,7 @@ export async function getComments(
     AUTH_STR: string,
     FROM_DATE: number,
     TO_DATE: number | undefined = undefined
-): Promise<APIComment[]> {
+): Promise<IndexedAPIComment[]> {
     const pageSize = 100;
     const postIdSet: Set<number> = await getActiveComments(AUTH_STR, FROM_DATE, TO_DATE, pageSize);
     return await getCommentsFromPostIds(AUTH_STR, pageSize, [...postIdSet]);

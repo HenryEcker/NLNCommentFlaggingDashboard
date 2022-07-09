@@ -86,8 +86,9 @@ const DashboardCommentTable = ({
                 <th>Comment Text</th>
                 {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <th>Author</th>}
                 {displaySettings['UI_DISPLAY_POST_TYPE'] && <th>Post Type</th>}
-                {displaySettings['UI_DISPLAY_POST_ID'] && <th>Post ID</th>}
-                {displaySettings['UI_DISPLAY_LINK_TO_COMMENT'] && <th>Link</th>}
+                {displaySettings['UI_DISPLAY_POST_ID'] && <th>Post Link</th>}
+                {displaySettings['UI_DISPLAY_POST_INDEX'] && <th>Comment No.</th>}
+                {displaySettings['UI_DISPLAY_LINK_TO_COMMENT'] && <th>Comment Link</th>}
                 {displaySettings['UI_DISPLAY_BLACKLIST_MATCHES'] && <th>Blacklist Matches</th>}
                 {displaySettings['UI_DISPLAY_WHITELIST_MATCHES'] && <th>Whitelist Matches</th>}
                 {displaySettings['UI_DISPLAY_NOISE_RATIO'] && <th>Noise Ratio</th>}
@@ -137,6 +138,8 @@ const DashboardCommentTable = ({
                                         {comment.post_id}
                                     </a>
                                 </td>}
+                                {displaySettings['UI_DISPLAY_POST_INDEX'] &&
+                                    <td>{comment.postCommentIndex}/{comment.totalPostComments}</td>}
                                 {displaySettings['UI_DISPLAY_LINK_TO_COMMENT'] && <td>
                                     <a href={comment.link}
                                        target={'_blank'}

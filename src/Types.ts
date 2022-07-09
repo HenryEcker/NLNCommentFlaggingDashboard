@@ -13,6 +13,8 @@ export interface Comment {
     whitelist_matches: RegExpMatchArray;
     noise_ratio: number;
     can_flag: boolean;
+    postCommentIndex: number;
+    totalPostComments: number;
     was_flagged?: boolean;
     was_deleted?: boolean;
     enqueued?: boolean;
@@ -50,6 +52,11 @@ export interface APIComment {
     body: string;
 }
 
+export interface IndexedAPIComment extends APIComment {
+    postCommentIndex: number;
+    totalCommentPosts: number;
+}
+
 export interface SEAPIResponseWrapper {
     has_more: boolean;
     quota_max: number;
@@ -63,8 +70,14 @@ export interface SECommentIDOnlyResponse extends SEAPIResponseWrapper {
     }[];
 }
 
+export interface SEAPIPostWithComments {
+    post_id: number;
+    last_activity_date: Date;
+    comments: APIComment[];
+}
+
 export interface SECommentAPIResponse extends SEAPIResponseWrapper {
-    items: APIComment[];
+    items: SEAPIPostWithComments[];
 }
 
 /**

@@ -132,6 +132,11 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'UI_DISPLAY_POST_INDEX': {
+                        'label': 'Show comment order and number of comments on the Post: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                     'UI_DISPLAY_LINK_TO_COMMENT': {
                         'label': 'Display Link to Comment: ',
                         'type': 'checkbox',
@@ -214,7 +219,8 @@ function UserScript(): void {
                 'UI_DISPLAY_WHITELIST_MATCHES',
                 'UI_DISPLAY_NOISE_RATIO',
                 'UI_DISPLAY_FLAG_BUTTON',
-                'UI_DISPLAY_COMMENT_DELETE_STATE'
+                'UI_DISPLAY_COMMENT_DELETE_STATE',
+                'UI_DISPLAY_POST_INDEX'
             ] as (keyof DashboardCommentTableDisplaySettings)[]
         ).reduce((acc, v) => {
             acc[v] = settings.get(v) as boolean;

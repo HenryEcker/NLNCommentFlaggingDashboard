@@ -27,6 +27,7 @@ export interface DashboardCommentTableDisplaySettings {
     UI_DISPLAY_COMMENT_OWNER: boolean;
     UI_DISPLAY_POST_TYPE: boolean;
     UI_DISPLAY_POST_ID: boolean;
+    UI_DISPLAY_POST_INDEX: boolean;
     UI_DISPLAY_LINK_TO_COMMENT: boolean;
     UI_DISPLAY_BLACKLIST_MATCHES: boolean;
     UI_DISPLAY_WHITELIST_MATCHES: boolean;

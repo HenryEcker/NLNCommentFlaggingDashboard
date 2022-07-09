@@ -46,9 +46,10 @@ const SettingSlider = (
                    }}
                    onMouseUp={ev => {
                        setConfigurableSettings(oldConfigurableSettings => {
-                           const newValue = Number((ev.target as HTMLInputElement).value);
-                           settings.set(settingKey, newValue);
-                           return {...oldConfigurableSettings, [settingKey]: newValue};
+                           return {
+                               ...oldConfigurableSettings,
+                               [settingKey]: Number((ev.target as HTMLInputElement).value)
+                           };
                        });
                    }}
             />
@@ -175,7 +176,6 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
                 onClick={ev => {
                     ev.preventDefault();
                     setConfigurableSettings(() => {
-                        settings.reload();
                         return {
                             DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
                             MAXIMUM_LENGTH_COMMENT: settings.get('MAXIMUM_LENGTH_COMMENT') as number,
