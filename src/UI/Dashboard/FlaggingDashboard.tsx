@@ -268,7 +268,11 @@ const FlaggingDashboard = (
             // Update Table Data to show as enqueued
             return {
                 ...oldTableData,
-                [commentId]: {...oldTableData[commentId], enqueued: true}
+                [commentId]: {
+                    ...oldTableData[commentId],
+                    enqueued: true,
+                    pinned: true // Also pin so that it stays visible in dashboard
+                }
             };
         });
     }, [setTableData]);
