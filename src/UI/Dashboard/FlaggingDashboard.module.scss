@@ -22,3 +22,55 @@
     }
   }
 }
+
+.modal-dashboard-wrapper {
+  // Fixed Full Window Size
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  // Same level as all other SO modals
+  z-index: var(--zi-modals);
+  // Center the wrapper in the window
+  display: flex;
+  justify-content: center;
+
+  .modal-content {
+    $background-color: var(--white);
+    @media (prefers-color-scheme: dark) {
+      $background-color: var(--black-100);
+    }
+    display: grid;
+    grid-template-rows: min-content 1fr;
+    box-shadow: var(--bs-sm);
+    background-color: $background-color;
+    padding: 25px;
+    border-radius: 10px;
+    margin: 5% 20%;
+
+    .modal-header {
+      display: grid;
+      grid-template-columns: 1fr min-content;
+
+      .modal-header-text {
+        margin: 4px;
+        font-size: 22pt;
+      }
+    }
+
+    .modal-body {
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .modal-close-button {
+      background: none;
+      border: none;
+      font-size: 24pt;
+      cursor: pointer;
+      color: var(--theme-body-font-color);
+    }
+  }
+}

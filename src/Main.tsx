@@ -127,7 +127,7 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-                    'UI_DISPLAY_POST_ID': {
+                    'UI_DISPLAY_POST_COMMENTS': {
                         'label': 'Display ID of Post the comment is under: ',
                         'type': 'checkbox',
                         'default': true
@@ -213,7 +213,7 @@ function UserScript(): void {
                 'UI_DISPLAY_PIN_COMMENT',
                 'UI_DISPLAY_COMMENT_OWNER',
                 'UI_DISPLAY_POST_TYPE',
-                'UI_DISPLAY_POST_ID',
+                'UI_DISPLAY_POST_COMMENTS',
                 'UI_DISPLAY_LINK_TO_COMMENT',
                 'UI_DISPLAY_BLACKLIST_MATCHES',
                 'UI_DISPLAY_WHITELIST_MATCHES',

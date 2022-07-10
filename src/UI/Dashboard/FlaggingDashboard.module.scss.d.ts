@@ -2,6 +2,12 @@
 export type Styles = {
   'comment-wrapper': string;
   'dashboard-settings-container': string;
+  'modal-body': string;
+  'modal-close-button': string;
+  'modal-content': string;
+  'modal-dashboard-wrapper': string;
+  'modal-header': string;
+  'modal-header-text': string;
   'setting-elem-container': string;
 };
 
