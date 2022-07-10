@@ -113,12 +113,7 @@ function UserScript(): void {
                         'default': true
                     },
                     'UI_DISPLAY_COMMENT_OWNER': {
-                        'label': 'Display User Name of Comment Author',
-                        'type': 'checkbox',
-                        'default': true
-                    },
-                    'UI_DISPLAY_PIN_COMMENT': {
-                        'label': 'Display Checkbox to allow comments to be pinned. (Forces them to stay in dashboard regardless of filters)',
+                        'label': 'Display display name of Comment author and enable comments-by-author modal',
                         'type': 'checkbox',
                         'default': true
                     },
@@ -128,7 +123,7 @@ function UserScript(): void {
                         'default': true
                     },
                     'UI_DISPLAY_POST_COMMENTS': {
-                        'label': 'Display ID of Post the comment is under: ',
+                        'label': 'Display ID of Post the comment is under and enable comments-on-post modal: ',
                         'type': 'checkbox',
                         'default': true
                     },
@@ -210,7 +205,6 @@ function UserScript(): void {
 
         const dashboardCommentDisplaySettings = (
             [
-                'UI_DISPLAY_PIN_COMMENT',
                 'UI_DISPLAY_COMMENT_OWNER',
                 'UI_DISPLAY_POST_TYPE',
                 'UI_DISPLAY_POST_COMMENTS',

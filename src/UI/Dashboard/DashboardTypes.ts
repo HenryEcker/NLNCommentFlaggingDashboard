@@ -23,7 +23,6 @@ export interface FlaggingDashboardProps {
 }
 
 export interface DashboardCommentTableDisplaySettings {
-    UI_DISPLAY_PIN_COMMENT: boolean;
     UI_DISPLAY_COMMENT_OWNER: boolean;
     UI_DISPLAY_POST_TYPE: boolean;
     UI_DISPLAY_POST_COMMENTS: boolean;

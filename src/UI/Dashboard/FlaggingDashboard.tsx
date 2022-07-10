@@ -318,6 +318,7 @@ const FlaggingDashboard = (
                                    handleEnqueueComment={handleEnqueueComment}
                                    handleRemoveComment={handleRemoveComment}
                                    handlePinComment={handlePinComment}
+                                   isModal={false}
             />
         </div>
     );

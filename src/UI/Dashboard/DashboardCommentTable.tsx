@@ -64,25 +64,31 @@ const DashboardDeleteIndicator = ({comment}: { comment: Comment; }): JSX.Element
 
 interface ModalDataType {
     filterFunction: (c: Comment) => boolean;
-    id: number;
     modalHeader: JSX.Element;
+    configurableSettingKey: 'UI_DISPLAY_COMMENT_OWNER' | 'UI_DISPLAY_POST_COMMENTS';
 }
 
-const DashboardCommentTable = ({
-                                   displaySettings,
-                                   tableData,
-                                   shouldRenderRow,
-                                   handleEnqueueComment,
-                                   handleRemoveComment,
-                                   handlePinComment
-                               }: {
+interface DashboardCommentTableProps {
     displaySettings: DashboardCommentTableDisplaySettings;
     tableData: TableData;
     shouldRenderRow: (c: Comment) => boolean;
     handleEnqueueComment: (comment_id: number) => void;
     handleRemoveComment: (comment_id: number) => void;
     handlePinComment: (comment_id: number, pinStatus: boolean) => void;
-}): JSX.Element => {
+    isModal: boolean;
+}
+
+const DashboardCommentTable = (
+    {
+        displaySettings,
+        tableData,
+        shouldRenderRow,
+        handleEnqueueComment,
+        handleRemoveComment,
+        handlePinComment,
+        isModal
+    }: DashboardCommentTableProps
+): JSX.Element => {
 
     const [modalData, setModalData] = useState<ModalDataType | undefined>(undefined);
 
@@ -109,10 +115,8 @@ const DashboardCommentTable = ({
             <table className={'s-table'}>
                 <thead>
                 <tr>
-                    {displaySettings['UI_DISPLAY_PIN_COMMENT'] &&
-                        <DashboardPinTh
-                            numberOfPinnedComments={Object.values(tableData).filter(c => c?.pinned).length}/>
-                    }
+                    <DashboardPinTh
+                        numberOfPinnedComments={Object.values(tableData).filter(c => c?.pinned).length}/>
                     <th>Comment Text</th>
                     {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <th>Author</th>}
                     {displaySettings['UI_DISPLAY_POST_TYPE'] && <th>Post Type</th>}
@@ -137,98 +141,114 @@ const DashboardCommentTable = ({
                         .map((comment: Comment, index: number) => {
                             return (
                                 <tr key={comment._id}>
-                                    {displaySettings['UI_DISPLAY_PIN_COMMENT'] &&
-                                        <td>
-                                            <input type={'checkbox'}
-                                                   className={'s-checkbox'}
-                                                   id={`nln-pin-${comment._id}`}
-                                                   title={`(${index + 1}). Check to pin comment to dashboard (ignores filters)`}
-                                                   onChange={ev => {
-                                                       handlePinComment(comment._id, ev.target.checked);
-                                                   }}
-                                                   checked={comment?.pinned === true}
-                                            />
-                                        </td>
-                                    }
+                                    <td>
+                                        <input type={'checkbox'}
+                                               className={'s-checkbox'}
+                                               id={`nln-pin-${comment._id}`}
+                                               title={`(${index + 1}). Check to pin comment to dashboard (ignores filters)`}
+                                               onChange={ev => {
+                                                   handlePinComment(comment._id, ev.target.checked);
+                                               }}
+                                               checked={comment?.pinned === true}
+                                        />
+                                    </td>
                                     <td>
                                         <span dangerouslySetInnerHTML={{__html: comment.body}}
                                               style={{wordBreak: 'break-word'}}/>
                                     </td>
                                     {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <td>
-                                        <button
-                                            className={'s-btn'}
-                                            onClick={ev => {
-                                                ev.preventDefault();
-                                                setModalData({
-                                                    filterFunction: (c: Comment) => c.owner.account_id === comment.owner.account_id,
-                                                    id: comment.post_id,
-                                                    modalHeader: <>
-                                                        <h1 className={styles['modal-header-text']}>All Comments by <a
-                                                            href={comment.owner.link}
-                                                            target={'_blank'}
-                                                            rel={'noreferrer'}
-                                                            title={'Link to post'}
-                                                        >
+                                        {isModal ?
+                                            <a href={comment.owner.link} target={'_blank'} rel={'noreferrer'}>
+                                                <span dangerouslySetInnerHTML={{__html: comment.owner.display_name}}/>
+                                            </a>
+                                            :
+                                            <button
+                                                className={'s-btn'}
+                                                onClick={ev => {
+                                                    ev.preventDefault();
+                                                    setModalData({
+                                                        filterFunction: (c: Comment) => c.owner.account_id === comment.owner.account_id,
+                                                        configurableSettingKey: 'UI_DISPLAY_COMMENT_OWNER',
+                                                        modalHeader: <>
+                                                            <h1 className={styles['modal-header-text']}>All Comments
+                                                                by <a
+                                                                    href={comment.owner.link}
+                                                                    target={'_blank'}
+                                                                    rel={'noreferrer'}
+                                                                    title={'Link to post'}
+                                                                >
                                                             <span
                                                                 dangerouslySetInnerHTML={{__html: comment.owner.display_name}}/>
-                                                        </a>
-                                                        </h1>
-                                                        <button
-                                                            className={styles['modal-close-button']}
-                                                            title={'close this popup (or hit Esc)'}
-                                                            onClick={ev => {
-                                                                ev.preventDefault();
-                                                                setModalData(undefined);
-                                                            }}
-                                                        >×
-                                                        </button>
-                                                    </>
-                                                });
-                                                ev.currentTarget.blur();
-                                            }}
-                                            title={'Open modal displaying all comments on the post'}
-                                        >
-                                            <span dangerouslySetInnerHTML={{__html: comment.owner.display_name}}/>
-                                        </button>
+                                                                </a>
+                                                            </h1>
+                                                            <button
+                                                                className={styles['modal-close-button']}
+                                                                title={'close this popup (or hit Esc)'}
+                                                                onClick={ev => {
+                                                                    ev.preventDefault();
+                                                                    setModalData(undefined);
+                                                                }}
+                                                            >×
+                                                            </button>
+                                                        </>
+                                                    });
+                                                    ev.currentTarget.blur();
+                                                }}
+                                                title={'Open modal displaying all comments on the post'}
+                                            >
+                                                <span dangerouslySetInnerHTML={{__html: comment.owner.display_name}}/>
+                                            </button>
+                                        }
                                     </td>}
                                     {displaySettings['UI_DISPLAY_POST_TYPE'] && <td>
                                         {capitalise(comment.post_type)}
                                     </td>}
                                     {displaySettings['UI_DISPLAY_POST_COMMENTS'] && <td>
-                                        <button
-                                            className={'s-btn'}
-                                            onClick={ev => {
-                                                ev.preventDefault();
-                                                setModalData({
-                                                    filterFunction: (c: Comment) => c.post_id === comment.post_id,
-                                                    id: comment.post_id,
-                                                    modalHeader: <>
-                                                        <h1 className={styles['modal-header-text']}>All Comments on <a
-                                                            href={`/${comment.post_type === 'question' ? 'q' : 'a'}/${comment.post_id}`}
-                                                            target={'_blank'}
-                                                            rel={'noreferrer'}
-                                                            title={'Link to post'}
-                                                        >
-                                                            {comment.post_id}
-                                                        </a>
-                                                        </h1>
-                                                        <button
-                                                            className={styles['modal-close-button']}
-                                                            title={'close this popup (or hit Esc)'}
-                                                            onClick={ev => {
-                                                                ev.preventDefault();
-                                                                setModalData(undefined);
-                                                            }}
-                                                        >×
-                                                        </button>
-                                                    </>
-                                                });
-                                                ev.currentTarget.blur();
-                                            }}
-                                            title={'Open modal displaying all comments on the post'}
-                                        >
-                                            {comment.post_id}
-                                        </button>
+                                        {isModal ?
+                                            <a href={`/${comment.post_type === 'question' ? 'q' : 'a'}/${comment.post_id}`}
+                                               target={'_blank'}
+                                               rel={'noreferrer'}
+                                               title={'Link to post'}
+                                            >
+                                                {comment.post_id}
+                                            </a>
+                                            :
+                                            <button
+                                                className={'s-btn'}
+                                                onClick={ev => {
+                                                    ev.preventDefault();
+                                                    setModalData({
+                                                        filterFunction: (c: Comment) => c.post_id === comment.post_id,
+                                                        configurableSettingKey: 'UI_DISPLAY_POST_COMMENTS',
+                                                        modalHeader: <>
+                                                            <h1 className={styles['modal-header-text']}>All Comments
+                                                                on <a
+                                                                    href={`/${comment.post_type === 'question' ? 'q' : 'a'}/${comment.post_id}`}
+                                                                    target={'_blank'}
+                                                                    rel={'noreferrer'}
+                                                                    title={'Link to post'}
+                                                                >
+                                                                    {comment.post_id}
+                                                                </a>
+                                                            </h1>
+                                                            <button
+                                                                className={styles['modal-close-button']}
+                                                                title={'close this popup (or hit Esc)'}
+                                                                onClick={ev => {
+                                                                    ev.preventDefault();
+                                                                    setModalData(undefined);
+                                                                }}
+                                                            >×
+                                                            </button>
+                                                        </>
+                                                    });
+                                                    ev.currentTarget.blur();
+                                                }}
+                                                title={'Open modal displaying all comments on the post'}
+                                            >
+                                                {comment.post_id}
+                                            </button>
+                                        }
                                     </td>}
                                     {displaySettings['UI_DISPLAY_POST_INDEX'] &&
                                         <td>{comment.postCommentIndex}/{comment.totalPostComments}</td>}
@@ -300,9 +320,8 @@ const DashboardCommentTable = ({
                                 displaySettings={
                                     {
                                         ...displaySettings,
-                                        // Don't display anything that can open modals inside this view
-                                        UI_DISPLAY_POST_COMMENTS: false,
-                                        UI_DISPLAY_COMMENT_OWNER: false
+                                        // Don't display unneeded column (_e.g._ post id is unneeded when displaying all comments on same post)
+                                        [modalData.configurableSettingKey]: false
                                     }
                                 }
                                 tableData={tableData}
@@ -310,6 +329,7 @@ const DashboardCommentTable = ({
                                 handleEnqueueComment={handleEnqueueComment}
                                 handleRemoveComment={handleRemoveComment}
                                 handlePinComment={handlePinComment}
+                                isModal={true}
                             />
                         </div>
                         <div>
@@ -319,7 +339,10 @@ const DashboardCommentTable = ({
                                         Object.values(tableData)
                                             .filter(modalData.filterFunction)
                                             .forEach((c: Comment) => {
-                                                handleRemoveComment(c._id);
+                                                // Don't clear pinned comments
+                                                if (c.pinned !== true) {
+                                                    handleRemoveComment(c._id);
+                                                }
                                             });
                                         // Close Modal After Clearing
                                         setModalData(undefined);
@@ -331,8 +354,7 @@ const DashboardCommentTable = ({
                 </div>
             }
         </>
-    )
-        ;
+    );
 };
 
 export default DashboardCommentTable;
