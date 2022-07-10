@@ -78,24 +78,24 @@ const DashboardCommentTable = ({
     handlePinComment: (comment_id: number, pinStatus: boolean) => void;
 }): JSX.Element => {
 
-    const [modalPostId, setModalPostId] = useState<number | undefined>(undefined);
+    const [modalPost, setModalPost] = useState<{ postId: number; postType: string; } | undefined>(undefined);
 
     const escapeKeyHandler = useCallback((evt: KeyboardEvent): void => {
         if (evt.key === 'Escape') {
-            setModalPostId(undefined);
+            setModalPost(undefined);
         }
-    }, [setModalPostId]);
+    }, [setModalPost]);
 
     /**
      * Bind.unbind escape handler whether modal is active
      */
     useEffect(() => {
-        if (modalPostId !== undefined) {
+        if (modalPost !== undefined) {
             document.body.addEventListener('keydown', escapeKeyHandler);
         } else {
             document.body.removeEventListener('keydown', escapeKeyHandler);
         }
-    }, [modalPostId]);
+    }, [modalPost]);
 
 
     return (
@@ -158,7 +158,7 @@ const DashboardCommentTable = ({
                                             className={'s-btn'}
                                             onClick={ev => {
                                                 ev.preventDefault();
-                                                setModalPostId(comment.post_id);
+                                                setModalPost({postId: comment.post_id, postType: comment.post_type});
                                             }}
                                             title={'Open modal displaying all comments on the post'}
                                         >
@@ -223,17 +223,25 @@ const DashboardCommentTable = ({
                 }
                 </tbody>
             </table>
-            {modalPostId !== undefined &&
+            {modalPost !== undefined &&
                 <div className={styles['modal-dashboard-wrapper']}>
                     <div className={styles['modal-content']}>
                         <div className={styles['modal-header']}>
-                            <h1 className={styles['modal-header-text']}>All Comments on {modalPostId}</h1>
+                            <h1 className={styles['modal-header-text']}>All Comments on <a
+                                href={`/${modalPost.postType === 'question' ? 'q' : 'a'}/${modalPost.postId}`}
+                                target={'_blank'}
+                                rel={'noreferrer'}
+                                title={'Link to post'}
+                            >
+                                {modalPost.postId}
+                            </a>
+                            </h1>
                             <button
                                 className={styles['modal-close-button']}
                                 title={'close this popup (or hit Esc)'}
                                 onClick={ev => {
                                     ev.preventDefault();
-                                    setModalPostId(undefined);
+                                    setModalPost(undefined);
                                 }}
                             >×
                             </button>
@@ -247,7 +255,7 @@ const DashboardCommentTable = ({
                                     }
                                 }
                                 tableData={tableData}
-                                shouldRenderRow={(c) => c.post_id === modalPostId} // Only filter by post ID nothing else
+                                shouldRenderRow={(c) => c.post_id === modalPost.postId} // Only filter by post ID nothing else
                                 handleEnqueueComment={handleEnqueueComment}
                                 handleRemoveComment={handleRemoveComment}
                                 handlePinComment={handlePinComment}
