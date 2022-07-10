@@ -5,7 +5,7 @@ import {mergeRegexes} from './Utils';
  * Flagging at T=5.1s then flagging again at T=10.4s seems to be rate limited despite being > 5s after the previous flag while flagging at T=11.0s works
  * For the moment, going to flag every 6 seconds to ensure that we're at the next whole second > 5 (not 5000 ms duration) after previous flag
  */
-export const flagRateLimit = 5000 + 1000;
+export const flagRateLimit = 6; // in Seconds
 
 export const blacklist = mergeRegexes([
     // Emojis

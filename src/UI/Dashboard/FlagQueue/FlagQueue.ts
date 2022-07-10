@@ -4,12 +4,12 @@ type FlagQueueEntry = () => Promise<void>;
 
 class FlagQueue {
     private readonly queue: FlagQueueEntry[];
-    private readonly queueDelay: number;
+    private readonly queueDelayInSeconds: number;
     private handlerIsActive: boolean;
 
     constructor(queueDelay: number) {
         this.queue = [];
-        this.queueDelay = queueDelay; // in ms
+        this.queueDelayInSeconds = queueDelay; // in seconds
         this.handlerIsActive = false;
     }
 
@@ -28,10 +28,18 @@ class FlagQueue {
             const cb = this.queue.shift();
             if (cb !== undefined) {
                 await cb();
+                const nextTime = new Date();
+                // setSeconds does wrap appropriately
+                nextTime.setSeconds(nextTime.getSeconds() + this.queueDelayInSeconds);
                 setTimeout(() => {
-                    this.handlerIsActive = true;
-                    void this.handleQueue();
-                }, this.queueDelay);
+                        this.handlerIsActive = true;
+                        void this.handleQueue();
+                    },
+                    Math.max(
+                        nextTime.getTime() - new Date().getTime(), // Calculate the distance to next run time
+                        50 // (ensure minimum delay in case bad things happen)
+                    )
+                );
             }
         } else {
             this.handlerIsActive = false;
