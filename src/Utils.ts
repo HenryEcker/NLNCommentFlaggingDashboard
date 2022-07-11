@@ -1,4 +1,13 @@
 /**
+ * Create a sleep promise which can be awaited or chained to add delay to function
+ *
+ * @param ms Number of ms to delay
+ */
+export function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Converts an array of distinct RegExp and joins them together using OR (|)
  *
  * @param {RegExp[]} arrRegex Array of RegExp that will be ORed (|) together

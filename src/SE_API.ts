@@ -1,4 +1,4 @@
-import {getFormDataFromObject, getURLSearchParamsFromObject} from './Utils';
+import {getFormDataFromObject, getURLSearchParamsFromObject, sleep} from './Utils';
 import {
     AlreadyDeletedError,
     AlreadyFlaggedError,
@@ -39,6 +39,9 @@ async function getActiveComments(
         });
         hasMore = resData.has_more;
         commentIdUsp.set('page', (resData.page + 1).toString()); // Move to next page
+        if (hasMore) {
+            await sleep(75); // Don't overwhelm the API with requests
+        }
     }
     return postIdSet;
 }
@@ -85,6 +88,9 @@ async function getCommentsFromPostIds(
             }
             hasMore = resData.has_more;
             postUsp.set('page', (resData.page + 1).toString()); // Move to next page
+            if (hasMore) {
+                await sleep(75); // Don't overwhelm the API with requests
+            }
         }
     }
     return data;
