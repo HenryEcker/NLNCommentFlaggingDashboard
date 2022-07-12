@@ -13,6 +13,7 @@
   justify-content: center;
 
   .modal-content {
+    $radius: 10px;
     $background-color: var(--white);
     @media (prefers-color-scheme: dark) {
       $background-color: var(--black-100);
@@ -23,7 +24,7 @@
     box-shadow: var(--bs-sm);
     background-color: $background-color;
     padding: 25px;
-    border-radius: 10px;
+    border-radius: $radius;
     margin: 5% 0;
     // SO's #content width calculation and limit
     width: calc(100% - 164px);
@@ -42,6 +43,8 @@
     .modal-body {
       height: 100%;
       overflow-y: auto;
+      background-color: var(--theme-background-color);
+      border-radius: $radius;
     }
 
     .modal-close-button {
