@@ -11,7 +11,7 @@
   },
   "scripts": {
     "lint": "eslint src",
-    "build-scss-types": "typed-scss-modules src -n none -e default --banner \"/* eslint-disable @typescript-eslint/consistent-type-definitions */\" --updateStaleOnly",
+    "build-scss-types": "typed-scss-modules src -n none -e default --updateStaleOnly && eslint **/*.module.scss.d.ts --fix",
     "build": "npm run lint && npm run build-scss-types && webpack"
   },
   "devDependencies": {

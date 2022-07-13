@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
-export type Styles = {
-  'comment-wrapper': string;
-  'dashboard-settings-container': string;
-  'setting-elem-container': string;
-};
+export interface Styles {
+    'comment-wrapper': string;
+    'dashboard-settings-container': string;
+    'setting-elem-container': string;
+}
 
 export type ClassNames = keyof Styles;
 
