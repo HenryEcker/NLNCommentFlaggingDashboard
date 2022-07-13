@@ -13,6 +13,8 @@ import {
 } from './Types';
 
 
+const timeBetweenRequests = 150; // in ms
+
 async function getActiveComments(
     AUTH_STR: string,
     FROM_DATE: number,
@@ -40,7 +42,7 @@ async function getActiveComments(
         hasMore = resData.has_more;
         commentIdUsp.set('page', (resData.page + 1).toString()); // Move to next page
         if (hasMore) {
-            await sleep(75); // Don't overwhelm the API with requests
+            await sleep(timeBetweenRequests); // Don't overwhelm the API with requests
         }
     }
     return postIdSet;
@@ -89,7 +91,7 @@ async function getCommentsFromPostIds(
             hasMore = resData.has_more;
             postUsp.set('page', (resData.page + 1).toString()); // Move to next page
             if (hasMore) {
-                await sleep(75); // Don't overwhelm the API with requests
+                await sleep(timeBetweenRequests); // Don't overwhelm the API with requests
             }
         }
     }
