@@ -30,6 +30,11 @@ const postTypeFilter = (configPostType: PostType, postType: PostType): boolean =
     }
 };
 
+const handlePreventPageUnload = (ev: BeforeUnloadEvent): void => {
+    ev.preventDefault();
+    ev.returnValue = '';
+};
+
 
 const FlaggingDashboard = (
     {
@@ -37,6 +42,7 @@ const FlaggingDashboard = (
     }: FlaggingDashboardProps
 ): JSX.Element => {
     const [tableData, setTableData] = useState<TableData>({});
+    const [tableDataSize, setTableDataSize] = useState<number>(0);
     const [configurableSettings, setConfigurableSettings] = useState<ConfigurableSettings>({
         DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
         MAXIMUM_LENGTH_COMMENT: settings.get('MAXIMUM_LENGTH_COMMENT') as number,
@@ -204,8 +210,22 @@ const FlaggingDashboard = (
             void pullDownComments();
         }
         window.setInterval(pullDownComments, apiRequestRate);
-
+        // Prevent accidental navigation away
     }, [settings, apiRequestRate, authStr, setTableData]);
+
+
+    useEffect(() => {
+        // Get Size of Table based on Keys
+        const tds = Object.keys(tableData).length;
+        // Prevent navigation away if there are values in the table
+        if (tds > 0) {
+            window.addEventListener('beforeunload', handlePreventPageUnload);
+        } else {
+            window.removeEventListener('beforeunload', handlePreventPageUnload);
+        }
+        // Update Size Value
+        setTableDataSize(tds);
+    }, [tableData]);
 
     /**
      * Determine if row should be rendered or not
@@ -301,7 +321,7 @@ const FlaggingDashboard = (
 
     return (
         <div className={styles['comment-wrapper']}>
-            <DashboardHeader totalComments={Object.keys(tableData).length}
+            <DashboardHeader totalComments={tableDataSize}
                              shouldDisplayTotal={settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') as boolean}
             />
             <DashboardSettingsComponent settings={settings}
