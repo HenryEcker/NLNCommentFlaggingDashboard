@@ -69,11 +69,11 @@ from trieregex import TrieRegEx as TRE
 TRE(
     'ingenious', 'superb', 'amazing', 'fantastic', 'perfect', 'wonderful',
     'brilliant', 'excellent', 'marvelous', 'awesome', 'bravo', 'elegant',
-    'concise'
+    'concise', 'sexy'
 ).regex()
      */
     // wow has any number of wow so should be |w+o+w+ (should be added at the end of the OR list)
-    /\b(?:e(?:xcellent|legant)|a(?:mazing|wesome)|br(?:illiant|avo)|fantastic|ingenious|marvelous|wonderful|concise|perfect|superb|w+o+w+)\b/,
+    /\b(?:e(?:xcellent|legant)|a(?:mazing|wesome)|br(?:illiant|avo)|s(?:uperb|exy)|fantastic|ingenious|marvelous|wonderful|concise|perfect|w+o+w+)\b/,
     // saviour
     /\b(?:(you(['’]?re?|\s+are|['’]?ve|\s+have)?|this(\s+(wa|i|['’])s)?)\s+)?(?:a\s+life(-|\s+)saver|sav(e|ed|ing)\s+(m[ey]|the|it))(\s+\w+)?\b/,
     // please accept/approve/rate
