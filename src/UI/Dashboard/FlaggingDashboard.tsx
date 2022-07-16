@@ -42,6 +42,7 @@ const FlaggingDashboard = (
     }: FlaggingDashboardProps
 ): JSX.Element => {
     const [tableData, setTableData] = useState<TableData>({});
+    const [seenCommentIds,] = useState<Set<number>>(new Set<number>());
     const [tableDataSize, setTableDataSize] = useState<number>(0);
     const [configurableSettings, setConfigurableSettings] = useState<ConfigurableSettings>({
         DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
@@ -146,13 +147,57 @@ const FlaggingDashboard = (
     }, [setTableData, toaster, pullDownRemainingFlagsFromFlagDialogue, setRemainingFlagCount]);
 
 
+    const processesCommentsAndUpdateTableData = useCallback((comments: IndexedAPIComment[]) => {
+        setTableData(oldTableData => {
+            return {
+                ...oldTableData,
+                ...comments.reduce((acc: TableData, currComment) => {
+                    const hasOwnCommentId = Object.hasOwn(oldTableData, currComment.comment_id);
+                    if (seenCommentIds.has(currComment.comment_id)) {
+                        if (!hasOwnCommentId) {
+                            return acc;
+                        }
+                    } else {
+                        seenCommentIds.add(currComment.comment_id);
+                    }
+
+                    const decodedMarkdown = htmlDecode(currComment.body_markdown) || '';
+                    const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist) || []; // exclude code from analysis
+
+                    const noiseRatio = calcNoiseRatio(
+                        blacklistMatches,
+                        decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
+                    );
+                    acc[currComment.comment_id] = {
+                        ...hasOwnCommentId && oldTableData[currComment.comment_id],
+                        can_flag: currComment.can_flag,
+                        body: currComment.body,
+                        body_markdown: currComment.body_markdown,
+                        body_markdown_length: decodedMarkdown.length,
+                        owner: currComment.owner,
+                        link: currComment.link,
+                        _id: currComment.comment_id,
+                        post_id: currComment.post_id,
+                        post_type: currComment.post_type,
+                        blacklist_matches: blacklistMatches,
+                        whitelist_matches: decodedMarkdown.match(whitelist) || [],
+                        noise_ratio: noiseRatio,
+                        postCommentIndex: currComment.postCommentIndex,
+                        totalPostComments: currComment.totalCommentPosts
+                    };
+                    return acc;
+                }, {} as TableData)
+            };
+        });
+    }, [setTableData, seenCommentIds]);
+
+
     /**
      * Define and start interval to pull down comments
      */
     useEffect(() => {
         // Prime last successful read
         let lastSuccessfulRead: number = Math.floor((getCurrentTimestamp() - apiRequestRate) / 1000);
-        const seenCommentIds = new Set<number>();
         const pullDownComments = async () => {
             const toDate = Math.floor(getCurrentTimestamp() / 1000);
             const comments: IndexedAPIComment[] = await getComments(
@@ -163,47 +208,8 @@ const FlaggingDashboard = (
             if (comments.length > 0) {
                 // Update last successful read time
                 lastSuccessfulRead = toDate + 1;
-                setTableData(oldTableData => {
-                    return {
-                        ...oldTableData,
-                        ...comments.reduce((acc: TableData, currComment) => {
-                            const hasOwnCommentId = Object.hasOwn(oldTableData, currComment.comment_id);
-                            if (seenCommentIds.has(currComment.comment_id)) {
-                                if (!hasOwnCommentId) {
-                                    return acc;
-                                }
-                            } else {
-                                seenCommentIds.add(currComment.comment_id);
-                            }
-
-                            const decodedMarkdown = htmlDecode(currComment.body_markdown) || '';
-                            const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist) || []; // exclude code from analysis
-
-                            const noiseRatio = calcNoiseRatio(
-                                blacklistMatches,
-                                decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
-                            );
-                            acc[currComment.comment_id] = {
-                                ...hasOwnCommentId && oldTableData[currComment.comment_id],
-                                can_flag: currComment.can_flag,
-                                body: currComment.body,
-                                body_markdown: currComment.body_markdown,
-                                body_markdown_length: decodedMarkdown.length,
-                                owner: currComment.owner,
-                                link: currComment.link,
-                                _id: currComment.comment_id,
-                                post_id: currComment.post_id,
-                                post_type: currComment.post_type,
-                                blacklist_matches: blacklistMatches,
-                                whitelist_matches: decodedMarkdown.match(whitelist) || [],
-                                noise_ratio: noiseRatio,
-                                postCommentIndex: currComment.postCommentIndex,
-                                totalPostComments: currComment.totalCommentPosts
-                            };
-                            return acc;
-                        }, {} as TableData)
-                    };
-                });
+                // Pass comments to update
+                processesCommentsAndUpdateTableData(comments);
             }
         };
         if (settings.get('RUN_IMMEDIATELY') as boolean) {
@@ -211,8 +217,20 @@ const FlaggingDashboard = (
         }
         window.setInterval(pullDownComments, apiRequestRate);
         // Prevent accidental navigation away
-    }, [settings, apiRequestRate, authStr, setTableData]);
+    }, [settings, apiRequestRate, authStr, setTableData, seenCommentIds]);
 
+
+    const handleBackFillComments = useCallback(async (offsetInMilliseconds: number) => {
+        const comments: IndexedAPIComment[] = await getComments(
+            authStr,
+            Math.floor((getCurrentTimestamp() - offsetInMilliseconds) / 1000), // fromDate
+            Math.floor(getCurrentTimestamp() / 1000) // toDate
+        );
+        if (comments.length > 0) {
+            // Pass comments to update
+            processesCommentsAndUpdateTableData(comments);
+        }
+    }, [processesCommentsAndUpdateTableData]);
 
     useEffect(() => {
         // Get Size of Table based on Keys
@@ -331,6 +349,7 @@ const FlaggingDashboard = (
             <DashboardCommentManagementControls setTableData={setTableData}
                                                 shouldRenderRow={shouldRenderRow}
                                                 remainingFlagCount={remainingFlagCount}
+                                                handleBackFillComments={settings.get('UI_DISPLAY_BACK_FILL_BUTTON') ? handleBackFillComments : undefined}
             />
             <DashboardCommentTable displaySettings={dashboardCommentDisplaySettings}
                                    tableData={tableData}

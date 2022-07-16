@@ -69,6 +69,9 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': false
                     },
+                },
+                'Dashboard Control Settings': {
+
                     'POST_TYPE': {
                         'label': 'Types of post to consider',
                         'type': 'select',
@@ -100,18 +103,6 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-                },
-                'UI Settings': {
-                    'DOCUMENT_TITLE_SHOULD_UPDATE': {
-                        'label': 'Update Title with number of pending comments for review: ',
-                        'type': 'checkbox',
-                        'default': true
-                    },
-                    'TOTAL_NUMBER_OF_POSTS_IN_MEMORY': {
-                        'label': 'Display total number of comments in memory: ',
-                        'type': 'checkbox',
-                        'default': true
-                    },
                     'UI_DISPLAY_COMMENT_OWNER': {
                         'label': 'Display display name of Comment author and enable comments-by-author modal',
                         'type': 'checkbox',
@@ -122,6 +113,24 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'UI_DISPLAY_FLAG_BUTTON': {
+                        'label': 'Display Flag button: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
+                    'UI_DISPLAY_BACK_FILL_BUTTON': {
+                        'label': 'Display Select Dropdown and button to pull comments from previous hours: ',
+                        'type': 'checkbox',
+                        'default': false
+                    },
+                },
+                'Table Display Settings': {
+                    'TOTAL_NUMBER_OF_POSTS_IN_MEMORY': {
+                        'label': 'Display total number of comments in memory: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
+
                     'UI_DISPLAY_POST_COMMENTS': {
                         'label': 'Display ID of Post the comment is under and enable comments-on-post modal: ',
                         'type': 'checkbox',
@@ -152,11 +161,6 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-                    'UI_DISPLAY_FLAG_BUTTON': {
-                        'label': 'Display Flag button: ',
-                        'type': 'checkbox',
-                        'default': true
-                    },
                     'UI_DISPLAY_REMAINING_FLAGS': {
                         'label': 'Display remaining flags (updated after flagging): ',
                         'type': 'checkbox',
@@ -164,6 +168,13 @@ function UserScript(): void {
                     },
                     'UI_DISPLAY_COMMENT_DELETE_STATE': {
                         'label': 'Display If comment was deleted or not: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
+                },
+                'UI Settings': {
+                    'DOCUMENT_TITLE_SHOULD_UPDATE': {
+                        'label': 'Update Title with number of pending comments for review: ',
                         'type': 'checkbox',
                         'default': true
                     },
