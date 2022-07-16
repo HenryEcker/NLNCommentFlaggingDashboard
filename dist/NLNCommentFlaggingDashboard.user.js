@@ -4,7 +4,7 @@
 // @description Find comments which may potentially be no longer needed and place them in a convenient flagging dashboard
 // @homepage    https://github.com/HenryEcker/NLNCommentFlaggingDashboard
 // @author      Henry Ecker (https://github.com/HenryEcker)
-// @version     3.1.9
+// @version     3.2.0
 // @downloadURL https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 // @updateURL   https://github.com/HenryEcker/NLNCommentFlaggingDashboard/raw/master/dist/NLNCommentFlaggingDashboard.user.js
 // @match       *://stackoverflow.com/users/flag-summary/15497888?group=4*
