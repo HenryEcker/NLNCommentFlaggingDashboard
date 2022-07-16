@@ -28,20 +28,16 @@ const DashboardFlagButton = ({comment, handleEnqueueComment}: {
         return <td><span title={'This comment cannot be flagged'}>🚫</span></td>;
     } else if (comment.was_flagged) {
         return <td><span title={'This comment was flagged successfully'}>✓</span></td>;
-    } else if (comment.enqueued) {
-        return <td>
-            <div className={'s-spinner'}>
-                <div className={'v-visible-sr'}>Flagging...</div>
-            </div>
-        </td>;
     } else {
         return <td>
             <button data-comment-id={comment._id}
-                    className={'s-btn s-btn__primary'}
+                    className={`s-btn s-btn__primary ${comment.enqueued ? 'is-loading' : ''}`}
                     title={'Click to flag the comment as No Longer Needed'}
                     onClick={ev => {
                         ev.preventDefault();
-                        handleEnqueueComment(comment._id);
+                        if (!comment.enqueued) { // don't enqueue comment that is already enqueued
+                            handleEnqueueComment(comment._id);
+                        }
                     }}>
                 Flag
             </button>

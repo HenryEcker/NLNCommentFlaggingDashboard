@@ -339,14 +339,14 @@ const FlaggingDashboard = (
 
     return (
         <div className={styles['comment-wrapper']}>
-            <DashboardHeader totalComments={tableDataSize}
-                             shouldDisplayTotal={settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') as boolean}
-            />
+            <DashboardHeader/>
             <DashboardSettingsComponent settings={settings}
                                         configurableSettings={configurableSettings}
                                         setConfigurableSettings={setConfigurableSettings}
             />
             <DashboardCommentManagementControls setTableData={setTableData}
+                                                tableDataSize={tableDataSize}
+                                                shouldDisplayTotal={settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') as boolean}
                                                 shouldRenderRow={shouldRenderRow}
                                                 remainingFlagCount={remainingFlagCount}
                                                 handleBackFillComments={settings.get('UI_DISPLAY_BACK_FILL_BUTTON') ? handleBackFillComments : undefined}

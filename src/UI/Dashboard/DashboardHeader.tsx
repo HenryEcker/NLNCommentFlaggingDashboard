@@ -1,15 +1,7 @@
-const DashboardHeader = ({totalComments, shouldDisplayTotal}: {
-    totalComments: number;
-    shouldDisplayTotal: boolean;
-}): JSX.Element => {
+const DashboardHeader = (): JSX.Element => {
     return (
         <div>
-            <h2>NLN Comment Flagging Dashboard
-                {
-                    shouldDisplayTotal &&
-                        <>&nbsp;<span title={'Total Number of Comments (without filters)'}>({totalComments})</span></>
-                }
-            </h2>
+            <h2>NLN Comment Flagging Dashboard </h2>
         </div>
     );
 };

@@ -1,34 +1,42 @@
-import {useId, useState} from 'react';
+import {useState} from 'react';
 import {Comment} from '../../Types';
 import {TableData} from './DashboardTypes';
 
 
 interface DashboardCommentManagementControlsProps {
     setTableData: React.Dispatch<React.SetStateAction<TableData>>;
+    tableDataSize: number;
+    shouldDisplayTotal: boolean;
     shouldRenderRow: (c: Comment) => boolean;
     remainingFlagCount: number | undefined;
     handleBackFillComments: undefined | ((c: number) => Promise<void>);
 }
 
 const strFmtHours = (hours: number) => {
-    return `${hours} hour${hours === 1 ? ' ' : 's'}`;
+    return `${hours} hour${hours === 1 ? '' : 's'}`;
 };
 
 const DashboardCommentManagementControls = (
     {
         setTableData,
+        tableDataSize,
+        shouldDisplayTotal,
         shouldRenderRow,
         remainingFlagCount,
         handleBackFillComments
     }: DashboardCommentManagementControlsProps
 ): JSX.Element => {
-    const [hours, setHours] = useState<number>(1);
+    // const [hours, setHours] = useState<number>(1);
     const [pulling, setPulling] = useState<boolean>(false);
-    const selectId = useId();
+    const [hourPanelOpen, setHourPanelOpen] = useState<boolean>(false);
 
     return (
         <div className={'d-flex gs8 gsx ai-center'}>
-            <button className={'s-btn s-btn__primary'}
+            <button className={`s-btn s-btn__danger s-btn__filled ${shouldDisplayTotal ? 's-btn--badge' : ''}`}
+                    {...shouldDisplayTotal && {
+                        title: `Clear all ${tableDataSize} comment${tableDataSize === 1 ? '' : 's'} in the dashboard (excluding filters)`
+                    }}
+                    disabled={tableDataSize === 0}
                     onClick={ev => {
                         ev.preventDefault();
                         // Remove All Values (Enqueued values cannot be removed)
@@ -43,11 +51,13 @@ const DashboardCommentManagementControls = (
                         });
                         ev.currentTarget.blur();
                     }}>
-                Clear All
+                Clear All {shouldDisplayTotal && <span className={'s-btn--badge'}>
+                <span className={'s-btn--number'}>{tableDataSize}</span>
+            </span>}
             </button>
-            <button className={'s-btn'}
-                    style={{marginLeft: '5px'}}
+            <button className={'s-btn s-btn__danger ml6'}
                     title={'Remove all comments that are not currently visible'}
+                    disabled={tableDataSize === 0}
                     onClick={ev => {
                         ev.preventDefault();
 
@@ -64,8 +74,9 @@ const DashboardCommentManagementControls = (
                     }}>
                 Clear Hidden
             </button>
-            <button className={'s-btn'}
-                    style={{marginLeft: '5px'}}
+            <button className={'s-btn ml6'}
+                    title={'Remove all comments have been actioned on'}
+                    disabled={tableDataSize === 0}
                     onClick={ev => {
                         ev.preventDefault();
 
@@ -83,43 +94,47 @@ const DashboardCommentManagementControls = (
                     }}>
                 Clear Handled
             </button>
-            {handleBackFillComments !== undefined && <>
-                <div className={'s-select'}>
-                    <select id={selectId}
-                            onChange={ev => {
-                                setHours(Number(ev.target.value));
-                            }}
-                            value={hours}
-                    >
+            {handleBackFillComments !== undefined && <div className={'flex--item'}>
+                <button className={`s-btn s-btn__outlined ${pulling ? 'is-loading' : 's-btn__dropdown'} ml6`}
+                        title={'Manually fetch comments from previous hours'}
+                        onClick={ev => {
+                            ev.preventDefault();
+                            if (!pulling) {
+                                setHourPanelOpen(open => !open);
+                            }
+                            ev.currentTarget.blur();
+                        }}>
+                    Pull Comments
+                </button>
+                <div className={`s-popover ws0 px1 py4 mt8 ${hourPanelOpen ? 'is-visible' : ''}`}>
+                    <div className={'s-popover--arrow s-popover--arrow__tc'}/>
+                    <ul className={'s-menu'} role={'menu'}>
                         {Array.from(
                             {length: 12}, // Only support up to 12 hours back (avoid pulling too many comments)
                             (_, i) => {
                                 const v = i + 1;
-                                return <option key={v} value={v}>{strFmtHours(v)}</option>;
+                                return <li role={'menuitem'} key={v}>
+                                    <button className={'s-block-link'}
+                                            onClick={(ev) => {
+                                                ev.preventDefault();
+                                                if (!pulling) { // Don't allow double pulling
+                                                    setPulling(true);
+                                                    setHourPanelOpen(false); // close menu while pulling
+                                                    // Pull down (convert hours to milliseconds)
+                                                    handleBackFillComments(v * 60 * 60 * 1000).finally(() => {
+                                                        setPulling(false);
+                                                    });
+                                                }
+                                                ev.currentTarget.blur();
+                                            }}>
+                                        {strFmtHours(v)}
+                                    </button>
+                                </li>;
                             }
                         )}
-                    </select>
+                    </ul>
                 </div>
-                <button className={'s-btn s-btn__primary'}
-                        style={{marginLeft: '5px'}}
-                        title={`Fetch the last ${strFmtHours(hours)} of Comments`}
-                        onClick={ev => {
-                            ev.preventDefault();
-                            // Pull down (convert hours to milliseconds)
-                            setPulling(true);
-                            handleBackFillComments(hours * 60 * 60 * 1000).finally(() => {
-                                setPulling(false);
-                            });
-                            ev.currentTarget.blur();
-                        }}>
-                    {!pulling ? 'Pull Comments' : <span style={{display: 'flex', gap: '3px'}}>
-                        <div className={'s-spinner s-spinner__sm'}>
-                            <div className={'v-visible-sr'}>Fetching...</div>
-                        </div>
-                        Pulling Comments...
-                    </span>}
-                </button>
-            </>}
+            </div>}
             {remainingFlagCount !== undefined &&
                 <div className={'flex--item ml-auto fc-light'}>
                     <span title={'The data is updated infrequently the number of flags may be inaccurate'}>

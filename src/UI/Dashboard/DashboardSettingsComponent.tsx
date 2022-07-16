@@ -82,9 +82,10 @@ const SettingSelect = (
                     value={value}
                     onChange={ev => {
                         setConfigurableSettings(oldConfigurableSettings => {
-                            const newValue = (ev.target as HTMLSelectElement).value as PostType;
-                            settings.set(settingKey, newValue);
-                            return {...oldConfigurableSettings, [settingKey]: newValue};
+                            return {
+                                ...oldConfigurableSettings,
+                                [settingKey]: (ev.target as HTMLSelectElement).value as PostType
+                            };
                         });
                     }}
                 >
@@ -103,10 +104,11 @@ const SettingSelect = (
 
 const SettingCheckbox = (
     {
-        settings, configurableSettings, setConfigurableSettings,
-        settingKey, textLabel
+        configurableSettings,
+        setConfigurableSettings,
+        settingKey,
+        textLabel
     }: {
-        settings: SettingsUI;
         configurableSettings: ConfigurableSettings;
         setConfigurableSettings: React.Dispatch<React.SetStateAction<ConfigurableSettings>>;
         settingKey: 'FILTER_WHITELIST';
@@ -125,9 +127,10 @@ const SettingCheckbox = (
                 checked={value}
                 onChange={ev => {
                     setConfigurableSettings(oldConfigurableSettings => {
-                        const newValue = Boolean((ev.target as HTMLInputElement).checked);
-                        settings.set(settingKey, newValue);
-                        return {...oldConfigurableSettings, [settingKey]: newValue};
+                        return {
+                            ...oldConfigurableSettings,
+                            [settingKey]: Boolean((ev.target as HTMLInputElement).checked)
+                        };
                     });
                 }}
             />
@@ -164,8 +167,7 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
                            settingKey={'POST_TYPE'}
                            textLabel={'Post Type'}
             />
-            <SettingCheckbox settings={settings}
-                             configurableSettings={configurableSettings}
+            <SettingCheckbox configurableSettings={configurableSettings}
                              setConfigurableSettings={setConfigurableSettings}
                              settingKey={'FILTER_WHITELIST'}
                              textLabel={'Filter Whitelist'}
@@ -176,12 +178,14 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
                 onClick={ev => {
                     ev.preventDefault();
                     setConfigurableSettings(() => {
-                        return {
+                        const c = {
                             DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
                             MAXIMUM_LENGTH_COMMENT: settings.get('MAXIMUM_LENGTH_COMMENT') as number,
                             POST_TYPE: settings.get('POST_TYPE') as PostType,
                             FILTER_WHITELIST: settings.get('FILTER_WHITELIST') as boolean
                         };
+                        console.log(c);
+                        return c;
                     });
                     ev.currentTarget.blur();
                 }}>
