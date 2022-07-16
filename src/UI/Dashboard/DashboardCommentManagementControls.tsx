@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useId, useState} from 'react';
 import {Comment} from '../../Types';
 import {TableData} from './DashboardTypes';
 
@@ -26,9 +26,8 @@ const DashboardCommentManagementControls = (
         handleBackFillComments
     }: DashboardCommentManagementControlsProps
 ): JSX.Element => {
-    // const [hours, setHours] = useState<number>(1);
     const [pulling, setPulling] = useState<boolean>(false);
-    const [hourPanelOpen, setHourPanelOpen] = useState<boolean>(false);
+    const popOverId = useId();
 
     return (
         <div className={'d-flex gs8 gsx ai-center'}>
@@ -95,18 +94,21 @@ const DashboardCommentManagementControls = (
                 Clear Handled
             </button>
             {handleBackFillComments !== undefined && <div className={'flex--item'}>
-                <button className={`s-btn s-btn__outlined ${pulling ? 'is-loading' : 's-btn__dropdown'} ml6`}
-                        title={'Manually fetch comments from previous hours'}
-                        onClick={ev => {
-                            ev.preventDefault();
-                            if (!pulling) {
-                                setHourPanelOpen(open => !open);
-                            }
-                            ev.currentTarget.blur();
-                        }}>
+                <button
+                    className={`s-btn s-btn__muted s-btn__outlined ${pulling ? 'is-loading' : 's-btn__dropdown'} ml6`}
+                    role={'button'}
+                    title={'Manually fetch comments from previous hours'}
+                    // Only support opening popover when not pulling data
+                    {...!pulling && {
+                        'aria-controls': popOverId,
+                        'data-controller': 's-popover',
+                        'data-action': 's-popover#toggle',
+                        'data-s-popover-placement': 'bottom-start',
+                        'data-s-popover-toggle-class': 'is-selected'
+                    }}>
                     Pull Comments
                 </button>
-                <div className={`s-popover ws0 px1 py4 mt8 ${hourPanelOpen ? 'is-visible' : ''}`}>
+                <div id={popOverId} className={'s-popover ws0 px1 py4'}>
                     <div className={'s-popover--arrow s-popover--arrow__tc'}/>
                     <ul className={'s-menu'} role={'menu'}>
                         {Array.from(
@@ -115,11 +117,14 @@ const DashboardCommentManagementControls = (
                                 const v = i + 1;
                                 return <li role={'menuitem'} key={v}>
                                     <button className={'s-block-link'}
+                                            role={'button'}
+                                            aria-controls={popOverId}
+                                            data-controller={'s-popover'}
+                                            data-action={'s-popover#toggle'} // Supports Close on click
                                             onClick={(ev) => {
                                                 ev.preventDefault();
                                                 if (!pulling) { // Don't allow double pulling
                                                     setPulling(true);
-                                                    setHourPanelOpen(false); // close menu while pulling
                                                     // Pull down (convert hours to milliseconds)
                                                     handleBackFillComments(v * 60 * 60 * 1000).finally(() => {
                                                         setPulling(false);
