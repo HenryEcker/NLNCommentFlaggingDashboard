@@ -19,15 +19,15 @@ export interface SelectFieldConfig extends FieldConfig {
 }
 
 export interface SettingConfigFieldType {
-    [fieldset: string]: {
-        [key: string]: InputFieldConfig | SelectFieldConfig;
-    };
+    [key: string]: InputFieldConfig | SelectFieldConfig;
 }
 
 export interface SettingConfigType {
     id: string;
     title: string;
-    fields: SettingConfigFieldType;
+    fields: {
+        [fieldset: string]: SettingConfigFieldType;
+    };
 }
 
 export interface ConfigVars {

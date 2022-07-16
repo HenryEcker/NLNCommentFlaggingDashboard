@@ -1,5 +1,50 @@
-import {Fragment, useId, useState} from 'react';
-import {ConfigVars, SettingsController, ValueType} from '../Controller/SettingsController';
+// noinspection JSUnusedGlobalSymbols
+
+import {Fragment, useCallback, useEffect, useId, useState} from 'react';
+import {
+    ConfigVars,
+    InputFieldConfig,
+    SelectFieldConfig,
+    SettingConfigFieldType,
+    SettingsController,
+    ValueType
+} from '../Controller/SettingsController';
+
+
+const SelectField = (
+    {id, fieldName, formConfigs, setFormConfigs, fieldOptions}:
+        {
+            id: string;
+            fieldName: string;
+            formConfigs: ConfigVars;
+            setFormConfigs: React.Dispatch<React.SetStateAction<ConfigVars>>;
+            fieldOptions: SelectFieldConfig;
+        }
+) => {
+    return (
+        <div className={'grid--item s-select'}>
+            <select id={id}
+                    value={formConfigs[fieldName].toString()}
+                    onChange={ev => {
+                        const target: HTMLSelectElement = ev.target;
+                        setFormConfigs(oldConfigs => {
+                            return {
+                                ...oldConfigs,
+                                [fieldName]: target.value
+                            };
+                        });
+                    }}
+            >
+                {fieldOptions.options.map((op) => {
+                    return (
+                        <option key={op}
+                                value={op}>{op}</option>
+                    );
+                })}
+            </select>
+        </div>
+    );
+};
 
 
 const processHtmlInputTarget = (target: HTMLInputElement): ValueType => {
@@ -12,11 +57,148 @@ const processHtmlInputTarget = (target: HTMLInputElement): ValueType => {
     }
 };
 
+const InputField = (
+    {id, fieldName, formConfigs, setFormConfigs, fieldOptions}:
+        {
+            id: string;
+            fieldName: string;
+            formConfigs: ConfigVars;
+            setFormConfigs: React.Dispatch<React.SetStateAction<ConfigVars>>;
+            fieldOptions: InputFieldConfig;
+        }
+) => {
+    return (
+
+        <input id={id}
+               className={`grid--item ${fieldOptions.type === 'checkbox' ? 's-checkbox' : 's-input'}`}
+               type={fieldOptions.type}
+               {...fieldOptions.attributes}
+               {...{
+                   [fieldOptions.type === 'checkbox' ? 'checked' : 'value']: formConfigs[fieldName]
+               }}
+               onChange={ev => {
+                   const target = ev.target;
+                   setFormConfigs(oldConfigs => {
+                       return {
+                           ...oldConfigs,
+                           [fieldName]: processHtmlInputTarget(target)
+                       };
+                   });
+               }}
+        />
+    );
+};
+
+const Field = (
+    {fieldName, formConfigs, setFormConfigs, fieldOptions}:
+        {
+            fieldName: string;
+            formConfigs: ConfigVars;
+            setFormConfigs: React.Dispatch<React.SetStateAction<ConfigVars>>;
+            fieldOptions: InputFieldConfig | SelectFieldConfig;
+        }
+) => {
+    const id = useId();
+    return (
+        <Fragment key={fieldOptions.label}>
+            <label id={`${id}-label`}
+                   htmlFor={id}
+                   className={'grid--item s-label'}
+            >{fieldOptions.label}</label>
+            {
+                fieldOptions.type === 'select' ?
+                    <SelectField
+                        id={id}
+                        fieldName={fieldName}
+                        formConfigs={formConfigs}
+                        setFormConfigs={setFormConfigs}
+                        fieldOptions={fieldOptions}
+                    />
+                    :
+                    <InputField
+                        id={id}
+                        fieldName={fieldName}
+                        formConfigs={formConfigs}
+                        setFormConfigs={setFormConfigs}
+                        fieldOptions={fieldOptions}
+                    />
+            }
+        </Fragment>
+    );
+};
+
+const FieldSet = (
+    {fieldSetName, fields, formConfigs, setFormConfigs}:
+        {
+            fieldSetName: string;
+            fields: SettingConfigFieldType;
+            formConfigs: ConfigVars;
+            setFormConfigs: React.Dispatch<React.SetStateAction<ConfigVars>>;
+        }
+) => {
+    return (
+        <fieldset key={fieldSetName} className={'s-card d-grid grid__auto g12 ai-center'}>
+            <legend
+                className={'grid--item fs-title lh-sm fc-dark fw-bold td-underline grid--col-all'}
+            >
+                {fieldSetName}
+            </legend>
+            {Object.entries(fields)
+                .map(([fieldName, fieldOptions]) => {
+                    return (
+                        <Field
+                            key={fieldName}
+                            fieldName={fieldName}
+                            formConfigs={formConfigs}
+                            setFormConfigs={setFormConfigs}
+                            fieldOptions={fieldOptions}
+                        />
+                    );
+                })}
+        </fieldset>
+    );
+};
+
+interface SModalEvent extends CustomEvent {
+    detail: {
+        dispatcher: HTMLElement;
+        returnElement: HTMLElement;
+    };
+}
+
+declare global {
+    // Make custom events visible to addEventListener
+    interface WindowEventMap {
+        's-modal:hide': SModalEvent;
+        's-modal:show': SModalEvent;
+    }
+}
+
 const SettingsUserInterface = ({settings, needsAuth}: { settings: SettingsController; needsAuth: boolean; }) => {
     const modalId = useId();
     const modalTitleId = useId();
     const settingsButtonId = useId();
     const [formConfigs, setFormConfigs] = useState<ConfigVars>(settings.getActiveConfig());
+
+    const handleRevertChanges = useCallback((ev: null | React.MouseEvent<HTMLButtonElement>) => {
+        if (ev !== null) {
+            ev.preventDefault();
+        }
+        settings.reload();
+        setFormConfigs(settings.getActiveConfig());
+    }, [setFormConfigs, settings]);
+
+    useEffect(() => {
+        window.addEventListener('s-modal:hide', (ev: SModalEvent): void => {
+            // Monitor setting modal being hidden
+            if (
+                ev.detail.dispatcher &&
+                ev.detail.dispatcher.id === modalId // only the settings modal no other modal closure
+            ) {
+                handleRevertChanges(null);
+            }
+        });
+    }, []);
 
     return (
         <div data-controller={'s-modal'} className={'w100 h100'}>
@@ -61,68 +243,16 @@ const SettingsUserInterface = ({settings, needsAuth}: { settings: SettingsContro
                             {Object.entries(settings.getFullConfigSchema().fields)
                                 .map(([fsName, fields]) => {
                                     return (
-                                        <fieldset key={fsName} className={'s-card d-grid grid__2 g8'}>
-                                            <legend
-                                                className={'fs-title lh-sm fc-dark fw-bold td-underline grid--col-all'}>{fsName}</legend>
-                                            {Object.entries(fields)
-                                                .map(([fieldName, fieldOptions]) => {
-                                                    const id = useId();
-                                                    return (
-                                                        <Fragment key={fieldOptions.label}>
-                                                            <label id={`${id}-label`}
-                                                                   htmlFor={id}
-                                                                   className={'s-label'}
-                                                            >{fieldOptions.label}</label>
-                                                            {
-                                                                fieldOptions.type === 'select' ?
-                                                                    <div className={'s-select'}>
-                                                                        <select id={id}
-                                                                                value={formConfigs[fieldName].toString()}
-                                                                                onChange={ev => {
-                                                                                    const target: HTMLSelectElement = ev.target;
-                                                                                    setFormConfigs(oldConfigs => {
-                                                                                        return {
-                                                                                            ...oldConfigs,
-                                                                                            [fieldName]: target.value
-                                                                                        };
-                                                                                    });
-                                                                                }}
-                                                                        >
-                                                                            {fieldOptions.options.map((op) => {
-                                                                                return (
-                                                                                    <option key={op}
-                                                                                            value={op}>{op}</option>
-                                                                                );
-                                                                            })}
-                                                                        </select>
-                                                                    </div>
-                                                                    :
-                                                                    <input id={id}
-                                                                           className={fieldOptions.type === 'checkbox' ? 's-checkbox' : 's-input'}
-                                                                           type={fieldOptions.type}
-                                                                           {...fieldOptions.attributes}
-                                                                           {...{
-                                                                               [fieldOptions.type === 'checkbox' ? 'checked' : 'value']: formConfigs[fieldName]
-                                                                           }}
-                                                                           onChange={ev => {
-                                                                               const target = ev.target;
-                                                                               setFormConfigs(oldConfigs => {
-                                                                                   return {
-                                                                                       ...oldConfigs,
-                                                                                       [fieldName]: processHtmlInputTarget(target)
-                                                                                   };
-                                                                               });
-                                                                           }}
-                                                                    />
-                                                            }
-                                                        </Fragment>
-                                                    );
-                                                })}
-                                        </fieldset>
+                                        <FieldSet key={fsName}
+                                                  fieldSetName={fsName}
+                                                  fields={fields}
+                                                  formConfigs={formConfigs}
+                                                  setFormConfigs={setFormConfigs}
+                                        />
                                     );
                                 })}
                         </div>
-                        <div className={'d-flex gs8 gsx s-modal--footer'}>
+                        <div className={'d-flex gs8 gsx jc-end s-modal--footer'}>
                             <button className={'flex--item s-btn s-btn__primary'}
                                     type={'submit'}
                                     title={'save the current settings and reload the page'}>
@@ -131,11 +261,7 @@ const SettingsUserInterface = ({settings, needsAuth}: { settings: SettingsContro
                             <button className={'flex--item s-btn'}
                                     type={'button'}
                                     title={'revert any changes to the last save point'}
-                                    onClick={ev => {
-                                        ev.preventDefault();
-                                        settings.reload();
-                                        setFormConfigs(settings.getActiveConfig());
-                                    }}
+                                    onClick={handleRevertChanges}
                             >
                                 Revert Changes
                             </button>
@@ -149,7 +275,8 @@ const SettingsUserInterface = ({settings, needsAuth}: { settings: SettingsContro
                     <button className={'s-modal--close s-btn s-btn__muted'}
                             type={'button'}
                             aria-label={'@_s(" Close")'}
-                            data-action={'s-modal#hide'}>
+                            data-action={'s-modal#hide'}
+                            onClick={handleRevertChanges}>
                         <svg aria-hidden={'true'}
                              className={'svg-icon iconClearSm'}
                              width={'14'}
