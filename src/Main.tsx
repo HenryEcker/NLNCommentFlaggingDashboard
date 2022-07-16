@@ -1,10 +1,11 @@
 import FlaggingDashboard from './UI/Dashboard/FlaggingDashboard';
 import {Toast} from './UI/Toast/Toast';
-import {SettingsUI} from './UI/Settings/SettingsUI';
+import {SettingsController} from './UI/Settings/Controller/SettingsController';
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {DashboardCommentTableDisplaySettings} from './UI/Dashboard/DashboardTypes';
 import {StackExchangeAPI} from './Types';
+import SettingsUserInterface from './UI/Settings/UI/SettingsUserInterface';
 
 
 declare const StackExchange: StackExchangeAPI;
@@ -12,8 +13,7 @@ declare const StackExchange: StackExchangeAPI;
 function UserScript(): void {
     const settingMountPoint = $('<div id="nln-flagging-dashboard-settings-modal"></div>');
     $('body').append(settingMountPoint);
-    const settings = new SettingsUI(
-        settingMountPoint,
+    const settingController = new SettingsController(
         {
             'id': 'NLN_Comment_Config',
             'title': 'NLN Comment Flagging Dashboard Settings',
@@ -39,15 +39,6 @@ function UserScript(): void {
                             'size': 25
                         }
                     },
-                    // 'API_QUOTA_LIMIT': {
-                    //     'label': 'At what API quota should this script stop making new requests',
-                    //     'type': 'number',
-                    //     'default': 500,
-                    //     'attributes': {
-                    //         'step': 1,
-                    //         'min': 0,
-                    //     }
-                    // },
                     'DELAY_BETWEEN_API_CALLS': {
                         'label': 'How frequently (in seconds) should comments be fetched',
                         'type': 'number',
@@ -183,27 +174,35 @@ function UserScript(): void {
         }
     );
 
-    const siteName: string = settings.get('SITE_NAME') as string;
-    const accessToken: string = settings.get('ACCESS_TOKEN') as string;
-    const apiKey: string = settings.get('KEY') as string;
-    if (!accessToken || !apiKey) {
-        // Will not run without a valid API auth string
-        settings.open();
-        return;
+    const siteName: string = settingController.get('SITE_NAME') as string;
+    const accessToken: string = settingController.get('ACCESS_TOKEN') as string;
+    const apiKey: string = settingController.get('KEY') as string;
+    const needsAuth = !accessToken || !apiKey;
+
+    const settingsContainer = document.createElement('div');
+    settingsContainer.id = 'nln-dashboard-settings-mount-point';
+    const li = document.createElement('li');
+    li.append(settingsContainer);
+    $('header ol.s-topbar--content > li:nth-child(2)').after(li);
+    createRoot(
+        settingsContainer,
+        {identifierPrefix: 'nln-settings-'}
+    ).render(
+        <React.StrictMode>
+            <SettingsUserInterface
+                settings={settingController}
+                needsAuth={needsAuth}
+            />
+        </React.StrictMode>
+    );
+
+    if (needsAuth) {
+        return; // can't run without these!
     }
 
-    // Add Settings Button
-    const settingsButton: JQuery<HTMLElement> = $('<span title="NLN Comment Flagging Dashboard Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
-    settingsButton.on('click', () => {
-        settings.open();
-    });
-    const li: JQuery = $('<li></li>');
-    li.append(settingsButton);
-    $('header ol.s-topbar--content > li:nth-child(2)').after(li);
-
-    if (settings.get('ACTIVE') as boolean) {
+    if (settingController.get('ACTIVE') as boolean) {
         const authStr = `site=${siteName}&access_token=${accessToken}&key=${apiKey}`;
-        const apiRequestRate = (settings.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
+        const apiRequestRate = (settingController.get('DELAY_BETWEEN_API_CALLS') as number) * 1000;
         const fkey = StackExchange.options.user.fkey;
 
         // Create Toaster for custom Toast Messages
@@ -228,20 +227,20 @@ function UserScript(): void {
                 'UI_DISPLAY_POST_INDEX'
             ] as (keyof DashboardCommentTableDisplaySettings)[]
         ).reduce((acc, v) => {
-            acc[v] = settings.get(v) as boolean;
+            acc[v] = settingController.get(v) as boolean;
             return acc;
         }, {} as DashboardCommentTableDisplaySettings);
 
         createRoot(
             container,
-            {identifierPrefix: 'nln-'}
+            {identifierPrefix: 'nln-dashboard-'}
         ).render(
             <React.StrictMode>
                 <FlaggingDashboard
                     authStr={authStr}
                     apiRequestRate={apiRequestRate}
                     fkey={fkey}
-                    settings={settings}
+                    settings={settingController}
                     dashboardCommentDisplaySettings={dashboardCommentDisplaySettings}
                     toaster={toaster}
                 />

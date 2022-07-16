@@ -1,5 +1,5 @@
 import {Comment, PostType} from '../../Types';
-import {SettingsUI} from '../Settings/SettingsUI';
+import {SettingsController} from '../Settings/Controller/SettingsController';
 import {Toast} from '../Toast/Toast';
 
 export interface TableData {
@@ -17,7 +17,7 @@ export interface FlaggingDashboardProps {
     authStr: string;
     apiRequestRate: number;
     fkey: string;
-    settings: SettingsUI;
+    settings: SettingsController;
     dashboardCommentDisplaySettings: DashboardCommentTableDisplaySettings;
     toaster: Toast;
 }

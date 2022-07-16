@@ -1,4 +1,4 @@
-import {InputFieldConfig, SelectFieldConfig, SettingsUI} from '../Settings/SettingsUI';
+import {InputFieldConfig, SelectFieldConfig, SettingsController} from '../Settings/Controller/SettingsController';
 import {PostType} from '../../Types';
 import {useEffect, useId, useState} from 'react';
 import {ConfigurableSettings} from './DashboardTypes';
@@ -10,7 +10,7 @@ const SettingSlider = (
         settings, configurableSettings, setConfigurableSettings,
         settingKey, textLabel, formatSliderValue
     }: {
-        settings: SettingsUI;
+        settings: SettingsController;
         configurableSettings: ConfigurableSettings;
         setConfigurableSettings: React.Dispatch<React.SetStateAction<ConfigurableSettings>>;
         settingKey: 'DISPLAY_CERTAINTY' | 'MAXIMUM_LENGTH_COMMENT';
@@ -63,7 +63,7 @@ const SettingSelect = (
         settings, configurableSettings, setConfigurableSettings,
         settingKey, textLabel
     }: {
-        settings: SettingsUI;
+        settings: SettingsController;
         configurableSettings: ConfigurableSettings;
         setConfigurableSettings: React.Dispatch<React.SetStateAction<ConfigurableSettings>>;
         settingKey: 'POST_TYPE';
@@ -140,7 +140,7 @@ const SettingCheckbox = (
 
 
 const DashboardSettingsComponent = ({settings, configurableSettings, setConfigurableSettings}: {
-    settings: SettingsUI;
+    settings: SettingsController;
     configurableSettings: ConfigurableSettings;
     setConfigurableSettings: React.Dispatch<React.SetStateAction<ConfigurableSettings>>;
 }): JSX.Element => {
