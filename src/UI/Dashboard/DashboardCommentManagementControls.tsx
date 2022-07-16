@@ -29,13 +29,15 @@ const DashboardCommentManagementControls = (
     const [pulling, setPulling] = useState<boolean>(false);
     const popOverId = useId();
 
+    const isDisabled = tableDataSize === 0;
+
     return (
         <div className={'d-flex gs8 gsx ai-center'}>
-            <button className={`s-btn s-btn__danger s-btn__filled ${shouldDisplayTotal ? 's-btn--badge' : ''}`}
+            <button className={`s-btn s-btn__danger s-btn__filled${shouldDisplayTotal ? ' s-btn--badge' : ''}`}
                     {...shouldDisplayTotal && {
                         title: `Clear all ${tableDataSize} comment${tableDataSize === 1 ? '' : 's'} in the dashboard (excluding filters)`
                     }}
-                    disabled={tableDataSize === 0}
+                    disabled={isDisabled}
                     onClick={ev => {
                         ev.preventDefault();
                         // Remove All Values (Enqueued values cannot be removed)
@@ -56,7 +58,7 @@ const DashboardCommentManagementControls = (
             </button>
             <button className={'s-btn s-btn__danger ml6'}
                     title={'Remove all comments that are not currently visible'}
-                    disabled={tableDataSize === 0}
+                    disabled={isDisabled}
                     onClick={ev => {
                         ev.preventDefault();
 
@@ -75,7 +77,7 @@ const DashboardCommentManagementControls = (
             </button>
             <button className={'s-btn ml6'}
                     title={'Remove all comments have been actioned on'}
-                    disabled={tableDataSize === 0}
+                    disabled={isDisabled}
                     onClick={ev => {
                         ev.preventDefault();
 

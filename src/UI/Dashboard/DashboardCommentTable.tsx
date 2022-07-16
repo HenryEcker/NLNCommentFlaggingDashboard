@@ -28,16 +28,16 @@ const DashboardFlagButton = ({comment, handleEnqueueComment}: {
     } else if (comment.was_flagged) {
         return <td><span title={'This comment was flagged successfully'}>✓</span></td>;
     } else {
+        const isEnqueued = comment?.enqueued === true;
         return <td>
             <button data-comment-id={comment._id}
-                    className={`s-btn s-btn__primary ${comment.enqueued ? 'is-loading' : ''}`}
+                    className={`s-btn ${isEnqueued ? 's-btn__outlined is-loading' : 's-btn__primary'}`}
                     title={'Click to flag the comment as No Longer Needed'}
                     onClick={ev => {
                         ev.preventDefault();
-                        if (!comment.enqueued) { // don't enqueue comment that is already enqueued
-                            handleEnqueueComment(comment._id);
-                        }
-                    }}>
+                        handleEnqueueComment(comment._id);
+                    }}
+                    disabled={isEnqueued}>
                 Flag
             </button>
         </td>;
@@ -106,13 +106,14 @@ const DashboardCommentTable = (
 
 
     return (
-        <div data-controller={'s-modal'}>
-            <aside className={'s-modal'}
-                   data-s-modal-target={'modal'}
-                   id={modalId}
-                   tabIndex={-1}
-                   role={'dialog'}
-                   aria-hidden={'true'}>
+        // Only build Modal if is not already modal
+        <div {...!isModal && {'data-controller': 's-modal'}}>
+            {!isModal && <aside className={'s-modal'}
+                                data-s-modal-target={'modal'}
+                                id={modalId}
+                                tabIndex={-1}
+                                role={'dialog'}
+                                aria-hidden={'true'}>
                 {
                     modalData !== undefined &&
                     <div className={'s-modal--dialog s-modal__full ws10'}
@@ -169,7 +170,7 @@ const DashboardCommentTable = (
                         </button>
                     </div>
                 }
-            </aside>
+            </aside>}
             <table className={'s-table'}>
                 <thead>
                 <tr>
