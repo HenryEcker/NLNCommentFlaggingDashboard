@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 import {Fragment, useCallback, useEffect, useId, useState} from 'react';
 import {
     ConfigVars,
@@ -48,13 +46,44 @@ const SelectField = (
 
 
 const processHtmlInputTarget = (target: HTMLInputElement): ValueType => {
-    if (target.type === 'checkbox') {
-        return target.checked;
-    } else if (target.type === 'number') {
+    if (target.type === 'number') {
         return Number(target.value);
     } else {
         return target.value;
     }
+};
+
+
+const ToggleSwitch = (
+    {id, fieldName, formConfigs, setFormConfigs, fieldOptions}:
+        {
+            id: string;
+            fieldName: string;
+            formConfigs: ConfigVars;
+            setFormConfigs: React.Dispatch<React.SetStateAction<ConfigVars>>;
+            fieldOptions: InputFieldConfig;
+        }
+) => {
+    return (
+        <div className={'s-toggle-switch'}>
+            <input id={id}
+                   className={'grid--item s-checkbox'}
+                   type={'checkbox'}
+                   {...fieldOptions.attributes}
+                   checked={formConfigs[fieldName] === true}
+                   onChange={ev => {
+                       const target = ev.target;
+                       setFormConfigs(oldConfigs => {
+                           return {
+                               ...oldConfigs,
+                               [fieldName]: target.checked
+                           };
+                       });
+                   }}
+            />
+            <div className={'s-toggle-switch--indicator'}/>
+        </div>
+    );
 };
 
 const InputField = (
@@ -67,26 +96,34 @@ const InputField = (
             fieldOptions: InputFieldConfig;
         }
 ) => {
-    return (
+    if (fieldOptions.type === 'checkbox') {
+        return (
+            <ToggleSwitch id={id}
+                          fieldName={fieldName}
+                          formConfigs={formConfigs}
+                          setFormConfigs={setFormConfigs}
+                          fieldOptions={fieldOptions}/>
+        );
+    } else {
+        return (
+            <input id={id}
+                   className={'grid--item s-input'}
+                   type={fieldOptions.type}
+                   {...fieldOptions.attributes}
+                   value={(formConfigs[fieldName] || '').toString()}
+                   onChange={ev => {
+                       const target = ev.target;
 
-        <input id={id}
-               className={`grid--item ${fieldOptions.type === 'checkbox' ? 's-checkbox' : 's-input'}`}
-               type={fieldOptions.type}
-               {...fieldOptions.attributes}
-               {...{
-                   [fieldOptions.type === 'checkbox' ? 'checked' : 'value']: formConfigs[fieldName]
-               }}
-               onChange={ev => {
-                   const target = ev.target;
-                   setFormConfigs(oldConfigs => {
-                       return {
-                           ...oldConfigs,
-                           [fieldName]: processHtmlInputTarget(target)
-                       };
-                   });
-               }}
-        />
-    );
+                       setFormConfigs(oldConfigs => {
+                           return {
+                               ...oldConfigs,
+                               [fieldName]: processHtmlInputTarget(target)
+                           };
+                       });
+                   }}
+            />
+        );
+    }
 };
 
 const Field = (
@@ -168,6 +205,7 @@ interface SModalEvent extends CustomEvent {
 
 declare global {
     // Make custom events visible to addEventListener
+    // noinspection JSUnusedGlobalSymbols
     interface WindowEventMap {
         's-modal:hide': SModalEvent;
         's-modal:show': SModalEvent;

@@ -3,22 +3,4 @@
   display: grid;
   grid-template-rows: 25px min-content 40px 1fr;
   grid-gap: 10px;
-
-  .dashboard-settings-container {
-    display: flex;
-    gap: 25px;
-    flex-wrap: wrap;
-    flex-direction: row;
-    align-items: center;
-
-    .setting-elem-container {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-
-      select {
-        height: min-content;
-      }
-    }
-  }
 }

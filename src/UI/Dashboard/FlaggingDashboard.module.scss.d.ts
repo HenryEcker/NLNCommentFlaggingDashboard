@@ -1,7 +1,5 @@
 export interface Styles {
-    'comment-wrapper': string;
-    'dashboard-settings-container': string;
-    'setting-elem-container': string;
+  'comment-wrapper': string;
 }
 
 export type ClassNames = keyof Styles;

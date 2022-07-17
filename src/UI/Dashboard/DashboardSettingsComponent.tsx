@@ -2,7 +2,6 @@ import {InputFieldConfig, SelectFieldConfig, SettingsController} from '../Settin
 import {PostType} from '../../Types';
 import {useEffect, useId, useState} from 'react';
 import {ConfigurableSettings} from './DashboardTypes';
-import styles from './FlaggingDashboard.module.scss';
 
 
 const SettingSlider = (
@@ -28,8 +27,8 @@ const SettingSlider = (
     }, [configurableSettings[settingKey]]);
 
     return (
-        <div className={styles['setting-elem-container']}>
-            <label htmlFor={id} className={'s-label fw-normal'}>
+        <>
+            <label htmlFor={id} className={'flex--item s-label fw-normal'}>
                 {textLabel}
             </label>
             <input id={id}
@@ -38,7 +37,7 @@ const SettingSlider = (
                    max={settingConfig.attributes?.max as number | undefined}
                    step={settingConfig.attributes?.step as number | undefined}
                    value={value}
-                   className={'slider'}
+                   className={'flex--item slider'}
                    onChange={ev => {
                        setValue(() => {
                            return Number((ev.target as HTMLInputElement).value);
@@ -54,7 +53,7 @@ const SettingSlider = (
                    }}
             />
             <span>{formatSliderValue(value)}</span>
-        </div>
+        </>
     );
 };
 
@@ -74,9 +73,9 @@ const SettingSelect = (
     const settingConfig = settings.getConfigProfile(settingKey) as SelectFieldConfig;
     const id = useId();
     return (
-        <div className={styles['setting-elem-container']}>
-            <label htmlFor={id} className={'s-label fw-normal'}>{textLabel}</label>
-            <div className={'s-select'}>
+        <>
+            <label htmlFor={id} className={'flex--item s-label fw-normal'}>{textLabel}</label>
+            <div className={'flex--item s-select'}>
                 <select
                     id={id}
                     value={value}
@@ -98,7 +97,7 @@ const SettingSelect = (
                     }
                 </select>
             </div>
-        </div>
+        </>
     );
 };
 
@@ -118,26 +117,37 @@ const SettingCheckbox = (
     const value = configurableSettings[settingKey];
     const id = useId();
     return (
-        <div className={styles['setting-elem-container']}>
-            <label htmlFor={id} className={'s-label fw-normal'}>{textLabel}</label>
-            <input
-                id={id}
-                className={'s-checkbox'}
-                type={'checkbox'}
-                checked={value}
-                onChange={ev => {
-                    setConfigurableSettings(oldConfigurableSettings => {
-                        return {
-                            ...oldConfigurableSettings,
-                            [settingKey]: Boolean((ev.target as HTMLInputElement).checked)
-                        };
-                    });
-                }}
-            />
-        </div>
+        <>
+            <label htmlFor={id} className={'flex--item s-label fw-normal'}>{textLabel}</label>
+            <div className={'flex--item s-toggle-switch'}>
+                <input
+                    id={id}
+                    className={'s-checkbox'}
+                    type={'checkbox'}
+                    checked={value}
+                    onChange={ev => {
+                        setConfigurableSettings(oldConfigurableSettings => {
+                            return {
+                                ...oldConfigurableSettings,
+                                [settingKey]: Boolean((ev.target as HTMLInputElement).checked)
+                            };
+                        });
+                    }}
+                />
+                <div className={'s-toggle-switch--indicator'}/>
+            </div>
+        </>
     );
 };
 
+
+const SettingElemContainer = ({children}: React.PropsWithChildren) => {
+    return (
+        <div className={'d-flex gs8 ai-center'}>
+            {children}
+        </div>
+    );
+};
 
 const DashboardSettingsComponent = ({settings, configurableSettings, setConfigurableSettings}: {
     settings: SettingsController;
@@ -146,35 +156,42 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
 }): JSX.Element => {
 
     return (
-        <div className={styles['dashboard-settings-container']}>
-            <SettingSlider settings={settings}
-                           configurableSettings={configurableSettings}
-                           setConfigurableSettings={setConfigurableSettings}
-                           settingKey={'DISPLAY_CERTAINTY'}
-                           textLabel={'Display Certainty'}
-                           formatSliderValue={(v) => `${Number(v).toFixed(2)}%`}
-            />
-            <SettingSlider settings={settings}
-                           configurableSettings={configurableSettings}
-                           setConfigurableSettings={setConfigurableSettings}
-                           settingKey={'MAXIMUM_LENGTH_COMMENT'}
-                           textLabel={'Maximum Length'}
-                           formatSliderValue={(v) => `${Number(v).toFixed(0)}`}
-            />
-            <SettingSelect settings={settings}
-                           configurableSettings={configurableSettings}
-                           setConfigurableSettings={setConfigurableSettings}
-                           settingKey={'POST_TYPE'}
-                           textLabel={'Post Type'}
-            />
-            <SettingCheckbox configurableSettings={configurableSettings}
-                             setConfigurableSettings={setConfigurableSettings}
-                             settingKey={'FILTER_WHITELIST'}
-                             textLabel={'Filter Whitelist'}
-            />
+        <div className={'d-flex gs8 flex__center fd-row fd-wrap'}>
+            <SettingElemContainer>
+                <SettingSlider settings={settings}
+                               configurableSettings={configurableSettings}
+                               setConfigurableSettings={setConfigurableSettings}
+                               settingKey={'DISPLAY_CERTAINTY'}
+                               textLabel={'Display Certainty'}
+                               formatSliderValue={(v) => `${Number(v).toFixed(2)}%`}
+                />
+            </SettingElemContainer>
+            <SettingElemContainer>
+                <SettingSlider settings={settings}
+                               configurableSettings={configurableSettings}
+                               setConfigurableSettings={setConfigurableSettings}
+                               settingKey={'MAXIMUM_LENGTH_COMMENT'}
+                               textLabel={'Maximum Length'}
+                               formatSliderValue={(v) => `${Number(v).toFixed(0)}`}
+                />
+            </SettingElemContainer>
+            <SettingElemContainer>
+                <SettingSelect settings={settings}
+                               configurableSettings={configurableSettings}
+                               setConfigurableSettings={setConfigurableSettings}
+                               settingKey={'POST_TYPE'}
+                               textLabel={'Post Type'}
+                />
+            </SettingElemContainer>
+            <SettingElemContainer>
+                <SettingCheckbox configurableSettings={configurableSettings}
+                                 setConfigurableSettings={setConfigurableSettings}
+                                 settingKey={'FILTER_WHITELIST'}
+                                 textLabel={'Filter Whitelist'}
+                />
+            </SettingElemContainer>
             <button
-                className={'s-btn'}
-                style={{marginLeft: 'auto'}}
+                className={'s-btn ml-auto flex--item'}
                 onClick={ev => {
                     ev.preventDefault();
                     setConfigurableSettings(() => {
