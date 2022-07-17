@@ -1,8 +1,9 @@
 import {useId, useState} from 'react';
-import {Comment} from '../../Types';
+import {Comment, StackExchangeAPI} from '../../Types';
 import {TableData} from './DashboardTypes';
 
 
+declare const StackExchange: StackExchangeAPI;
 interface DashboardCommentManagementControlsProps {
     setTableData: React.Dispatch<React.SetStateAction<TableData>>;
     tableDataSize: number;
@@ -40,15 +41,25 @@ const DashboardCommentManagementControls = (
                     disabled={isDisabled}
                     onClick={ev => {
                         ev.preventDefault();
-                        // Remove All Values (Enqueued values cannot be removed)
-                        setTableData(oldTableData => {
-                            const newTableData: TableData = {};
-                            for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
-                                if (comment?.enqueued === true) {
-                                    newTableData[commentId] = {...comment};
-                                }
+                        void StackExchange.helpers.showConfirmModal(
+                            {
+                                title: 'Clear All Comments From Dashboard',
+                                bodyHtml: '<span>Are you sure you want to remove all comments from the dashboard? (this cannot be undone)</span>',
+                                buttonLabel: 'Clear All',
                             }
-                            return newTableData;
+                        ).then((confirm: boolean) => {
+                            if (confirm) {
+                                // Remove All Values (Enqueued values cannot be removed)
+                                setTableData(oldTableData => {
+                                    const newTableData: TableData = {};
+                                    for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
+                                        if (comment?.enqueued === true) {
+                                            newTableData[commentId] = {...comment};
+                                        }
+                                    }
+                                    return newTableData;
+                                });
+                            }
                         });
                         ev.currentTarget.blur();
                     }}>
@@ -61,22 +72,31 @@ const DashboardCommentManagementControls = (
                     disabled={isDisabled}
                     onClick={ev => {
                         ev.preventDefault();
-
-                        setTableData(oldTableData => {
-                            const newTableData: TableData = {};
-                            for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
-                                if (shouldRenderRow(comment)) {
-                                    newTableData[commentId] = {...comment};
-                                }
+                        void StackExchange.helpers.showConfirmModal(
+                            {
+                                title: 'Clear Hidden Comments From Dashboard',
+                                bodyHtml: '<p>Are you sure you want to remove all currently hidden comments from the dashboard?</p><p><strong>This cannot be undone</strong> and will limit modal actions like pulling all comments on a post or by author.</p>',
+                                buttonLabel: 'Clear All',
                             }
-                            return newTableData;
+                        ).then((confirm: boolean) => {
+                            if (confirm) {
+                                setTableData(oldTableData => {
+                                    const newTableData: TableData = {};
+                                    for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
+                                        if (shouldRenderRow(comment)) {
+                                            newTableData[commentId] = {...comment};
+                                        }
+                                    }
+                                    return newTableData;
+                                });
+                            }
                         });
                         ev.currentTarget.blur();
                     }}>
                 Clear Hidden
             </button>
             <button className={'s-btn ml6'}
-                    title={'Remove all comments have been actioned on'}
+                    title={'Remove all comments that have been actioned on'}
                     disabled={isDisabled}
                     onClick={ev => {
                         ev.preventDefault();
