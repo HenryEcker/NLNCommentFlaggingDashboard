@@ -13,7 +13,7 @@ import {
 } from './Types';
 
 
-const timeBetweenRequests = 150; // in ms
+const timeBetweenRequests = 200; // in ms
 
 async function getActiveComments(
     AUTH_STR: string,
