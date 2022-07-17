@@ -10,12 +10,12 @@ import {
     PostType,
     RatedLimitedError
 } from '../../Types';
-import DashboardSettingsComponent from './DashboardSettingsComponent';
+import DashboardSettingsComponent from './SettingComponents/DashboardSettingsComponent';
 import DashboardCommentTable from './DashboardCommentTable';
 import {calcNoiseRatio, getCurrentTimestamp, htmlDecode} from '../../Utils';
 import {flagComment, getComments, getFlagQuota} from '../../SE_API';
 import {blacklist, whitelist} from '../../GlobalVars';
-import DashboardCommentManagementControls from './DashboardCommentManagementControls';
+import DashboardCommentManagementControls from './ManagementControls/DashboardCommentManagementControls';
 import DashboardHeader from './DashboardHeader';
 import globalFlagQueue from './FlagQueue/FlagQueue';
 import {ConfigurableSettings, FlaggingDashboardProps, TableData} from './DashboardTypes';

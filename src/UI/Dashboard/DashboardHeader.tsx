@@ -1,3 +1,5 @@
+import {memo} from 'react';
+
 const DashboardHeader = (): JSX.Element => {
     return (
         <div>
@@ -6,4 +8,4 @@ const DashboardHeader = (): JSX.Element => {
     );
 };
 
-export default DashboardHeader;
+export default memo(DashboardHeader);

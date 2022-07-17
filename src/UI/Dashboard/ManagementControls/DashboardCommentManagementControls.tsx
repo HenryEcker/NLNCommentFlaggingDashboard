@@ -1,6 +1,9 @@
-import {useCallback, useId, useMemo, useState} from 'react';
-import {Comment, StackExchangeAPI} from '../../Types';
-import {TableData} from './DashboardTypes';
+import {useCallback, useMemo} from 'react';
+import {Comment, StackExchangeAPI} from '../../../Types';
+import {TableData} from '../DashboardTypes';
+import ClearAllButton from './ClearAllButton';
+import RemainingFlagCountSpan from './RemainingFlagCountSpan';
+import BackFillCommentsButtonAndPopover from './BackFillCommentsButtonAndPopover';
 
 
 declare const StackExchange: StackExchangeAPI;
@@ -14,10 +17,6 @@ interface DashboardCommentManagementControlsProps {
     handleBackFillComments: undefined | ((c: number) => Promise<void>);
 }
 
-const strFmtHours = (hours: number) => {
-    return `${hours} hour${hours === 1 ? '' : 's'}`;
-};
-
 const DashboardCommentManagementControls = (
     {
         setTableData,
@@ -28,9 +27,6 @@ const DashboardCommentManagementControls = (
         handleBackFillComments
     }: DashboardCommentManagementControlsProps
 ): JSX.Element => {
-    const [pulling, setPulling] = useState<boolean>(false);
-    const popOverId = useId();
-
     const isDisabled = useMemo(() => tableDataSize === 0, [tableDataSize]);
 
     const clearAllClickHandler = useCallback((ev: React.MouseEvent<HTMLButtonElement>) => {
@@ -64,7 +60,7 @@ const DashboardCommentManagementControls = (
             {
                 title: 'Clear Hidden Comments From Dashboard',
                 bodyHtml: '<p>Are you sure you want to remove all currently hidden comments from the dashboard?</p><p><strong>This cannot be undone</strong> and will limit modal actions like pulling all comments on a post or by author.</p>',
-                buttonLabel: 'Clear All',
+                buttonLabel: 'Clear Hidden',
             }
         ).then((confirm: boolean) => {
             if (confirm) {
@@ -80,20 +76,16 @@ const DashboardCommentManagementControls = (
             }
         });
         ev.currentTarget.blur();
-    }, [setTableData]);
+    }, [setTableData, shouldRenderRow]);
 
     return (
         <div className={'d-flex gs8 gsx ai-center'}>
-            <button className={`s-btn s-btn__danger s-btn__filled${shouldDisplayTotal ? ' s-btn--badge' : ''}`}
-                    {...shouldDisplayTotal && {
-                        title: `Clear all ${tableDataSize} comment${tableDataSize === 1 ? '' : 's'} in the dashboard (excluding filters)`
-                    }}
-                    disabled={isDisabled}
-                    onClick={clearAllClickHandler}>
-                Clear All {shouldDisplayTotal && <span className={'s-btn--badge'}>
-                <span className={'s-btn--number'}>{tableDataSize}</span>
-            </span>}
-            </button>
+            <ClearAllButton
+                shouldDisplayTotal={shouldDisplayTotal}
+                tableDataSize={tableDataSize}
+                isDisabled={isDisabled}
+                clearAllClickHandler={clearAllClickHandler}
+            />
             <button className={'s-btn s-btn__danger ml6'}
                     title={'Remove all comments that are not currently visible'}
                     disabled={isDisabled}
@@ -120,59 +112,8 @@ const DashboardCommentManagementControls = (
                     }}>
                 Clear Handled
             </button>
-            {handleBackFillComments !== undefined && <div className={'flex--item'}>
-                <button
-                    className={`s-btn s-btn__muted s-btn__outlined ${pulling ? 'is-loading' : 's-btn__dropdown'} ml6`}
-                    role={'button'}
-                    title={'Manually fetch comments from previous hours'}
-                    // Only support opening popover when not pulling data
-                    {...!pulling && {
-                        'aria-controls': popOverId,
-                        'data-controller': 's-popover',
-                        'data-action': 's-popover#toggle',
-                        'data-s-popover-placement': 'bottom-start',
-                        'data-s-popover-toggle-class': 'is-selected'
-                    }}>
-                    Pull Comments
-                </button>
-                <div id={popOverId} className={'s-popover ws0 px1 py4'}>
-                    <div className={'s-popover--arrow s-popover--arrow__tc'}/>
-                    <ul className={'s-menu'} role={'menu'}>
-                        {Array.from(
-                            {length: 12}, // Only support up to 12 hours back (avoid pulling too many comments)
-                            (_, i) => {
-                                const v = i + 1;
-                                return <li role={'menuitem'} key={v}>
-                                    <button className={'s-block-link'}
-                                            role={'button'}
-                                            aria-controls={popOverId}
-                                            data-controller={'s-popover'}
-                                            data-action={'s-popover#toggle'} // Supports Close on click
-                                            onClick={(ev) => {
-                                                ev.preventDefault();
-                                                if (!pulling) { // Don't allow double pulling
-                                                    setPulling(true);
-                                                    // Pull down (convert hours to milliseconds)
-                                                    handleBackFillComments(v * 60 * 60 * 1000).finally(() => {
-                                                        setPulling(false);
-                                                    });
-                                                }
-                                                ev.currentTarget.blur();
-                                            }}>
-                                        {strFmtHours(v)}
-                                    </button>
-                                </li>;
-                            }
-                        )}
-                    </ul>
-                </div>
-            </div>}
-            {remainingFlagCount !== undefined &&
-                <div className={'flex--item ml-auto fc-light'}>
-                    <span title={'The data is updated infrequently the number of flags may be inaccurate'}>
-                        You have {remainingFlagCount} flags left today
-                    </span>
-                </div>}
+            <BackFillCommentsButtonAndPopover handleBackFillComments={handleBackFillComments}/>
+            <RemainingFlagCountSpan remainingFlagCount={remainingFlagCount}/>
         </div>
     );
 };
