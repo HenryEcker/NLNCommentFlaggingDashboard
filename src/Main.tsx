@@ -62,7 +62,6 @@ function UserScript(): void {
                     },
                 },
                 'Dashboard Control Settings': {
-
                     'POST_TYPE': {
                         'label': 'Types of post to consider',
                         'type': 'select',
@@ -99,8 +98,8 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-                    'UI_DISPLAY_POST_TYPE': {
-                        'label': 'Display Type of Post the comment is under: ',
+                    'UI_DISPLAY_POST_COMMENTS': {
+                        'label': 'Display ID of Post the comment is under and enable comments-on-post modal: ',
                         'type': 'checkbox',
                         'default': true
                     },
@@ -121,14 +120,13 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-
-                    'UI_DISPLAY_POST_COMMENTS': {
-                        'label': 'Display ID of Post the comment is under and enable comments-on-post modal: ',
+                    'UI_DISPLAY_POST_INDEX': {
+                        'label': 'Show comment order and number of comments on the Post: ',
                         'type': 'checkbox',
                         'default': true
                     },
-                    'UI_DISPLAY_POST_INDEX': {
-                        'label': 'Show comment order and number of comments on the Post: ',
+                    'UI_DISPLAY_POST_TYPE': {
+                        'label': 'Display Type of Post the comment is under: ',
                         'type': 'checkbox',
                         'default': true
                     },
