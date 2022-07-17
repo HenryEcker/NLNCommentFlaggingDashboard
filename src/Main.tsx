@@ -1,7 +1,7 @@
 import FlaggingDashboard from './UI/Dashboard/FlaggingDashboard';
 import {Toast} from './UI/Toast/Toast';
 import {SettingsController} from './UI/Settings/Controller/SettingsController';
-import React from 'react';
+import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import {DashboardCommentTableDisplaySettings} from './UI/Dashboard/DashboardTypes';
 import {StackExchangeAPI} from './Types';
@@ -93,6 +93,11 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
+                    'UI_DISPLAY_BACK_FILL_BUTTON': {
+                        'label': 'Display Select Dropdown and button to pull comments from previous hours: ',
+                        'type': 'checkbox',
+                        'default': false
+                    },
                     'UI_DISPLAY_COMMENT_OWNER': {
                         'label': 'Display display name of Comment author and enable comments-by-author modal',
                         'type': 'checkbox',
@@ -108,25 +113,15 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-                    'UI_DISPLAY_BACK_FILL_BUTTON': {
-                        'label': 'Display Select Dropdown and button to pull comments from previous hours: ',
-                        'type': 'checkbox',
-                        'default': false
-                    },
                 },
                 'Table Display Settings': {
-                    'TOTAL_NUMBER_OF_POSTS_IN_MEMORY': {
-                        'label': 'Display total number of comments in memory: ',
+                    'UI_DISPLAY_POST_TYPE': {
+                        'label': 'Display Type of Post the comment is under: ',
                         'type': 'checkbox',
                         'default': true
                     },
                     'UI_DISPLAY_POST_INDEX': {
                         'label': 'Show comment order and number of comments on the Post: ',
-                        'type': 'checkbox',
-                        'default': true
-                    },
-                    'UI_DISPLAY_POST_TYPE': {
-                        'label': 'Display Type of Post the comment is under: ',
                         'type': 'checkbox',
                         'default': true
                     },
@@ -150,11 +145,6 @@ function UserScript(): void {
                         'type': 'checkbox',
                         'default': true
                     },
-                    'UI_DISPLAY_REMAINING_FLAGS': {
-                        'label': 'Display remaining flags (updated after flagging): ',
-                        'type': 'checkbox',
-                        'default': true
-                    },
                     'UI_DISPLAY_COMMENT_DELETE_STATE': {
                         'label': 'Display If comment was deleted or not: ',
                         'type': 'checkbox',
@@ -162,6 +152,16 @@ function UserScript(): void {
                     },
                 },
                 'UI Settings': {
+                    'TOTAL_NUMBER_OF_POSTS_IN_MEMORY': {
+                        'label': 'Display total number of comments in memory: ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
+                    'UI_DISPLAY_REMAINING_FLAGS': {
+                        'label': 'Display remaining flags (updated after flagging): ',
+                        'type': 'checkbox',
+                        'default': true
+                    },
                     'DOCUMENT_TITLE_SHOULD_UPDATE': {
                         'label': 'Update Title with number of pending comments for review: ',
                         'type': 'checkbox',
@@ -177,21 +177,19 @@ function UserScript(): void {
     const apiKey: string = settingController.get('KEY') as string;
     const needsAuth = !accessToken || !apiKey;
 
-    const settingsContainer = document.createElement('div');
+    const settingsContainer = document.createElement('li');
     settingsContainer.id = 'nln-dashboard-settings-mount-point';
-    const li = document.createElement('li');
-    li.append(settingsContainer);
-    $('header ol.s-topbar--content > li:nth-child(2)').after(li);
+    $('header ol.s-topbar--content > li:nth-child(2)').after(settingsContainer);
     createRoot(
         settingsContainer,
         {identifierPrefix: 'nln-settings-'}
     ).render(
-        <React.StrictMode>
+        <StrictMode>
             <SettingsUserInterface
                 settings={settingController}
                 needsAuth={needsAuth}
             />
-        </React.StrictMode>
+        </StrictMode>
     );
 
     if (needsAuth) {
@@ -233,7 +231,7 @@ function UserScript(): void {
             container,
             {identifierPrefix: 'nln-dashboard-'}
         ).render(
-            <React.StrictMode>
+            <StrictMode>
                 <FlaggingDashboard
                     authStr={authStr}
                     apiRequestRate={apiRequestRate}
@@ -242,7 +240,7 @@ function UserScript(): void {
                     dashboardCommentDisplaySettings={dashboardCommentDisplaySettings}
                     toaster={toaster}
                 />
-            </React.StrictMode>
+            </StrictMode>
         );
     }
 }

@@ -242,10 +242,11 @@ const SettingsUserInterface = ({settings, needsAuth}: { settings: SettingsContro
         <div data-controller={'s-modal'} className={'w100 h100'}>
             <button
                 id={settingsButtonId}
+                aria-label={'NLN Comment Flagging Dashboard Settings'}
                 className={'s-topbar--item s-btn w100 h100'}
                 type={'button'}
                 data-action={'s-modal#show'}
-                title={'NLN Comment Flagging Dashboard Settings'}>
+                title={'Configure NLN Comment Flagging Dashboard Settings'}>
                 <svg aria-hidden={'true'}
                      className={'svg-icon iconGear'}
                      width={'20'}
