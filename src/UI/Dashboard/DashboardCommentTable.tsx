@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useId, useState} from 'react';
+import {useCallback, useEffect, useId, useMemo, useState} from 'react';
 import {Comment, StackExchangeAPI} from '../../Types';
 import {capitalise, displayFormatRegExpMatchArray, formatPercentage} from '../../Utils';
 import {DashboardCommentTableDisplaySettings, TableData} from './DashboardTypes';
@@ -104,6 +104,19 @@ const DashboardCommentTable = (
         }
     }, [modalData]);
 
+    // Memoise these potentially expensive operations
+    const numberOfPinnedComments = useMemo(() => {
+        return Object.values(tableData).filter(c => c?.pinned).length;
+    }, [tableData]);
+
+    const filteredSortedComments = useMemo(() => {
+        return Object.values(tableData)
+            .filter(shouldRenderRow)
+            .sort((a: Comment, b: Comment): number => {
+                return a.post_id - b.post_id || a._id - b._id;
+            });
+    }, [tableData, shouldRenderRow]);
+
 
     return (
         // Only build Modal if is not already modal
@@ -175,7 +188,7 @@ const DashboardCommentTable = (
                 <thead>
                 <tr>
                     <DashboardPinTh
-                        numberOfPinnedComments={Object.values(tableData).filter(c => c?.pinned).length}/>
+                        numberOfPinnedComments={numberOfPinnedComments}/>
                     <th>Comment Text</th>
                     {displaySettings['UI_DISPLAY_COMMENT_OWNER'] && <th>Author</th>}
                     {displaySettings['UI_DISPLAY_POST_TYPE'] && <th>Post Type</th>}
@@ -192,11 +205,7 @@ const DashboardCommentTable = (
                 </thead>
                 <tbody>
                 {
-                    Object.values(tableData)
-                        .filter(shouldRenderRow)
-                        .sort((a: Comment, b: Comment): number => {
-                            return a.post_id - b.post_id || a._id - b._id;
-                        })
+                    filteredSortedComments
                         .map((comment: Comment, index: number) => {
                             return (
                                 <tr key={comment._id}>

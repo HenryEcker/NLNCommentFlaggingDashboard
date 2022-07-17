@@ -69,7 +69,6 @@ const SettingSelect = (
         textLabel: string;
     }
 ): JSX.Element => {
-    const value = configurableSettings[settingKey];
     const settingConfig = settings.getConfigProfile(settingKey) as SelectFieldConfig;
     const id = useId();
     return (
@@ -78,7 +77,7 @@ const SettingSelect = (
             <div className={'flex--item s-select'}>
                 <select
                     id={id}
-                    value={value}
+                    value={configurableSettings[settingKey]}
                     onChange={ev => {
                         setConfigurableSettings(oldConfigurableSettings => {
                             return {
@@ -114,7 +113,6 @@ const SettingCheckbox = (
         textLabel: string;
     }
 ): JSX.Element => {
-    const value = configurableSettings[settingKey];
     const id = useId();
     return (
         <>
@@ -124,7 +122,7 @@ const SettingCheckbox = (
                     id={id}
                     className={'s-checkbox'}
                     type={'checkbox'}
-                    checked={value}
+                    checked={configurableSettings[settingKey]}
                     onChange={ev => {
                         setConfigurableSettings(oldConfigurableSettings => {
                             return {
@@ -195,14 +193,12 @@ const DashboardSettingsComponent = ({settings, configurableSettings, setConfigur
                 onClick={ev => {
                     ev.preventDefault();
                     setConfigurableSettings(() => {
-                        const c = {
+                        return {
                             DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
                             MAXIMUM_LENGTH_COMMENT: settings.get('MAXIMUM_LENGTH_COMMENT') as number,
                             POST_TYPE: settings.get('POST_TYPE') as PostType,
                             FILTER_WHITELIST: settings.get('FILTER_WHITELIST') as boolean
                         };
-                        console.log(c);
-                        return c;
                     });
                     ev.currentTarget.blur();
                 }}>
