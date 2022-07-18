@@ -23,7 +23,7 @@ const SettingSlider = (
 
     useEffect(() => {
         setValue(configurableSettings[settingKey]);
-    }, [configurableSettings[settingKey]]);
+    }, [setValue, configurableSettings[settingKey]]);
 
     return (
         <>

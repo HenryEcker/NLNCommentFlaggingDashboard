@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {
     AlreadyDeletedError,
     AlreadyFlaggedError,
@@ -42,8 +42,20 @@ const FlaggingDashboard = (
     }: FlaggingDashboardProps
 ): JSX.Element => {
     const [tableData, setTableData] = useState<TableData>({});
+    const tableDataSize = useMemo(() => {
+        return Object.keys(tableData).length;
+    }, [tableData]);
+
+    useEffect(() => {
+        // Prevent navigation away if there are values in the table
+        if (tableDataSize > 0) {
+            window.addEventListener('beforeunload', handlePreventPageUnload);
+        } else {
+            window.removeEventListener('beforeunload', handlePreventPageUnload);
+        }
+    }, [tableDataSize]);
+
     const [seenCommentIds,] = useState<Set<number>>(new Set<number>());
-    const [tableDataSize, setTableDataSize] = useState<number>(0);
     const [configurableSettings, setConfigurableSettings] = useState<ConfigurableSettings>({
         DISPLAY_CERTAINTY: settings.get('DISPLAY_CERTAINTY') as number,
         MAXIMUM_LENGTH_COMMENT: settings.get('MAXIMUM_LENGTH_COMMENT') as number,
@@ -63,7 +75,7 @@ const FlaggingDashboard = (
                 // Pass (It doesn't really matter whether the flag count is updated or not)
             }
         }
-    }, [settings, setRemainingFlagCount]);
+    }, [setRemainingFlagCount]);
 
     /**
      * Handle the Flagging of the comment and update the TableData with the result
@@ -144,7 +156,7 @@ const FlaggingDashboard = (
                 };
             });
         }
-    }, [setTableData, toaster, pullDownRemainingFlagsFromFlagDialogue, setRemainingFlagCount]);
+    }, [pullDownRemainingFlagsFromFlagDialogue, setTableData, setRemainingFlagCount]);
 
 
     const processesCommentsAndUpdateTableData = useCallback((comments: IndexedAPIComment[]) => {
@@ -217,7 +229,7 @@ const FlaggingDashboard = (
         }
         window.setInterval(pullDownComments, apiRequestRate);
         // Prevent accidental navigation away
-    }, [settings, apiRequestRate, authStr, setTableData, seenCommentIds]);
+    }, [setTableData, seenCommentIds]);
 
 
     const handleBackFillComments = useCallback(async (offsetInMilliseconds: number) => {
@@ -232,18 +244,6 @@ const FlaggingDashboard = (
         }
     }, [processesCommentsAndUpdateTableData]);
 
-    useEffect(() => {
-        // Get Size of Table based on Keys
-        const tds = Object.keys(tableData).length;
-        // Prevent navigation away if there are values in the table
-        if (tds > 0) {
-            window.addEventListener('beforeunload', handlePreventPageUnload);
-        } else {
-            window.removeEventListener('beforeunload', handlePreventPageUnload);
-        }
-        // Update Size Value
-        setTableDataSize(tds);
-    }, [tableData]);
 
     /**
      * Determine if row should be rendered or not
@@ -258,6 +258,13 @@ const FlaggingDashboard = (
             comment.body_markdown_length <= configurableSettings.MAXIMUM_LENGTH_COMMENT &&
             comment.noise_ratio >= configurableSettings.DISPLAY_CERTAINTY;
     }, [configurableSettings]);
+
+    /**
+     * Determine if row has already been handled
+     */
+    const commentWasHandled = useCallback((comment: Comment): boolean => {
+        return !comment.can_flag || comment?.was_flagged === true || comment?.was_deleted === true;
+    }, []);
 
     /**
      * Handle removing a comment from table
@@ -313,7 +320,7 @@ const FlaggingDashboard = (
                 }
             };
         });
-    }, [setTableData]);
+    }, [setTableData, handleFlagComment]);
 
     /**
      * Update Page Title based on number of visible and actionable comments
@@ -321,7 +328,7 @@ const FlaggingDashboard = (
     useEffect(() => {
         if (settings.get('DOCUMENT_TITLE_SHOULD_UPDATE')) {
             const pending = Object.values(tableData).reduce((acc, comment) => {
-                if (shouldRenderRow(comment) && comment.can_flag && !comment.was_flagged) {
+                if (shouldRenderRow(comment) && !commentWasHandled(comment)) {
                     return acc + 1;
                 } else {
                     return acc;
@@ -335,7 +342,7 @@ const FlaggingDashboard = (
             }
             document.title = title;
         }
-    }, [settings, shouldRenderRow, tableData]);
+    }, [shouldRenderRow, tableData]);
 
     return (
         <div className={styles['comment-wrapper']}>
@@ -348,12 +355,14 @@ const FlaggingDashboard = (
                                                 tableDataSize={tableDataSize}
                                                 shouldDisplayTotal={settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') as boolean}
                                                 shouldRenderRow={shouldRenderRow}
+                                                commentWasHandled={commentWasHandled}
                                                 remainingFlagCount={remainingFlagCount}
                                                 handleBackFillComments={settings.get('UI_DISPLAY_BACK_FILL_BUTTON') ? handleBackFillComments : undefined}
             />
             <DashboardCommentTable displaySettings={dashboardCommentDisplaySettings}
                                    tableData={tableData}
                                    shouldRenderRow={shouldRenderRow}
+                                   commentWasHandled={commentWasHandled}
                                    handleEnqueueComment={handleEnqueueComment}
                                    handleRemoveComment={handleRemoveComment}
                                    handlePinComment={handlePinComment}

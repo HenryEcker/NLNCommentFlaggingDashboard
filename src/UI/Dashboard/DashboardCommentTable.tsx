@@ -67,6 +67,7 @@ interface DashboardCommentTableProps {
     displaySettings: DashboardCommentTableDisplaySettings;
     tableData: TableData;
     shouldRenderRow: (c: Comment) => boolean;
+    commentWasHandled: (c: Comment) => boolean;
     handleEnqueueComment: (comment_id: number) => void;
     handleRemoveComment: (comment_id: number) => void;
     handlePinComment: (comment_id: number, pinStatus: boolean) => void;
@@ -78,6 +79,7 @@ const DashboardCommentTable = (
         displaySettings,
         tableData,
         shouldRenderRow,
+        commentWasHandled,
         handleEnqueueComment,
         handleRemoveComment,
         handlePinComment,
@@ -143,6 +145,7 @@ const DashboardCommentTable = (
                                 }
                                 tableData={tableData}
                                 shouldRenderRow={modalData.filterFunction} // Only filter by post ID nothing else
+                                commentWasHandled={commentWasHandled}
                                 handleEnqueueComment={handleEnqueueComment}
                                 handleRemoveComment={handleRemoveComment}
                                 handlePinComment={handlePinComment}
@@ -329,7 +332,7 @@ const DashboardCommentTable = (
                                             title={'Click to remove this comment from the Dashboard.'}
                                             onClick={ev => {
                                                 ev.preventDefault();
-                                                if (comment?.pinned === true) {
+                                                if (comment?.pinned === true && !commentWasHandled(comment)) {
                                                     void StackExchange.helpers.showConfirmModal(
                                                         {
                                                             title: 'Clear pinned comment',

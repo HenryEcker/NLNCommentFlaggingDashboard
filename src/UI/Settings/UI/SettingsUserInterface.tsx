@@ -224,7 +224,7 @@ const SettingsUserInterface = ({settings, needsAuth}: { settings: SettingsContro
         }
         settings.reload();
         setFormConfigs(settings.getActiveConfig());
-    }, [setFormConfigs, settings]);
+    }, [setFormConfigs]);
 
     useEffect(() => {
         window.addEventListener('s-modal:hide', (ev: SModalEvent): void => {

@@ -13,6 +13,7 @@ interface DashboardCommentManagementControlsProps {
     tableDataSize: number;
     shouldDisplayTotal: boolean;
     shouldRenderRow: (c: Comment) => boolean;
+    commentWasHandled: (c: Comment) => boolean;
     remainingFlagCount: number | undefined;
     handleBackFillComments: undefined | ((c: number) => Promise<void>);
 }
@@ -23,6 +24,7 @@ const DashboardCommentManagementControls = (
         tableDataSize,
         shouldDisplayTotal,
         shouldRenderRow,
+        commentWasHandled,
         remainingFlagCount,
         handleBackFillComments
     }: DashboardCommentManagementControlsProps
@@ -101,10 +103,9 @@ const DashboardCommentManagementControls = (
                         setTableData(oldTableData => {
                             const newTableData: TableData = {};
                             for (const [commentId, comment] of Object.entries(oldTableData) as unknown as [number, Comment][]) {
-                                if (!comment.can_flag || comment?.was_flagged || comment?.was_deleted) {
-                                    continue;
+                                if (!commentWasHandled(comment)) {
+                                    newTableData[commentId] = {...comment};
                                 }
-                                newTableData[commentId] = {...comment};
                             }
                             return newTableData;
                         });
