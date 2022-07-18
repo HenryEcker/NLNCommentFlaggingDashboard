@@ -20,20 +20,7 @@ import DashboardHeader from './DashboardHeader';
 import globalFlagQueue from './FlagQueue/FlagQueue';
 import {ConfigurableSettings, FlaggingDashboardProps, TableData} from './DashboardTypes';
 import styles from './FlaggingDashboard.module.scss';
-
-
-const postTypeFilter = (configPostType: PostType, postType: PostType): boolean => {
-    if (configPostType === 'all') {
-        return true;
-    } else {
-        return configPostType === postType;
-    }
-};
-
-const handlePreventPageUnload = (ev: BeforeUnloadEvent): void => {
-    ev.preventDefault();
-    ev.returnValue = '';
-};
+import {commentWasHandled, handlePreventPageUnload, postTypeFilter} from './DashboardUtils';
 
 
 const FlaggingDashboard = (
@@ -260,13 +247,6 @@ const FlaggingDashboard = (
     }, [configurableSettings]);
 
     /**
-     * Determine if row has already been handled
-     */
-    const commentWasHandled = useCallback((comment: Comment): boolean => {
-        return !comment.can_flag || comment?.was_flagged === true || comment?.was_deleted === true;
-    }, []);
-
-    /**
      * Handle removing a comment from table
      */
     const handleRemoveComment = useCallback((commentId: number) => {
@@ -355,14 +335,12 @@ const FlaggingDashboard = (
                                                 tableDataSize={tableDataSize}
                                                 shouldDisplayTotal={settings.get('TOTAL_NUMBER_OF_POSTS_IN_MEMORY') as boolean}
                                                 shouldRenderRow={shouldRenderRow}
-                                                commentWasHandled={commentWasHandled}
                                                 remainingFlagCount={remainingFlagCount}
                                                 handleBackFillComments={settings.get('UI_DISPLAY_BACK_FILL_BUTTON') ? handleBackFillComments : undefined}
             />
             <DashboardCommentTable displaySettings={dashboardCommentDisplaySettings}
                                    tableData={tableData}
                                    shouldRenderRow={shouldRenderRow}
-                                   commentWasHandled={commentWasHandled}
                                    handleEnqueueComment={handleEnqueueComment}
                                    handleRemoveComment={handleRemoveComment}
                                    handlePinComment={handlePinComment}

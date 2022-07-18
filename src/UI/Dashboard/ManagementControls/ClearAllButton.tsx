@@ -1,4 +1,5 @@
-import {memo} from 'react';
+import {memo, useMemo} from 'react';
+import {buildClearCommentFragment} from '../DashboardUtils';
 
 const ClearAllButton = (
     {
@@ -14,9 +15,14 @@ const ClearAllButton = (
     }
 ) => {
     if (shouldDisplayTotal) {
+        // Only needed when displaying the total
+        const clearAllTitleFragment = useMemo(() => {
+            return buildClearCommentFragment(tableDataSize);
+        }, [tableDataSize]);
+
         return (
             <button className={'s-btn s-btn__danger s-btn__filled s-btn--badge'}
-                    title={`Clear all ${tableDataSize} comment${tableDataSize === 1 ? '' : 's'} in the dashboard (excluding filters)`}
+                    title={`Clear ${clearAllTitleFragment} in the dashboard (does not consider filters)`}
                     disabled={isDisabled}
                     onClick={clearAllClickHandler}>
                 Clear All <span className={'s-btn--badge'}>
@@ -27,6 +33,7 @@ const ClearAllButton = (
     } else {
         return (
             <button className={'s-btn s-btn__danger s-btn__filled'}
+                    title={'Clear all comments in the dashboard (does not consider filters)'}
                     disabled={isDisabled}
                     onClick={clearAllClickHandler}>
                 Clear All

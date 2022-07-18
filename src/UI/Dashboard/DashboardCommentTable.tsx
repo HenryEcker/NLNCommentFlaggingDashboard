@@ -2,6 +2,7 @@ import {useCallback, useEffect, useId, useMemo, useState} from 'react';
 import {Comment, StackExchangeAPI} from '../../Types';
 import {capitalise, displayFormatRegExpMatchArray, formatPercentage} from '../../Utils';
 import {DashboardCommentTableDisplaySettings, TableData} from './DashboardTypes';
+import {commentWasHandled} from './DashboardUtils';
 
 declare const StackExchange: StackExchangeAPI;
 
@@ -67,7 +68,6 @@ interface DashboardCommentTableProps {
     displaySettings: DashboardCommentTableDisplaySettings;
     tableData: TableData;
     shouldRenderRow: (c: Comment) => boolean;
-    commentWasHandled: (c: Comment) => boolean;
     handleEnqueueComment: (comment_id: number) => void;
     handleRemoveComment: (comment_id: number) => void;
     handlePinComment: (comment_id: number, pinStatus: boolean) => void;
@@ -79,7 +79,6 @@ const DashboardCommentTable = (
         displaySettings,
         tableData,
         shouldRenderRow,
-        commentWasHandled,
         handleEnqueueComment,
         handleRemoveComment,
         handlePinComment,
@@ -145,7 +144,6 @@ const DashboardCommentTable = (
                                 }
                                 tableData={tableData}
                                 shouldRenderRow={modalData.filterFunction} // Only filter by post ID nothing else
-                                commentWasHandled={commentWasHandled}
                                 handleEnqueueComment={handleEnqueueComment}
                                 handleRemoveComment={handleRemoveComment}
                                 handlePinComment={handlePinComment}

@@ -4,6 +4,7 @@ import {TableData} from '../DashboardTypes';
 import ClearAllButton from './ClearAllButton';
 import RemainingFlagCountSpan from './RemainingFlagCountSpan';
 import BackFillCommentsButtonAndPopover from './BackFillCommentsButtonAndPopover';
+import {buildClearCommentFragment, commentWasHandled} from '../DashboardUtils';
 
 
 declare const StackExchange: StackExchangeAPI;
@@ -13,7 +14,6 @@ interface DashboardCommentManagementControlsProps {
     tableDataSize: number;
     shouldDisplayTotal: boolean;
     shouldRenderRow: (c: Comment) => boolean;
-    commentWasHandled: (c: Comment) => boolean;
     remainingFlagCount: number | undefined;
     handleBackFillComments: undefined | ((c: number) => Promise<void>);
 }
@@ -24,7 +24,6 @@ const DashboardCommentManagementControls = (
         tableDataSize,
         shouldDisplayTotal,
         shouldRenderRow,
-        commentWasHandled,
         remainingFlagCount,
         handleBackFillComments
     }: DashboardCommentManagementControlsProps
@@ -36,7 +35,7 @@ const DashboardCommentManagementControls = (
         void StackExchange.helpers.showConfirmModal(
             {
                 title: 'Clear All Comments From Dashboard',
-                bodyHtml: '<span>Are you sure you want to remove all comments from the dashboard? (this cannot be undone)</span>',
+                bodyHtml: `<span>Are you sure you want to remove ${buildClearCommentFragment(tableDataSize)} from the dashboard? (this cannot be undone)</span>`,
                 buttonLabel: 'Clear All',
             }
         ).then((confirm: boolean) => {
@@ -54,7 +53,7 @@ const DashboardCommentManagementControls = (
             }
         });
         ev.currentTarget.blur();
-    }, [setTableData]);
+    }, [setTableData, tableDataSize]);
 
     const clearHiddenClickHandler = useCallback((ev: React.MouseEvent<HTMLButtonElement>) => {
         ev.preventDefault();
