@@ -1,9 +1,12 @@
 import {flagRateLimit} from '../../../GlobalVars';
 
-type FlagQueueEntry = () => Promise<void>;
+interface FlagQueueEntry {
+    id: number;
+    task: () => Promise<void>;
+}
 
 class FlagQueue {
-    private readonly queue: FlagQueueEntry[];
+    private queue: FlagQueueEntry[];
     private readonly queueDelayInSeconds: number;
     private handlerIsActive: boolean;
 
@@ -13,8 +16,8 @@ class FlagQueue {
         this.handlerIsActive = false;
     }
 
-    enqueue = (cb: FlagQueueEntry) => {
-        this.queue.push(cb);
+    enqueue = (fqe: FlagQueueEntry) => {
+        this.queue.push(fqe);
         // Prevents multiple instances of handleQueue from running
         if (!this.handlerIsActive) {
             this.handlerIsActive = true;
@@ -22,12 +25,16 @@ class FlagQueue {
         }
     };
 
+    removeFromQueue = (id: number) => {
+        this.queue = this.queue.filter(fqe => fqe.id != id);
+    };
+
     handleQueue = async () => {
         if (this.queue.length > 0) {
             this.handlerIsActive = true;
-            const cb = this.queue.shift();
-            if (cb !== undefined) {
-                await cb();
+            const fqe = this.queue.shift();
+            if (fqe !== undefined) {
+                await fqe.task();
                 const nextTime = new Date();
                 // setSeconds does wrap appropriately
                 nextTime.setSeconds(nextTime.getSeconds() + this.queueDelayInSeconds);

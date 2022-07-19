@@ -281,14 +281,16 @@ const FlaggingDashboard = (
     }, [setTableData]);
 
     /**
-     * Update comment in table to be enqueued (creates spinner effect)
-     * Also setTimeout to handle the flag
+     * Add flag to global flag queue
+     * Also update comment in table to be enqueued (creates spinner effect)
      */
     const handleEnqueueComment = useCallback((commentId: number) => {
         setTableData(oldTableData => {
-            // Set Timeout to Handle Flag after time based on number of pending flags
-            globalFlagQueue.enqueue(() => {
-                return handleFlagComment(commentId);
+            globalFlagQueue.enqueue({
+                id: commentId,
+                task: () => {
+                    return handleFlagComment(commentId);
+                }
             });
             // Update Table Data to show as enqueued
             return {
@@ -297,6 +299,25 @@ const FlaggingDashboard = (
                     ...oldTableData[commentId],
                     enqueued: true,
                     pinned: true // Also pin so that it stays visible in dashboard
+                }
+            };
+        });
+    }, [setTableData, handleFlagComment]);
+
+
+    /**
+     * Remove the pending task from the flagQueue
+     * also update comment in table to un-enqueue the comment
+     */
+    const handleUnqueueComment = useCallback((commentId: number) => {
+        setTableData(oldTableData => {
+            globalFlagQueue.removeFromQueue(commentId);
+            // Update Table Data to show it's no longer enqueued
+            return {
+                ...oldTableData,
+                [commentId]: {
+                    ...oldTableData[commentId],
+                    enqueued: false
                 }
             };
         });
@@ -342,6 +363,7 @@ const FlaggingDashboard = (
                                    tableData={tableData}
                                    shouldRenderRow={shouldRenderRow}
                                    handleEnqueueComment={handleEnqueueComment}
+                                   handleUnqueueComment={handleUnqueueComment}
                                    handleRemoveComment={handleRemoveComment}
                                    handlePinComment={handlePinComment}
                                    isModal={false}

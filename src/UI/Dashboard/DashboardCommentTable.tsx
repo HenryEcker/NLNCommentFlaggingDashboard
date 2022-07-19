@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useId, useMemo, useState} from 'react';
+import {memo, useCallback, useEffect, useId, useMemo, useState} from 'react';
 import {Comment, StackExchangeAPI} from '../../Types';
 import {capitalise, displayFormatRegExpMatchArray, formatPercentage} from '../../Utils';
 import {DashboardCommentTableDisplaySettings, TableData} from './DashboardTypes';
@@ -7,56 +7,81 @@ import {commentWasHandled} from './DashboardUtils';
 declare const StackExchange: StackExchangeAPI;
 
 
-const DashboardPinTh = ({numberOfPinnedComments}: {
-    numberOfPinnedComments: number;
-}): JSX.Element => {
-    const isSingular = numberOfPinnedComments === 1;
-    return (
-        <th>Pin&nbsp;<span
-            title={`There ${isSingular ? 'is' : 'are'} ${numberOfPinnedComments} comment${isSingular ? '' : 's'} pinned.`}>
+const DashboardPinTh = memo(
+    ({numberOfPinnedComments}: {
+        numberOfPinnedComments: number;
+    }): JSX.Element => {
+        const isSingular = numberOfPinnedComments === 1;
+        return (
+            <th>Pin&nbsp;<span
+                title={`There ${isSingular ? 'is' : 'are'} ${numberOfPinnedComments} comment${isSingular ? '' : 's'} pinned.`}>
             ({numberOfPinnedComments})
         </span>
-        </th>
-    );
-};
-
-const DashboardFlagButton = ({comment, handleEnqueueComment}: {
-    comment: Comment;
-    handleEnqueueComment: (comment_id: number) => void;
-}): JSX.Element => {
-    if (!comment.can_flag) {
-        return <td><span title={'This comment cannot be flagged'}>🚫</span></td>;
-    } else if (comment.was_flagged) {
-        return <td><span title={'This comment was flagged successfully'}>✓</span></td>;
-    } else {
-        const isEnqueued = comment?.enqueued === true;
-        return <td>
-            <button data-comment-id={comment._id}
-                    className={`s-btn ${isEnqueued ? 's-btn__outlined is-loading' : 's-btn__primary'}`}
-                    title={'Click to flag the comment as No Longer Needed'}
-                    onClick={ev => {
-                        ev.preventDefault();
-                        handleEnqueueComment(comment._id);
-                    }}
-                    disabled={isEnqueued}>
-                Flag
-            </button>
-        </td>;
+            </th>
+        );
     }
-};
+);
+DashboardPinTh.displayName = 'DashboardPinTh';
 
-const DashboardDeleteIndicator = ({comment}: { comment: Comment; }): JSX.Element => {
-    if (comment.was_deleted !== undefined) {
-        if (comment.was_deleted) {
-            return <td><span title={'This comment has been deleted.'}>✓</span></td>;
+const DashboardFlagButton = memo(
+    ({comment, handleEnqueueComment, handleUnqueueComment}: {
+        comment: Comment;
+        handleEnqueueComment: (comment_id: number) => void;
+        handleUnqueueComment: (comment_id: number) => void;
+    }): JSX.Element => {
+        if (!comment.can_flag) {
+            return <td><span title={'This comment cannot be flagged'}>🚫</span></td>;
+        } else if (comment.was_flagged) {
+            return <td><span title={'This comment was flagged successfully'}>✓</span></td>;
         } else {
-            return <td><span title={'This post has been flagged and is pending moderator evaluation'}
-                             className={'supernovabg mod-flag-indicator'}>pending</span></td>;
+            const isEnqueued = comment?.enqueued === true;
+            return <td>
+                <button data-comment-id={comment._id}
+                        className={`s-btn ${isEnqueued ? 's-btn__outlined is-loading' : 's-btn__primary'}`}
+                        title={'Click to flag the comment as No Longer Needed'}
+                        onClick={ev => {
+                            ev.preventDefault();
+                            if (isEnqueued) {
+                                // if already enqueued remove instead
+                                handleUnqueueComment(comment._id);
+                            } else {
+                                handleEnqueueComment(comment._id);
+                            }
+                        }}>
+                    Flag
+                </button>
+            </td>;
         }
-    } else {
-        return <td></td>;
+    },
+    (prevProps, nextProps) => {
+        return prevProps.handleEnqueueComment === nextProps.handleEnqueueComment &&
+            prevProps.handleUnqueueComment === nextProps.handleUnqueueComment &&
+            prevProps.comment._id === nextProps.comment._id &&
+            prevProps.comment.can_flag === nextProps.comment.can_flag &&
+            prevProps.comment.was_flagged === nextProps.comment.was_flagged &&
+            prevProps.comment.enqueued === nextProps.comment.enqueued;
     }
-};
+);
+DashboardFlagButton.displayName = 'DashboardFlagButton';
+
+const DashboardDeleteIndicator = memo(
+    ({comment}: { comment: Comment; }): JSX.Element => {
+        if (comment.was_deleted !== undefined) {
+            if (comment.was_deleted) {
+                return <td><span title={'This comment has been deleted.'}>✓</span></td>;
+            } else {
+                return <td><span title={'This post has been flagged and is pending moderator evaluation'}
+                                 className={'supernovabg mod-flag-indicator'}>pending</span></td>;
+            }
+        } else {
+            return <td></td>;
+        }
+    },
+    (prevProps, nextProps) => {
+        return prevProps.comment.was_deleted === nextProps.comment.was_deleted;
+    }
+);
+DashboardDeleteIndicator.displayName = 'DashboardDeleteIndicator';
 
 interface ModalDataType {
     filterFunction: (c: Comment) => boolean;
@@ -69,6 +94,7 @@ interface DashboardCommentTableProps {
     tableData: TableData;
     shouldRenderRow: (c: Comment) => boolean;
     handleEnqueueComment: (comment_id: number) => void;
+    handleUnqueueComment: (comment_id: number) => void;
     handleRemoveComment: (comment_id: number) => void;
     handlePinComment: (comment_id: number, pinStatus: boolean) => void;
     isModal: boolean;
@@ -80,6 +106,7 @@ const DashboardCommentTable = (
         tableData,
         shouldRenderRow,
         handleEnqueueComment,
+        handleUnqueueComment,
         handleRemoveComment,
         handlePinComment,
         isModal
@@ -145,6 +172,7 @@ const DashboardCommentTable = (
                                 tableData={tableData}
                                 shouldRenderRow={modalData.filterFunction} // Only filter by post ID nothing else
                                 handleEnqueueComment={handleEnqueueComment}
+                                handleUnqueueComment={handleUnqueueComment}
                                 handleRemoveComment={handleRemoveComment}
                                 handlePinComment={handlePinComment}
                                 isModal={true}
@@ -319,7 +347,8 @@ const DashboardCommentTable = (
                                     </td>}
                                     {displaySettings['UI_DISPLAY_FLAG_BUTTON'] &&
                                         <DashboardFlagButton comment={comment}
-                                                             handleEnqueueComment={handleEnqueueComment}/>
+                                                             handleEnqueueComment={handleEnqueueComment}
+                                                             handleUnqueueComment={handleUnqueueComment}/>
                                     }
                                     {displaySettings['UI_DISPLAY_COMMENT_DELETE_STATE'] &&
                                         <DashboardDeleteIndicator comment={comment}/>
